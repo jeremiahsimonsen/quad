@@ -38,8 +38,8 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
 #include "stm32f4xx_it.h"
+#include "stm32f4xx_hal.h"
    
 /** @addtogroup STM32F4xx_HAL_Examples
   * @{
@@ -54,7 +54,7 @@
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 /* UART handler declared in "main.c" file */
-extern UART_HandleTypeDef UartHandle;
+//extern UART_HandleTypeDef UartHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
@@ -167,7 +167,8 @@ void SysTick_Handler(void)
 /*  available peripheral interrupt handler's name please refer to the startup */
 /*  file (startup_stm32f4xx.s).                                               */
 /******************************************************************************/
-
+#define USE_UART_H
+#ifndef USE_UART_H
 /**
   * @brief  This function handles DMA RX interrupt request.  
   * @param  None
@@ -197,7 +198,7 @@ void USARTx_IRQHandler(void)
 {
   HAL_UART_IRQHandler(&UartHandle);
 }
-
+#endif
 /**
   * @brief  This function handles PPP interrupt request.
   * @param  None

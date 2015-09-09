@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "diag/Trace.h"
-#include "main.h"
+#include "stm32f4xx_hal.h"
+#include "stm32f4_discovery.h"
+#include "uart.h"
 
 // ----------------------------------------------------------------------------
 //
@@ -15,9 +17,13 @@
 //
 // ----------------------------------------------------------------------------
 
-/* UART handler declaration */
-UART_HandleTypeDef UartHandle;
-__IO ITStatus UartReady = RESET;
+/* Size of Transmission buffer */
+#define TXBUFFERSIZE                     (COUNTOF(aTxBuffer) - 1)
+/* Size of Reception buffer */
+#define RXBUFFERSIZE                     TXBUFFERSIZE
+
+/* Exported macro ------------------------------------------------------------*/
+#define COUNTOF(__BUFFER__)   (sizeof(__BUFFER__) / sizeof(*(__BUFFER__)))
 
 /* Buffer used for transmission */
 uint8_t aTxBuffer[] = " ****UART_TwoBoards communication based on DMA****  ****UART_TwoBoards communication based on DMA****  ****UART_TwoBoards communication based on DMA**** ";
@@ -29,6 +35,8 @@ uint8_t aRxBuffer[RXBUFFERSIZE];
 static void Error_Handler(void);
 
 /* Private functions ---------------------------------------------------------*/
+
+#define USE_UART_H
 
 /**
   * @brief  Main program
@@ -52,31 +60,7 @@ int main(void)
   BSP_LED_Init(LED5);
   BSP_LED_Init(LED6);
 
-  /* Configure the system clock to 168 MHz */
-  //SystemClock_Config();
-
-  /*##-1- Configure the UART peripheral ######################################*/
-  /* Put the USART peripheral in the Asynchronous mode (UART Mode) */
-  /* UART1 configured as follow:
-      - Word Length = 8 Bits
-      - Stop Bit = One Stop bit
-      - Parity = None
-      - BaudRate = 9600 baud
-      - Hardware flow control disabled (RTS and CTS signals) */
-  UartHandle.Instance          = USARTx;
-
-  UartHandle.Init.BaudRate     = 9600;
-  UartHandle.Init.WordLength   = UART_WORDLENGTH_8B;
-  UartHandle.Init.StopBits     = UART_STOPBITS_1;
-  UartHandle.Init.Parity       = UART_PARITY_NONE;
-  UartHandle.Init.HwFlowCtl    = UART_HWCONTROL_NONE;
-  UartHandle.Init.Mode         = UART_MODE_TX_RX;
-  UartHandle.Init.OverSampling = UART_OVERSAMPLING_16;
-
-  if(HAL_UART_Init(&UartHandle) != HAL_OK)
-  {
-    Error_Handler();
-  }
+  init_USART(2,2);
 
   /* Configure USER Button */
   BSP_PB_Init(BUTTON_KEY, BUTTON_MODE_GPIO);
@@ -97,38 +81,7 @@ int main(void)
   /* Turn LED3 off */
   BSP_LED_Off(LED3);
 
-  /* The board sends the message and expects to receive it back */
-
-  /*##-2- Start the transmission process #####################################*/
-  /* While the UART in reception process, user can transmit data through
-     "aTxBuffer" buffer */
-  if(HAL_UART_Transmit_DMA(&UartHandle, (uint8_t*)aTxBuffer, TXBUFFERSIZE)!= HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  /*##-3- Wait for the end of the transfer ###################################*/
-  while (UartReady != SET)
-  {
-  }
-
-  /* Reset transmission flag */
-  UartReady = RESET;
-
-  /*##-4- Put UART peripheral in reception process ###########################*/
-  if(HAL_UART_Receive_DMA(&UartHandle, (uint8_t *)aRxBuffer, RXBUFFERSIZE) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-
-  /*##-5- Wait for the end of the transfer ###################################*/
-  while (UartReady != SET)
-  {
-  }
-
-  /* Reset transmission flag */
-  UartReady = RESET;
+  usart_transmit(aTxBuffer);
 
   /* Infinite loop */
   while (1)
@@ -136,56 +89,8 @@ int main(void)
   }
 }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-
-/**
-  * @brief  Tx Transfer completed callback
-  * @param  UartHandle: UART handle.
-  * @note   This example shows a simple way to report end of DMA Tx transfer, and
-  *         you can add your own implementation.
-  * @retval None
-  */
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
-{
-  /* Set transmission flag: transfer complete */
-  UartReady = SET;
-
-  /* Turn LED6 on: Transfer in transmission process is correct */
-  BSP_LED_On(LED6);
-}
-
-/**
-  * @brief  Rx Transfer completed callback
-  * @param  UartHandle: UART handle
-  * @note   This example shows a simple way to report end of DMA Rx transfer, and
-  *         you can add your own implementation.
-  * @retval None
-  */
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-  /* Set transmission flag: transfer complete */
-  UartReady = SET;
-
-  /* Turn LED4 on: Transfer in reception process is correct */
-  BSP_LED_On(LED4);
-}
-
-/**
-  * @brief  UART error callbacks
-  * @param  UartHandle: UART handle
-  * @note   This example shows a simple way to report transfer error, and you can
-  *         add your own implementation.
-  * @retval None
-  */
-void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
-{
-  /* Turn LED3 on: Transfer error in reception/transmission process */
-  BSP_LED_On(LED3);
-}
-
-#pragma GCC diagnostic pop
-
+#if 0
+//TODO: Refactor this to error.h
 /**
   * @brief  This function is executed in case of error occurrence.
   * @param  None
@@ -199,4 +104,4 @@ static void Error_Handler(void)
   {
   }
 }
-
+#endif
