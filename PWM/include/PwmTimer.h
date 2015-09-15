@@ -117,8 +117,18 @@ enum class ApbNum {
 
 class PwmTimer {
 private:
+	// STM HAL variables
 	TIM_HandleTypeDef TimHandle;
+//	TIM_OC_InitTypeDef sConfig;
+//	TIM_TypeDef *TIMx;
+//	GPIO_TypeDef *GPIO_PORT;
+//	uint32_t GPIO_PIN;
+//	uint32_t channel;
+//	uint32_t AF;
+
+	// Convenience variables
 	TimerPin pin;
+	TimerChannel ch;
 	float frequency;
 	float pulseWidth;
 

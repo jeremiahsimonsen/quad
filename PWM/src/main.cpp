@@ -30,11 +30,12 @@
 #pragma GCC diagnostic ignored "-Wmissing-declarations"
 #pragma GCC diagnostic ignored "-Wreturn-type"
 
-int
-main(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
 	// At this stage the system clock should have already been configured
 	// at high speed.
+
+	HAL_Init();
 
 //	PwmTimer pwm1(51.5, TimerPin::PA8);
 //	PwmTimer pwm2(51.5, TimerPin::PA1);
@@ -44,9 +45,19 @@ main(int argc, char* argv[])
 //	PwmTimer pwm9(51.5, TimerPin::PE6);
 //	PwmTimer pwm12(51.5, TimerPin::PB14);
 
-	// Infinite loop
+	float w = 1.0;
+	float dir = 1.0;
+
 	while (1) {
-		// Add your code here.
+		if (w >= 2.5) dir *= -1.0f;
+		else if (w <= 0.5) dir *= -1.0f;
+		w += dir * 0.1f;
+
+		pwm4.setWidth(w);
+
+//		for (int i = 0; i < 1000; i++) {
+			// do nothing
+//		}
 	}
 }
 

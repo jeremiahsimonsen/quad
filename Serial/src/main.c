@@ -32,7 +32,7 @@ uint8_t aTxBuffer[] = " ****UART_TwoBoards communication based on DMA****  ****U
 uint8_t aRxBuffer[RXBUFFERSIZE];
 
 /* Private function prototypes -----------------------------------------------*/
-static void Error_Handler(void);
+//static void Error_Handler(void);
 
 /* Private functions ---------------------------------------------------------*/
 
