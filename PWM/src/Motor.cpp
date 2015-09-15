@@ -40,5 +40,5 @@ float Motor::getSpeed(void) {
 }
 
 float Motor::mapSpeedToPulseW(float s) {
-	return (FULL_SPEED_WIDTH / ZERO_SPEED_WIDTH) * s + ZERO_SPEED_WIDTH;
+	return (FULL_SPEED_WIDTH - ZERO_SPEED_WIDTH) * s + ZERO_SPEED_WIDTH;
 }

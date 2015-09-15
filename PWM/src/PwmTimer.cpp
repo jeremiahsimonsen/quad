@@ -149,6 +149,7 @@ void PwmTimer::initTimer(float f, float w, TimerPin p) {
 	TimHandle.Init.Prescaler = PSC;
 	TimHandle.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
 	TimHandle.Init.CounterMode = TIM_COUNTERMODE_UP;
+	TimHandle.State = HAL_TIM_STATE_RESET;
 	if (HAL_TIM_PWM_Init(&TimHandle) != HAL_OK) {
 		// TODO: Error_Handler();
 		while(1);

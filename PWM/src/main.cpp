@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include "diag/Trace.h"
 #include "PwmTimer.h"
+#include "Motor.h"
 
 // ----------------------------------------------------------------------------
 //
@@ -40,24 +41,16 @@ int main(int argc, char* argv[])
 //	PwmTimer pwm1(51.5, TimerPin::PA8);
 //	PwmTimer pwm2(51.5, TimerPin::PA1);
 //	PwmTimer pwm3(51.5, TimerPin::PA6);
-	PwmTimer pwm4(51.5, TimerPin::PB7);
-	PwmTimer pwm5(51.5, TimerPin::PA0);
+//	PwmTimer pwm4(50.0, TimerPin::PB7);
+//	PwmTimer pwm5(51.5, TimerPin::PA0);
 //	PwmTimer pwm9(51.5, TimerPin::PE6);
 //	PwmTimer pwm12(51.5, TimerPin::PB14);
 
-	float w = 1.0;
-	float dir = 1.0;
+	Motor m(TimerPin::PB7);
 
+	m.setSpeed(1.0f);
 	while (1) {
-		if (w >= 2.5) dir *= -1.0f;
-		else if (w <= 0.5) dir *= -1.0f;
-		w += dir * 0.1f;
 
-		pwm4.setWidth(w);
-
-//		for (int i = 0; i < 1000; i++) {
-			// do nothing
-//		}
 	}
 }
 
