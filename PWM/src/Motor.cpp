@@ -1,8 +1,20 @@
-/*
- * Motor.cpp
+/**
+ * @file Motor.cpp
  *
- *  Created on: Sep 11, 2015
- *      Author: Jeremiah
+ * @brief Class for controlling hobby ESCs
+ *
+ * @author Jeremiah Simonsen
+ *
+ * @date Sep 11, 2015
+ *
+ * This class abstracts the low-level PWM interface used by hobby electronic
+ * speed controllers (ESCs). It allows for simple initialization by specifying
+ * a compatible GPIO pin to the constructor.
+ *
+ * The Motor::setSpeed function takes care of calculating the necessary pulse
+ * width and calls routines in the PwmTimer class for processor-specific
+ * operations.
+ *
  */
 
 #include "Motor.h"
@@ -27,10 +39,12 @@ Motor::Motor(TimerPin p) {
 void Motor::setSpeed(float s) {
 	float w;
 
-	if (s <= 0.0) speed = 0.0;
-	else if (s >= 1.0) speed = 1.0;
+	// Only allow speeds between 0.0 and 1.0
+	if (s < 0.0) speed = 0.0;
+	else if (s > 1.0) speed = 1.0;
 	else speed = s;
 
+	// Convert speed to pulse width and configure TIM for new width
 	w = mapSpeedToPulseW(speed);
 	pwm->setWidth(w);
 }

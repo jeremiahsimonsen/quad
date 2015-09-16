@@ -1,8 +1,24 @@
-/*
- * PwmTimer.h
+/**
+ * @file PwmTimer.h
  *
- *  Created on: Sep 11, 2015
- *      Author: Jeremiah
+ * @brief Class for generating PWM waveforms on the STM32F407
+ *
+ * @author Jeremiah Simonsen
+ *
+ * @date Sep 11, 2015
+ *
+ * This class takes care of the low-level configuration required for PWM signal
+ * generation. It allows for simple initialization by specifying a compatible
+ * GPIO pin to the constructor.
+ *
+ * The default constructor PwmTimer::PwmTimer() starts PWM on PA0 with a
+ * frequency of 50 Hz and pulse width of 1 ms, consistent with the default for
+ * many hobby ESCs. The frequency and pin can be specified using the alternate
+ * constructor.
+ *
+ * The PwmTimer::setFreq() and PwmTimer::setWidth() functions adjust the PWM
+ * frequency and positive pulse width, respectively.
+ *
  */
 
 #ifndef PWMTIMER_H_
@@ -15,6 +31,9 @@
 #include "stm32f4_discovery.h"
 #include "stm32f407xx.h"
 
+/**
+ * GPIO pins that are PWM compatible
+ */
 enum class TimerPin {
 	PA0 = 0,// TIM5_CH1
 	PA1,	// TIM2_CH2
@@ -75,70 +94,90 @@ enum class TimerPin {
 	PI7		// TIM8_CH3
 };
 
+/**
+ * TIM channels for the STM32F407
+ */
 enum class TimerChannel {
-	TIM1_CH1 = 0,
-	TIM1_CH2,
-	TIM1_CH3,
-	TIM1_CH4,
-	TIM2_CH1,
-	TIM2_CH2,
-	TIM2_CH3,
-	TIM2_CH4,
-	TIM3_CH1,
-	TIM3_CH2,
-	TIM3_CH3,
-	TIM3_CH4,
-	TIM4_CH1,
-	TIM4_CH2,
-	TIM4_CH3,
-	TIM4_CH4,
-	TIM5_CH1,
-	TIM5_CH2,
-	TIM5_CH3,
-	TIM5_CH4,
-	TIM8_CH1,
-	TIM8_CH2,
-	TIM8_CH3,
-	TIM8_CH4,
-	TIM9_CH1,
-	TIM9_CH2,
-	TIM10_CH1,
-	TIM11_CH1,
-	TIM12_CH1,
-	TIM12_CH2,
-	TIM13_CH1,
-	TIM14_CH1
+	TIM1_CH1 = 0,//!< TIM1_CH1
+	TIM1_CH2,    //!< TIM1_CH2
+	TIM1_CH3,    //!< TIM1_CH3
+	TIM1_CH4,    //!< TIM1_CH4
+	TIM2_CH1,    //!< TIM2_CH1
+	TIM2_CH2,    //!< TIM2_CH2
+	TIM2_CH3,    //!< TIM2_CH3
+	TIM2_CH4,    //!< TIM2_CH4
+	TIM3_CH1,    //!< TIM3_CH1
+	TIM3_CH2,    //!< TIM3_CH2
+	TIM3_CH3,    //!< TIM3_CH3
+	TIM3_CH4,    //!< TIM3_CH4
+	TIM4_CH1,    //!< TIM4_CH1
+	TIM4_CH2,    //!< TIM4_CH2
+	TIM4_CH3,    //!< TIM4_CH3
+	TIM4_CH4,    //!< TIM4_CH4
+	TIM5_CH1,    //!< TIM5_CH1
+	TIM5_CH2,    //!< TIM5_CH2
+	TIM5_CH3,    //!< TIM5_CH3
+	TIM5_CH4,    //!< TIM5_CH4
+	TIM8_CH1,    //!< TIM8_CH1
+	TIM8_CH2,    //!< TIM8_CH2
+	TIM8_CH3,    //!< TIM8_CH3
+	TIM8_CH4,    //!< TIM8_CH4
+	TIM9_CH1,    //!< TIM9_CH1
+	TIM9_CH2,    //!< TIM9_CH2
+	TIM10_CH1,   //!< TIM10_CH1
+	TIM11_CH1,   //!< TIM11_CH1
+	TIM12_CH1,   //!< TIM12_CH1
+	TIM12_CH2,   //!< TIM12_CH2
+	TIM13_CH1,   //!< TIM13_CH1
+	TIM14_CH1    //!< TIM14_CH1
 };
 
+/**
+ * APBx options - determines f_timer
+ */
 enum class ApbNum {
-	APB1,
-	APB2
+	APB1,//!< APB1
+	APB2 //!< APB2
 };
 
 class PwmTimer {
 private:
-	// STM HAL variables
-	TIM_HandleTypeDef TimHandle;
-//	TIM_OC_InitTypeDef sConfig;
-//	TIM_TypeDef *TIMx;
-//	GPIO_TypeDef *GPIO_PORT;
-//	uint32_t GPIO_PIN;
-//	uint32_t channel;
-//	uint32_t AF;
+	TIM_HandleTypeDef TimHandle;	///< STM HAL variable containing TIM config
 
-	// Convenience variables
-	TimerPin pin;
-	TimerChannel ch;
-	float frequency;
-	float pulseWidth;
+	TimerPin pin;					///< The pin on which to generate PWM
+	TimerChannel ch;				///< The TIM and channel corresponding to the pin
+	float frequency;				///< PWM frequency in Hz
+	float pulseWidth;				///< PWM positive pulse width in ms
 
+	/**
+	 * Helper function for configuring the TIM for the given parameters
+	 * @param f PWM frequency in Hz
+	 * @param w PWM positive pulse width in ms
+	 * @param p GPIO pin to initialize
+	 */
 	void initTimer(float f, float w, TimerPin p);
 
 public:
+	/**
+	 * Default constructor initialize pin PA0 for PWM with 50 Hz and 1 ms
+	 */
 	PwmTimer();
+	/**
+	 * Initializes the specified GPIO pin, p, for PWM at the frequency, f
+	 * @param f PWM frequency in Hz
+	 * @param p PWM positive pulse width in ms
+	 */
 	PwmTimer(float f, TimerPin p);
 
+	/**
+	 * Sets the PWM frequency
+	 * @param f PWM frequency in Hz
+	 */
 	void setFreq(float f);
+	/**
+	 * Sets the PWM positive pulse width
+	 * @param w PWM positive pulse width in ms
+	 */
 	void setWidth(float w);
 };
 
