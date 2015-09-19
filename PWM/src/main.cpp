@@ -41,16 +41,33 @@ int main(int argc, char* argv[])
 //	PwmTimer pwm1(51.5, TimerPin::PA8);
 //	PwmTimer pwm2(51.5, TimerPin::PA1);
 //	PwmTimer pwm3(51.5, TimerPin::PA6);
-//	PwmTimer pwm4(50.0, TimerPin::PB7);
+	PwmTimer pwm4(50.0, TimerPin::PB7);
 //	PwmTimer pwm5(51.5, TimerPin::PA0);
 //	PwmTimer pwm9(51.5, TimerPin::PE6);
 //	PwmTimer pwm12(51.5, TimerPin::PB14);
 
-	Motor m(TimerPin::PB7);
+//	pwm4.setFreq(100.0f);
+//	pwm4.setWidth(1.5f);
 
-	m.setSpeed(1.0f);
+//	Motor m(TimerPin::PB7);
+//
+//	m.setSpeed(1.0f);
+
+	float fDir = 1.0f;
+	float wDir = 1.0f;
+	float f = 50.0f;
+	float w = ZERO_SPEED_WIDTH;
+
 	while (1) {
+		if (f < 50.0f || f > 400.0f) fDir *= -1;
+		f += 1.0f*fDir;
+		pwm4.setFreq(f);
 
+		if (w < ZERO_SPEED_WIDTH || w > FULL_SPEED_WIDTH) wDir *= -1;
+		w += 0.1f * wDir;
+		pwm4.setWidth(w);
+
+		HAL_Delay(40);
 	}
 }
 

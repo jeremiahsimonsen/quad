@@ -146,6 +146,7 @@ private:
 
 	TimerPin pin;					///< The pin on which to generate PWM
 	TimerChannel ch;				///< The TIM and channel corresponding to the pin
+	float fTimer;					///< The counting frequency of the timer
 	float frequency;				///< PWM frequency in Hz
 	float pulseWidth;				///< PWM positive pulse width in ms
 

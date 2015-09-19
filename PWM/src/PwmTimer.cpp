@@ -51,7 +51,31 @@ PwmTimer::PwmTimer(float f, TimerPin p) {
 
 // TODO: Implement this function
 void PwmTimer::setFreq(float f) {
+	frequency = f;
 
+	float fTick = 3360000.0f;
+
+	uint32_t PSC = (uint32_t) ( fTimer / fTick - 1 );
+	uint32_t ARR = (uint32_t) ( fTick / f - 1 );
+
+	// If max value is exceeded, try again
+	while (ARR > 65535) {
+		PSC++;
+		fTick = fTimer / (float)(PSC + 1);
+		ARR = (uint32_t) ( fTick / f - 1 );
+	}
+
+	// Store the TIM settings in the peripheral
+	TimHandle.Init.Period = ARR;
+	TimHandle.Init.Prescaler = PSC;
+	TimHandle.State = HAL_TIM_STATE_RESET;
+	// NOTE: Calls HAL_TIM_PWM_MspInit()
+	if (HAL_TIM_PWM_Init(&TimHandle) != HAL_OK) {
+		// TODO: Error_Handler();
+		while(1);
+	}
+
+	setWidth(pulseWidth);
 }
 
 void PwmTimer::setWidth(float w) {
@@ -95,7 +119,7 @@ void PwmTimer::initTimer(float f, float w, TimerPin p) {
 	uint16_t TimerPinToGpioPin[50] = {GPIO_PIN_0, GPIO_PIN_1, GPIO_PIN_2, GPIO_PIN_3, GPIO_PIN_6, GPIO_PIN_7, GPIO_PIN_8, GPIO_PIN_9, GPIO_PIN_10, GPIO_PIN_11,  GPIO_PIN_15, GPIO_PIN_0, GPIO_PIN_1, GPIO_PIN_3, GPIO_PIN_4, GPIO_PIN_5, GPIO_PIN_6, GPIO_PIN_7, GPIO_PIN_8, GPIO_PIN_9, GPIO_PIN_10, GPIO_PIN_11,  GPIO_PIN_14, GPIO_PIN_15, GPIO_PIN_6, GPIO_PIN_7, GPIO_PIN_8, GPIO_PIN_9, GPIO_PIN_12, GPIO_PIN_13, GPIO_PIN_14, GPIO_PIN_15, GPIO_PIN_5, GPIO_PIN_6, GPIO_PIN_9, GPIO_PIN_11, GPIO_PIN_13, GPIO_PIN_14, GPIO_PIN_6, GPIO_PIN_7, GPIO_PIN_8, GPIO_PIN_9, GPIO_PIN_10, GPIO_PIN_11, GPIO_PIN_12, GPIO_PIN_0, GPIO_PIN_2, GPIO_PIN_5, GPIO_PIN_6, GPIO_PIN_7	};
 
 	TIM_TypeDef* TimerChannelToTIM_TD[32] = {TIM1, TIM1, TIM1, TIM1, TIM2, TIM2, TIM2, TIM2, TIM3, TIM3, TIM3, TIM3, TIM4, TIM4, TIM4, TIM4, TIM5, TIM5, TIM5, TIM5, TIM8, TIM8, TIM8, TIM8, TIM9, TIM9, TIM10, TIM11, TIM12, TIM12, TIM13, TIM14};
-	uint32_t TimerChannelToCH[32] = {TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_1, TIM_CHANNEL_1, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_1, TIM_CHANNEL_1};
+//	uint32_t TimerChannelToCH[32] = {TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_1, TIM_CHANNEL_1, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_1, TIM_CHANNEL_1};
 	uint8_t TimerChannelToAF[32] = {GPIO_AF1_TIM1, GPIO_AF1_TIM1, GPIO_AF1_TIM1, GPIO_AF1_TIM1, GPIO_AF1_TIM2, GPIO_AF1_TIM2, GPIO_AF1_TIM2, GPIO_AF1_TIM2, GPIO_AF2_TIM3, GPIO_AF2_TIM3, GPIO_AF2_TIM3, GPIO_AF2_TIM3, GPIO_AF2_TIM4, GPIO_AF2_TIM4, GPIO_AF2_TIM4, GPIO_AF2_TIM4, GPIO_AF2_TIM5, GPIO_AF2_TIM5, GPIO_AF2_TIM5, GPIO_AF2_TIM5, GPIO_AF3_TIM8, GPIO_AF3_TIM8, GPIO_AF3_TIM8, GPIO_AF3_TIM8, GPIO_AF3_TIM9, GPIO_AF3_TIM9, GPIO_AF3_TIM10, GPIO_AF3_TIM11, GPIO_AF9_TIM12, GPIO_AF9_TIM12, GPIO_AF9_TIM13, GPIO_AF9_TIM14};
 
 	// Map to usable variables
@@ -104,7 +128,7 @@ void PwmTimer::initTimer(float f, float w, TimerPin p) {
 	uint16_t GPIO_PIN = TimerPinToGpioPin[(int)p];
 
 	TIM_TypeDef *TIMx = TimerChannelToTIM_TD[(int)ch];
-	uint32_t channel = TimerChannelToCH[(int)ch];
+//	uint32_t channel = TimerChannelToCH[(int)ch];
 	uint32_t AF = TimerChannelToAF[(int)ch];
 
 	// GPIO Initialization
@@ -133,7 +157,6 @@ void PwmTimer::initTimer(float f, float w, TimerPin p) {
 	HAL_GPIO_Init(GPIO_PORT, &GPIO_InitStruct);
 
 	// TIM Configuration
-	TIM_OC_InitTypeDef sConfig;
 	ApbNum apb;
 
 	// Determine which APB for f_timer calculation
@@ -156,10 +179,10 @@ void PwmTimer::initTimer(float f, float w, TimerPin p) {
 	// Calculate PSC and ARR values for given PWM frequency
 	float fTick = 3360000;
 	uint32_t SysClkFreq = HAL_RCC_GetSysClockFreq();
-	float fTimer;
-	// TODO: Refactor to HAL_GET_PCLK1()
-	if (apb == ApbNum::APB1) fTimer = (float)SysClkFreq / 2;
+
+	if (apb == ApbNum::APB1) fTimer = (float)(SysClkFreq/2);
 	else fTimer = (float)SysClkFreq;
+
 	uint32_t PSC = (uint32_t) ( fTimer / fTick - 1 );
 	uint32_t ARR = (uint32_t) ( fTick / f - 1 );
 
@@ -183,24 +206,7 @@ void PwmTimer::initTimer(float f, float w, TimerPin p) {
 		while(1);
 	}
 
-	// Channel specific settings
-	sConfig.OCMode = TIM_OCMODE_PWM1;
-	sConfig.OCPolarity = TIM_OCPOLARITY_HIGH;
-	sConfig.Pulse = (uint32_t) ( (float)(ARR + 1) * f * w * .001 - 1 );		// ccr value
-	sConfig.OCNPolarity = TIM_OCPOLARITY_HIGH;
-	sConfig.OCIdleState = TIM_OCIDLESTATE_RESET;
-	sConfig.OCFastMode = TIM_OCFAST_DISABLE;
-	sConfig.OCNIdleState = TIM_OCIDLESTATE_RESET;
-	if (HAL_TIM_PWM_ConfigChannel(&TimHandle, &sConfig, channel) != HAL_OK) {
-		// TODO: Error_Handler();
-		while(1);
-	}
-
-	// Start the PWM signal generation
-	if (HAL_TIM_PWM_Start(&TimHandle, channel) != HAL_OK) {
-		// TODO: Error_Handler();
-		while(1);
-	}
+	setWidth(1.0f);
 }
 
 /**
