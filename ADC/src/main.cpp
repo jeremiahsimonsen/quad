@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include "diag/Trace.h"
 #include "Adc.h"
+#include "Motor.h"
 
 // ----------------------------------------------------------------------------
 //
@@ -30,20 +31,27 @@
 #pragma GCC diagnostic ignored "-Wmissing-declarations"
 #pragma GCC diagnostic ignored "-Wreturn-type"
 
-int
-main(int argc, char* argv[])
+float mapAdcValToMotorSpeed(uint32_t val);
+
+int main(int argc, char* argv[])
 {
 	// At this stage the system clock should have already been configured
 	// at high speed.
 
 	Adc adc(AdcPin::PA2);
+	Motor m(TimerPin::PB7);
 
 	// Infinite loop
 	while (1)
 	{
 		uint32_t adcVal = adc.read();
-		trace_printf("%d\n",adcVal);
+		float speed = mapAdcValToMotorSpeed(adcVal);
+		m.setSpeed(speed);
 	}
+}
+
+float mapAdcValToMotorSpeed(uint32_t val) {
+	return (float)val / 4096.0f;
 }
 
 #pragma GCC diagnostic pop
