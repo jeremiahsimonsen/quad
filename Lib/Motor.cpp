@@ -21,16 +21,12 @@
 #include "PwmTimer.h"
 
 Motor::Motor() {
-	float w;
-
 	pwm = new PwmTimer();
 
 	setSpeed(0.0);
 }
 
 Motor::Motor(TimerPin p) {
-	float w;
-
 	pwm = new PwmTimer(50.0, p);
 
 	setSpeed(0.0);

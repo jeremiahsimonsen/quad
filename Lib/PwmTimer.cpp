@@ -206,7 +206,7 @@ void PwmTimer::initTimer(float f, float w, TimerPin p) {
 		while(1);
 	}
 
-	setWidth(1.0f);
+	setWidth(w);
 }
 
 /**
