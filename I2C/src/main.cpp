@@ -24,8 +24,6 @@
 #pragma GCC diagnostic ignored "-Wmissing-declarations"
 #pragma GCC diagnostic ignored "-Wreturn-type"
 
-float mapAdcValToMotorSpeed(uint32_t val);
-
 int main(int argc, char* argv[])
 {
 	// At this stage the system clock should have already been configured
@@ -42,10 +40,6 @@ int main(int argc, char* argv[])
 	{
 
 	}
-}
-
-float mapAdcValToMotorSpeed(uint32_t val) {
-	return (float)val / 4096.0f;
 }
 
 #pragma GCC diagnostic pop
