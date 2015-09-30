@@ -14,6 +14,9 @@
 
 #include "stm32f4xx_hal.h"
 #include "stm32f4_discovery.h"
+#include "I2C_Msp.h"
+
+#define I2C_USE_DMA
 
 enum class i2cPin {
 	PA8 = 0,// I2C3_SCL
@@ -34,11 +37,7 @@ enum class i2cPin {
 
 class I2C {
 private:
-	I2C_HandleTypeDef i2cHandle;
-
 	i2cPin scl, sda;
-
-	void initI2C();
 
 public:
 	I2C();

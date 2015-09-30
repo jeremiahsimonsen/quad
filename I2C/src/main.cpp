@@ -33,9 +33,9 @@ int main(int argc, char* argv[])
 
 	uint8_t slave_addr = 0b01011101;
 	I2C i2c(i2cPin::PB8, i2cPin::PB9);
+//	I2C i2c();
 
 	uint8_t on_buf[] = {0x20, 0xB0};
-	i2c.write((uint16_t)slave_addr,on_buf,2);
 
 	// Infinite loop
 	while (1)
