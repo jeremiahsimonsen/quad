@@ -13,23 +13,29 @@
 #include "stm32f4xx_hal.h"
 #include "stm32f4_discovery.h"
 
-static I2C_HandleTypeDef i2cHandle;
+I2C_HandleTypeDef i2cHandle;
 static DMA_HandleTypeDef hdma_tx;
 static DMA_HandleTypeDef hdma_rx;
 
 ///////////////////////////////////////////////////////////////////////
 //                     Function Pre-Declarations                     //
 ///////////////////////////////////////////////////////////////////////
+
+//void copyI2CHandle(I2C_HandleTypeDef &hi2c);
+
+void initI2C(int scl, int sda);
 void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c);
 void I2C1_MspInit(I2C_HandleTypeDef *hi2c);
 void I2C2_MspInit(I2C_HandleTypeDef *hi2c);
 void I2C3_MspInit(I2C_HandleTypeDef *hi2c);
 
+void deInitI2C(int scl, int sda);
 void HAL_I2C_MspDeInit(I2C_HandleTypeDef *hi2c);
 void I2C1_MspDeInit(void);
 void I2C2_MspDeInit(void);
 void I2C3_MspDeInit(void);
 
+extern "C" {
 void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c);
 void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c);
 void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c);
@@ -46,6 +52,15 @@ void I2C2_DMA_TX_IRQHandler(void);
 
 void I2C3_DMA_RX_IRQHandler(void);
 void I2C3_DMA_TX_IRQHandler(void);
+};
+
+//void copyI2CHandle(I2C_HandleTypeDef *hi2c) {
+//	hi2c = &i2cHandle;
+//}
+
+///////////////////////////////////////////////////////////////////////
+//                      Initialization Routines                      //
+///////////////////////////////////////////////////////////////////////
 
 void initI2C(int scl, int sda) {
 	GPIO_InitTypeDef GPIO_InitStruct;
@@ -112,28 +127,6 @@ void initI2C(int scl, int sda) {
 		while(1);
 	}
 }
-
-void deInitI2C(int scl, int sda) {
-	GPIO_TypeDef *i2cPinToGPIO_TD[] = {GPIOA, GPIOB, GPIOB, GPIOB, GPIOB, GPIOB, GPIOB, GPIOC, GPIOF, GPIOF, GPIOH, GPIOH, GPIOH, GPIOH};
-	uint16_t i2cPinToGpioPin[] = {GPIO_PIN_8, GPIO_PIN_6, GPIO_PIN_7, GPIO_PIN_8, GPIO_PIN_9, GPIO_PIN_10, GPIO_PIN_11, GPIO_PIN_9, GPIO_PIN_0, GPIO_PIN_1, GPIO_PIN_4, GPIO_PIN_5, GPIO_PIN_7, GPIO_PIN_8};
-
-	GPIO_TypeDef *SCL_PORT = i2cPinToGPIO_TD[(int)scl];
-	GPIO_TypeDef *SDA_PORT = i2cPinToGPIO_TD[(int)sda];
-	uint16_t SCL_PIN = i2cPinToGpioPin[(int)scl];
-	uint16_t SDA_PIN = i2cPinToGpioPin[(int)sda];
-
-	if (HAL_I2C_DeInit(&i2cHandle) != HAL_OK) {
-		// Error Handling
-	}
-
-	// Disable peripherals and GPIO clocks
-	HAL_GPIO_DeInit(SCL_PORT, SCL_PIN);
-	HAL_GPIO_DeInit(SDA_PORT, SDA_PIN);
-}
-
-///////////////////////////////////////////////////////////////////////
-//                      Initialization Routines                      //
-///////////////////////////////////////////////////////////////////////
 
 void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c) {
 	uint32_t I2Cx = (uint32_t)hi2c->Instance;
@@ -315,6 +308,24 @@ void I2C3_MspInit(I2C_HandleTypeDef *hi2c) {
 ///////////////////////////////////////////////////////////////////////
 //                     DeInitialization Routines                     //
 ///////////////////////////////////////////////////////////////////////
+
+void deInitI2C(int scl, int sda) {
+	GPIO_TypeDef *i2cPinToGPIO_TD[] = {GPIOA, GPIOB, GPIOB, GPIOB, GPIOB, GPIOB, GPIOB, GPIOC, GPIOF, GPIOF, GPIOH, GPIOH, GPIOH, GPIOH};
+	uint16_t i2cPinToGpioPin[] = {GPIO_PIN_8, GPIO_PIN_6, GPIO_PIN_7, GPIO_PIN_8, GPIO_PIN_9, GPIO_PIN_10, GPIO_PIN_11, GPIO_PIN_9, GPIO_PIN_0, GPIO_PIN_1, GPIO_PIN_4, GPIO_PIN_5, GPIO_PIN_7, GPIO_PIN_8};
+
+	GPIO_TypeDef *SCL_PORT = i2cPinToGPIO_TD[(int)scl];
+	GPIO_TypeDef *SDA_PORT = i2cPinToGPIO_TD[(int)sda];
+	uint16_t SCL_PIN = i2cPinToGpioPin[(int)scl];
+	uint16_t SDA_PIN = i2cPinToGpioPin[(int)sda];
+
+	if (HAL_I2C_DeInit(&i2cHandle) != HAL_OK) {
+		// Error Handling
+	}
+
+	// Disable peripherals and GPIO clocks
+	HAL_GPIO_DeInit(SCL_PORT, SCL_PIN);
+	HAL_GPIO_DeInit(SDA_PORT, SDA_PIN);
+}
 
 void HAL_I2C_MspDeInit(I2C_HandleTypeDef *hi2c){
 	uint32_t I2Cx = (uint32_t)hi2c->Instance;

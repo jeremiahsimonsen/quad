@@ -29,16 +29,28 @@ int main(int argc, char* argv[])
 	// At this stage the system clock should have already been configured
 	// at high speed.
 
-	uint8_t slave_addr = 0b01011101;
-	I2C i2c(i2cPin::PB8, i2cPin::PB9);
-//	I2C i2c();
+//	HAL_Init();
 
-	uint8_t on_buf[] = {0x20, 0xB0};
+	uint8_t slave_addr = 0b10111010;
+	I2C i2c(i2cPin::PB6, i2cPin::PB9);
+
+	uint8_t data[3] = {0xB0, 0x00, 0x00};
+	// Power on and set output data rate to 12.5 Hz
+	i2c.memWrite(slave_addr, 0x20, data, 1);
+	data[0] = 0x00;
 
 	// Infinite loop
 	while (1)
 	{
+		int32_t pressure;
+		uint8_t x;
 
+		i2c.memRead(slave_addr, 0x28|(1<<7), data, 3);
+
+		pressure = data[2] << 16 | data[1] << 8 | data[0];
+		trace_printf("Pressure: %d\n", pressure);
+
+//		trace_printf("I am: %d\n", x);
 	}
 }
 

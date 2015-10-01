@@ -37,13 +37,19 @@ enum class i2cPin {
 
 class I2C {
 private:
+//	I2C_HandleTypeDef *hi2c;
+
 	i2cPin scl, sda;
 
 public:
 	I2C();
 	I2C(i2cPin cl, i2cPin da);
 
-	void write(uint16_t addr, uint8_t *pData, uint16_t size);
+	void write(uint16_t devAddr, uint8_t *pData, uint16_t size);
+	void read(uint16_t devAddr, uint8_t *pData, uint16_t size);
+
+	void memWrite(uint16_t devAddr, uint16_t memAddr, uint8_t *pData, uint16_t size);
+	void memRead(uint16_t devAddr, uint16_t memAddr, uint8_t *pData, uint16_t size);
 };
 
 #endif

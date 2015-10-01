@@ -23,6 +23,7 @@ I2C::I2C() {
 	sda = i2cPin::PB9;
 
 	initI2C((int)scl, (int)sda);
+//	copyI2CHandle(hi2c);
 }
 
 I2C::I2C(i2cPin cl, i2cPin da) {
@@ -32,20 +33,36 @@ I2C::I2C(i2cPin cl, i2cPin da) {
 	sda = da;
 
 	initI2C((int)scl, (int)sda);
+//	copyI2CHandle(hi2c);
 }
 
-//void I2C::write(uint16_t addr, uint8_t *pData, uint16_t size) {
-//	while(HAL_I2C_Master_Transmit(&i2cHandle, addr, pData, size, 1000) != HAL_OK)
-//	{
-//		/* Error_Handler() function is called when Timeout error occurs.
-//		   When Acknowledge failure occurs (Slave don't acknowledge it's address)
-//		   Master restarts communication */
-//		if (HAL_I2C_GetError(&i2cHandle) != HAL_I2C_ERROR_AF)
-//		{
-//		  while(1);
-//		}
-//	}
-//}
+// TODO: Return an error value
+void I2C::write(uint16_t devAddr, uint8_t *pData, uint16_t size) {
+	if (HAL_I2C_Master_Transmit_DMA(&i2cHandle, devAddr, pData, size) != HAL_OK) {
+		// return error;
+	}
+}
+
+// TODO: Return an error value
+void I2C::read(uint16_t devAddr, uint8_t *pData, uint16_t size) {
+	if (HAL_I2C_Master_Receive_DMA(&i2cHandle, devAddr, pData, size) != HAL_OK) {
+		// return error;
+	}
+}
+
+// TODO: Return an error value
+void I2C::memWrite(uint16_t devAddr, uint16_t memAddr, uint8_t *pData, uint16_t size) {
+	if (HAL_I2C_Mem_Write_DMA(&i2cHandle, devAddr, memAddr, I2C_MEMADD_SIZE_8BIT, pData, size) != HAL_OK) {
+		// return error;
+	}
+}
+
+// TODO: Return an error value
+void I2C::memRead(uint16_t devAddr, uint16_t memAddr, uint8_t *pData, uint16_t size) {
+	if (HAL_I2C_Mem_Read_DMA(&i2cHandle, devAddr, memAddr, I2C_MEMADD_SIZE_8BIT, pData, size) != HAL_OK) {
+		// return error;
+	}
+}
 
 
 

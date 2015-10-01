@@ -12,9 +12,9 @@
 #ifndef _I2C_MSP_H_
 #define _I2C_MSP_H_
 
-#ifdef __cplusplus
-  extern "C" {
-#endif
+//#ifdef __cplusplus
+//  extern "C" {
+//#endif
 
 #include "stm32f4xx_hal.h"
 #include "stm32f4_discovery.h"
@@ -60,9 +60,13 @@
 
 void initI2C(int scl, int sda);
 void deInitI2C(int scl, int sda);
+void copyI2CHandle(I2C_HandleTypeDef *hi2c);
+extern "C"{
+	extern I2C_HandleTypeDef i2cHandle;
+};
 
-#ifdef __cplusplus
-  }
-#endif
+//#ifdef __cplusplus
+//  }
+//#endif
 
 #endif
