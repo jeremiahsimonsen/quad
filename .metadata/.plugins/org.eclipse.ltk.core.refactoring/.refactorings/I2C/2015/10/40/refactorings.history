@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;I2C/src/I2C_Msp.c&apos; to &apos;I2C_Msp.cpp&apos;" description="Rename resource &apos;I2C_Msp.c&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="src/I2C_Msp.c" name="I2C_Msp.cpp" stamp="1443663675101" updateReferences="true"/>
+</session>

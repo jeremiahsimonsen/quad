@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">&#x0A;<refactoring comment="Rename resource &apos;PWM/src/PWM.cpp&apos; to &apos;PwmTimer.cpp&apos;" description="Rename resource &apos;PWM.cpp&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="src/PWM.cpp" name="PwmTimer.cpp" stamp="1442011458216" updateReferences="true"/>&#x0A;<refactoring comment="Rename resource &apos;PWM/include/PWM.h&apos; to &apos;PwmTimer.h&apos;" description="Rename resource &apos;PWM.h&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="include/PWM.h" name="PwmTimer.h" stamp="1442011466219" updateReferences="true"/>
+</session>
