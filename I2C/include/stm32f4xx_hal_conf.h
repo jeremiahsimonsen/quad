@@ -60,6 +60,7 @@
 #define HAL_DAC_MODULE_ENABLED  
 #define HAL_DCMI_MODULE_ENABLED 
 #define HAL_DMA_MODULE_ENABLED
+#define HAL_DMA_EX_MODULE_ENABLED
 #define HAL_DMA2D_MODULE_ENABLED 
 #define HAL_ETH_MODULE_ENABLED 
 #define HAL_FLASH_MODULE_ENABLED 
@@ -242,6 +243,10 @@
 #ifdef HAL_DMA_MODULE_ENABLED
   #include "stm32f4xx_hal_dma.h"
 #endif /* HAL_DMA_MODULE_ENABLED */
+
+#ifdef HAL_DMA_EX_MODULE_ENABLED
+  #include "stm32f4xx_hal_dma_ex.h"
+#endif /* HAL_DMA_EX_MODULE_ENABLED */
    
 #ifdef HAL_CORTEX_MODULE_ENABLED
   #include "stm32f4xx_hal_cortex.h"

@@ -38,6 +38,7 @@ I2C::I2C(i2cPin cl, i2cPin da) {
 
 // TODO: Return an error value
 void I2C::write(uint16_t devAddr, uint8_t *pData, uint16_t size) {
+	while (HAL_I2C_GetState(&i2cHandle) != HAL_I2C_STATE_READY);
 	if (HAL_I2C_Master_Transmit_DMA(&i2cHandle, devAddr, pData, size) != HAL_OK) {
 		// return error;
 	}
@@ -45,6 +46,7 @@ void I2C::write(uint16_t devAddr, uint8_t *pData, uint16_t size) {
 
 // TODO: Return an error value
 void I2C::read(uint16_t devAddr, uint8_t *pData, uint16_t size) {
+	while (HAL_I2C_GetState(&i2cHandle) != HAL_I2C_STATE_READY);
 	if (HAL_I2C_Master_Receive_DMA(&i2cHandle, devAddr, pData, size) != HAL_OK) {
 		// return error;
 	}
@@ -52,19 +54,35 @@ void I2C::read(uint16_t devAddr, uint8_t *pData, uint16_t size) {
 
 // TODO: Return an error value
 void I2C::memWrite(uint16_t devAddr, uint16_t memAddr, uint8_t *pData, uint16_t size) {
-	if (HAL_I2C_Mem_Write_DMA(&i2cHandle, devAddr, memAddr, I2C_MEMADD_SIZE_8BIT, pData, size) != HAL_OK) {
-		// return error;
+	while (HAL_I2C_GetState(&i2cHandle) != HAL_I2C_STATE_READY);
+//	if (HAL_I2C_Mem_Write_DMA(&i2cHandle, devAddr, memAddr, I2C_MEMADD_SIZE_8BIT, pData, size) != HAL_OK) {
+//		// return error;
+//	}
+	if (HAL_I2C_Mem_Write(&i2cHandle, devAddr, memAddr, I2C_MEMADD_SIZE_8BIT, pData, size, 1000) != HAL_OK) {
+		while (1);
 	}
 }
 
 // TODO: Return an error value
+//uint8_t* I2C::memRead(uint16_t devAddr, uint16_t memAddr, uint8_t *pData1, uint8_t *pData2, uint16_t size) {
+//	while (HAL_I2C_GetState(&i2cHandle) != HAL_I2C_STATE_READY);
+////	if (HAL_I2C_Mem_Read_DMA_Hacked(&i2cHandle, devAddr, memAddr, I2C_MEMADD_SIZE_8BIT, pData1, pData2, size) != HAL_OK) {
+//	if (HAL_I2C_Mem_Read_DMA(&i2cHandle, devAddr, memAddr, I2C_MEMADD_SIZE_8BIT, pData1, size) != HAL_OK) {
+//		// return error;
+//	}
+//	if ( (i2cHandle.hdmarx->Instance->CR & DMA_SxCR_CT) == 0) {
+//		return pData1;
+//	} else {
+//		return pData2;
+//	}
+//}
+
 void I2C::memRead(uint16_t devAddr, uint16_t memAddr, uint8_t *pData, uint16_t size) {
-	if (HAL_I2C_Mem_Read_DMA(&i2cHandle, devAddr, memAddr, I2C_MEMADD_SIZE_8BIT, pData, size) != HAL_OK) {
-		// return error;
+	while(HAL_I2C_GetState(&i2cHandle) != HAL_I2C_STATE_READY);
+	if (HAL_I2C_Mem_Read(&i2cHandle, devAddr, memAddr, I2C_MEMADD_SIZE_8BIT, pData, size, 1000) != HAL_OK) {
+		while(1);
 	}
 }
-
-
 
 
 

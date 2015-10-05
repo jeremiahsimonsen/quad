@@ -35,24 +35,24 @@ void I2C1_MspDeInit(void);
 void I2C2_MspDeInit(void);
 void I2C3_MspDeInit(void);
 
-extern "C" {
-void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c);
-void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c);
-void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c);
-void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c);
-void HAL_I2C_MemTxCpltCallback(I2C_HandleTypeDef *hi2c);
-void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c);
-void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c);
-
-void I2C1_DMA_RX_IRQHandler(void);
-void I2C1_DMA_TX_IRQHandler(void);
-
-void I2C2_DMA_RX_IRQHandler(void);
-void I2C2_DMA_TX_IRQHandler(void);
-
-void I2C3_DMA_RX_IRQHandler(void);
-void I2C3_DMA_TX_IRQHandler(void);
-};
+//extern "C" {
+//void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c);
+//void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c);
+//void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c);
+//void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c);
+//void HAL_I2C_MemTxCpltCallback(I2C_HandleTypeDef *hi2c);
+//void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c);
+//void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c);
+//
+//void I2C1_DMA_RX_IRQHandler(void);
+//void I2C1_DMA_TX_IRQHandler(void);
+//
+//void I2C2_DMA_RX_IRQHandler(void);
+//void I2C2_DMA_TX_IRQHandler(void);
+//
+//void I2C3_DMA_RX_IRQHandler(void);
+//void I2C3_DMA_TX_IRQHandler(void);
+//};
 
 //void copyI2CHandle(I2C_HandleTypeDef *hi2c) {
 //	hi2c = &i2cHandle;
@@ -147,162 +147,162 @@ void I2C1_MspInit(I2C_HandleTypeDef *hi2c) {
 	__HAL_RCC_I2C1_CLK_ENABLE();
 
 	// Enable the DMA clock
-	__HAL_RCC_DMA1_CLK_ENABLE();
-
-	// Configure DMA for tx
-	hdma_tx.Instance				 = I2C1_TX_DMA_STREAM;
-	hdma_tx.Init.Channel 			 = I2C1_TX_DMA_CHANNEL;
-	hdma_tx.Init.Direction           = DMA_MEMORY_TO_PERIPH;
-	hdma_tx.Init.PeriphInc           = DMA_PINC_DISABLE;
-	hdma_tx.Init.MemInc              = DMA_MINC_ENABLE;
-	hdma_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-	hdma_tx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
-	hdma_tx.Init.Mode                = DMA_NORMAL;
-	hdma_tx.Init.Priority            = DMA_PRIORITY_LOW;
-	hdma_tx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
-	hdma_tx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
-	hdma_tx.Init.MemBurst            = DMA_MBURST_INC4;
-	hdma_tx.Init.PeriphBurst         = DMA_PBURST_INC4;
-
-	HAL_DMA_Init(&hdma_tx);
-
-	// Associate the initialized DMA handle to the I2C handle
-	__HAL_LINKDMA(hi2c, hdmatx, hdma_tx);
-
-	// Configure DMA for rx
-	hdma_rx.Instance                 = I2C1_RX_DMA_STREAM;
-	hdma_rx.Init.Channel             = I2C1_RX_DMA_CHANNEL;
-	hdma_rx.Init.Direction           = DMA_PERIPH_TO_MEMORY;
-	hdma_rx.Init.PeriphInc           = DMA_PINC_DISABLE;
-	hdma_rx.Init.MemInc              = DMA_MINC_ENABLE;
-	hdma_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-	hdma_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
-	hdma_rx.Init.Mode                = DMA_NORMAL;
-	hdma_rx.Init.Priority            = DMA_PRIORITY_HIGH;
-	hdma_rx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
-	hdma_rx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
-	hdma_rx.Init.MemBurst            = DMA_MBURST_INC4;
-	hdma_rx.Init.PeriphBurst         = DMA_PBURST_INC4;
-
-	HAL_DMA_Init(&hdma_rx);
-
-	// Associate the initialized DMA handle to the I2C handle
-	__HAL_LINKDMA(hi2c, hdmarx, hdma_rx);
-
-	// Configure NVIC for DMA
-	HAL_NVIC_SetPriority(I2C1_DMA_TX_IRQn, 1, 0);
-	HAL_NVIC_EnableIRQ(I2C1_DMA_TX_IRQn);
-
-	HAL_NVIC_SetPriority(I2C1_DMA_RX_IRQn, 0, 0);
-	HAL_NVIC_EnableIRQ(I2C1_DMA_RX_IRQn);
+//	__HAL_RCC_DMA1_CLK_ENABLE();
+//
+//	// Configure DMA for tx
+//	hdma_tx.Instance				 = I2C1_TX_DMA_STREAM;
+//	hdma_tx.Init.Channel 			 = I2C1_TX_DMA_CHANNEL;
+//	hdma_tx.Init.Direction           = DMA_MEMORY_TO_PERIPH;
+//	hdma_tx.Init.PeriphInc           = DMA_PINC_DISABLE;
+//	hdma_tx.Init.MemInc              = DMA_MINC_ENABLE;
+//	hdma_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+//	hdma_tx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
+//	hdma_tx.Init.Mode                = DMA_NORMAL;
+//	hdma_tx.Init.Priority            = DMA_PRIORITY_LOW;
+//	hdma_tx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
+//	hdma_tx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
+//	hdma_tx.Init.MemBurst            = DMA_MBURST_INC4;
+//	hdma_tx.Init.PeriphBurst         = DMA_PBURST_INC4;
+//
+//	HAL_DMA_Init(&hdma_tx);
+//
+//	// Associate the initialized DMA handle to the I2C handle
+//	__HAL_LINKDMA(hi2c, hdmatx, hdma_tx);
+//
+//	// Configure DMA for rx
+//	hdma_rx.Instance                 = I2C1_RX_DMA_STREAM;
+//	hdma_rx.Init.Channel             = I2C1_RX_DMA_CHANNEL;
+//	hdma_rx.Init.Direction           = DMA_PERIPH_TO_MEMORY;
+//	hdma_rx.Init.PeriphInc           = DMA_PINC_DISABLE;
+//	hdma_rx.Init.MemInc              = DMA_MINC_ENABLE;
+//	hdma_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+//	hdma_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
+//	hdma_rx.Init.Mode                = DMA_NORMAL;
+//	hdma_rx.Init.Priority            = DMA_PRIORITY_HIGH;
+//	hdma_rx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
+//	hdma_rx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
+//	hdma_rx.Init.MemBurst            = DMA_MBURST_INC4;
+//	hdma_rx.Init.PeriphBurst         = DMA_PBURST_INC4;
+//
+//	HAL_DMA_Init(&hdma_rx);
+//
+//	// Associate the initialized DMA handle to the I2C handle
+//	__HAL_LINKDMA(hi2c, hdmarx, hdma_rx);
+//
+//	// Configure NVIC for DMA
+//	HAL_NVIC_SetPriority(I2C1_DMA_TX_IRQn, 1, 0);
+//	HAL_NVIC_EnableIRQ(I2C1_DMA_TX_IRQn);
+//
+//	HAL_NVIC_SetPriority(I2C1_DMA_RX_IRQn, 0, 0);
+//	HAL_NVIC_EnableIRQ(I2C1_DMA_RX_IRQn);
 }
 
 void I2C2_MspInit(I2C_HandleTypeDef *hi2c) {
 	__HAL_RCC_I2C2_CLK_ENABLE();
 
 	// Enable the DMA clock
-	__HAL_RCC_DMA1_CLK_ENABLE();
+//	__HAL_RCC_DMA1_CLK_ENABLE();
 
 	// Configure DMA for tx
-	hdma_tx.Instance				 = I2C2_TX_DMA_STREAM;
-	hdma_tx.Init.Channel 			 = I2C2_TX_DMA_CHANNEL;
-	hdma_tx.Init.Direction           = DMA_MEMORY_TO_PERIPH;
-	hdma_tx.Init.PeriphInc           = DMA_PINC_DISABLE;
-	hdma_tx.Init.MemInc              = DMA_MINC_ENABLE;
-	hdma_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-	hdma_tx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
-	hdma_tx.Init.Mode                = DMA_NORMAL;
-	hdma_tx.Init.Priority            = DMA_PRIORITY_LOW;
-	hdma_tx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
-	hdma_tx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
-	hdma_tx.Init.MemBurst            = DMA_MBURST_INC4;
-	hdma_tx.Init.PeriphBurst         = DMA_PBURST_INC4;
+//	hdma_tx.Instance				 = I2C2_TX_DMA_STREAM;
+//	hdma_tx.Init.Channel 			 = I2C2_TX_DMA_CHANNEL;
+//	hdma_tx.Init.Direction           = DMA_MEMORY_TO_PERIPH;
+//	hdma_tx.Init.PeriphInc           = DMA_PINC_DISABLE;
+//	hdma_tx.Init.MemInc              = DMA_MINC_ENABLE;
+//	hdma_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+//	hdma_tx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
+//	hdma_tx.Init.Mode                = DMA_NORMAL;
+//	hdma_tx.Init.Priority            = DMA_PRIORITY_LOW;
+//	hdma_tx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
+//	hdma_tx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
+//	hdma_tx.Init.MemBurst            = DMA_MBURST_INC4;
+//	hdma_tx.Init.PeriphBurst         = DMA_PBURST_INC4;
 
-	HAL_DMA_Init(&hdma_tx);
+//	HAL_DMA_Init(&hdma_tx);
 
 	// Associate the initialized DMA handle to the I2C handle
-	__HAL_LINKDMA(hi2c, hdmatx, hdma_tx);
+//	__HAL_LINKDMA(hi2c, hdmatx, hdma_tx);
 
 	// Configure DMA for rx
-	hdma_rx.Instance                 = I2C2_RX_DMA_STREAM;
-	hdma_rx.Init.Channel             = I2C2_RX_DMA_CHANNEL;
-	hdma_rx.Init.Direction           = DMA_PERIPH_TO_MEMORY;
-	hdma_rx.Init.PeriphInc           = DMA_PINC_DISABLE;
-	hdma_rx.Init.MemInc              = DMA_MINC_ENABLE;
-	hdma_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-	hdma_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
-	hdma_rx.Init.Mode                = DMA_NORMAL;
-	hdma_rx.Init.Priority            = DMA_PRIORITY_HIGH;
-	hdma_rx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
-	hdma_rx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
-	hdma_rx.Init.MemBurst            = DMA_MBURST_INC4;
-	hdma_rx.Init.PeriphBurst         = DMA_PBURST_INC4;
+//	hdma_rx.Instance                 = I2C2_RX_DMA_STREAM;
+//	hdma_rx.Init.Channel             = I2C2_RX_DMA_CHANNEL;
+//	hdma_rx.Init.Direction           = DMA_PERIPH_TO_MEMORY;
+//	hdma_rx.Init.PeriphInc           = DMA_PINC_DISABLE;
+//	hdma_rx.Init.MemInc              = DMA_MINC_ENABLE;
+//	hdma_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+//	hdma_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
+//	hdma_rx.Init.Mode                = DMA_NORMAL;
+//	hdma_rx.Init.Priority            = DMA_PRIORITY_HIGH;
+//	hdma_rx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
+//	hdma_rx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
+//	hdma_rx.Init.MemBurst            = DMA_MBURST_INC4;
+//	hdma_rx.Init.PeriphBurst         = DMA_PBURST_INC4;
 
-	HAL_DMA_Init(&hdma_rx);
+//	HAL_DMA_Init(&hdma_rx);
 
 	// Associate the initialized DMA handle to the I2C handle
-	__HAL_LINKDMA(hi2c, hdmarx, hdma_rx);
+//	__HAL_LINKDMA(hi2c, hdmarx, hdma_rx);
 
 	// Configure NVIC for DMA
-	HAL_NVIC_SetPriority(I2C2_DMA_TX_IRQn, 1, 0);
-	HAL_NVIC_EnableIRQ(I2C2_DMA_TX_IRQn);
-
-	HAL_NVIC_SetPriority(I2C2_DMA_RX_IRQn, 0, 0);
-	HAL_NVIC_EnableIRQ(I2C2_DMA_RX_IRQn);
+//	HAL_NVIC_SetPriority(I2C2_DMA_TX_IRQn, 1, 0);
+//	HAL_NVIC_EnableIRQ(I2C2_DMA_TX_IRQn);
+//
+//	HAL_NVIC_SetPriority(I2C2_DMA_RX_IRQn, 0, 0);
+//	HAL_NVIC_EnableIRQ(I2C2_DMA_RX_IRQn);
 }
 
 void I2C3_MspInit(I2C_HandleTypeDef *hi2c) {
 	__HAL_RCC_I2C3_CLK_ENABLE();
 
 	// Enable the DMA clock
-	__HAL_RCC_DMA1_CLK_ENABLE();
+//	__HAL_RCC_DMA1_CLK_ENABLE();
 
 	// Configure DMA for tx
-	hdma_tx.Instance				 = I2C3_TX_DMA_STREAM;
-	hdma_tx.Init.Channel 			 = I2C3_TX_DMA_CHANNEL;
-	hdma_tx.Init.Direction           = DMA_MEMORY_TO_PERIPH;
-	hdma_tx.Init.PeriphInc           = DMA_PINC_DISABLE;
-	hdma_tx.Init.MemInc              = DMA_MINC_ENABLE;
-	hdma_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-	hdma_tx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
-	hdma_tx.Init.Mode                = DMA_NORMAL;
-	hdma_tx.Init.Priority            = DMA_PRIORITY_LOW;
-	hdma_tx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
-	hdma_tx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
-	hdma_tx.Init.MemBurst            = DMA_MBURST_INC4;
-	hdma_tx.Init.PeriphBurst         = DMA_PBURST_INC4;
+//	hdma_tx.Instance				 = I2C3_TX_DMA_STREAM;
+//	hdma_tx.Init.Channel 			 = I2C3_TX_DMA_CHANNEL;
+//	hdma_tx.Init.Direction           = DMA_MEMORY_TO_PERIPH;
+//	hdma_tx.Init.PeriphInc           = DMA_PINC_DISABLE;
+//	hdma_tx.Init.MemInc              = DMA_MINC_ENABLE;
+//	hdma_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+//	hdma_tx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
+//	hdma_tx.Init.Mode                = DMA_NORMAL;
+//	hdma_tx.Init.Priority            = DMA_PRIORITY_LOW;
+//	hdma_tx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
+//	hdma_tx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
+//	hdma_tx.Init.MemBurst            = DMA_MBURST_INC4;
+//	hdma_tx.Init.PeriphBurst         = DMA_PBURST_INC4;
 
-	HAL_DMA_Init(&hdma_tx);
+//	HAL_DMA_Init(&hdma_tx);
 
 	// Associate the initialized DMA handle to the I2C handle
-	__HAL_LINKDMA(hi2c, hdmatx, hdma_tx);
+//	__HAL_LINKDMA(hi2c, hdmatx, hdma_tx);
 
 	// Configure DMA for rx
-	hdma_rx.Instance                 = I2C3_RX_DMA_STREAM;
-	hdma_rx.Init.Channel             = I2C3_RX_DMA_CHANNEL;
-	hdma_rx.Init.Direction           = DMA_PERIPH_TO_MEMORY;
-	hdma_rx.Init.PeriphInc           = DMA_PINC_DISABLE;
-	hdma_rx.Init.MemInc              = DMA_MINC_ENABLE;
-	hdma_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-	hdma_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
-	hdma_rx.Init.Mode                = DMA_NORMAL;
-	hdma_rx.Init.Priority            = DMA_PRIORITY_HIGH;
-	hdma_rx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
-	hdma_rx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
-	hdma_rx.Init.MemBurst            = DMA_MBURST_INC4;
-	hdma_rx.Init.PeriphBurst         = DMA_PBURST_INC4;
-
-	HAL_DMA_Init(&hdma_rx);
+//	hdma_rx.Instance                 = I2C3_RX_DMA_STREAM;
+//	hdma_rx.Init.Channel             = I2C3_RX_DMA_CHANNEL;
+//	hdma_rx.Init.Direction           = DMA_PERIPH_TO_MEMORY;
+//	hdma_rx.Init.PeriphInc           = DMA_PINC_DISABLE;
+//	hdma_rx.Init.MemInc              = DMA_MINC_ENABLE;
+//	hdma_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
+//	hdma_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
+//	hdma_rx.Init.Mode                = DMA_NORMAL;
+//	hdma_rx.Init.Priority            = DMA_PRIORITY_HIGH;
+//	hdma_rx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
+//	hdma_rx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
+//	hdma_rx.Init.MemBurst            = DMA_MBURST_INC4;
+//	hdma_rx.Init.PeriphBurst         = DMA_PBURST_INC4;
+//
+//	HAL_DMA_Init(&hdma_rx);
 
 	// Associate the initialized DMA handle to the I2C handle
-	__HAL_LINKDMA(hi2c, hdmarx, hdma_rx);
+//	__HAL_LINKDMA(hi2c, hdmarx, hdma_rx);
 
 	// Configure NVIC for DMA
-	HAL_NVIC_SetPriority(I2C3_DMA_TX_IRQn, 1, 0);
-	HAL_NVIC_EnableIRQ(I2C3_DMA_TX_IRQn);
-
-	HAL_NVIC_SetPriority(I2C3_DMA_RX_IRQn, 0, 0);
-	HAL_NVIC_EnableIRQ(I2C3_DMA_RX_IRQn);
+//	HAL_NVIC_SetPriority(I2C3_DMA_TX_IRQn, 1, 0);
+//	HAL_NVIC_EnableIRQ(I2C3_DMA_TX_IRQn);
+//
+//	HAL_NVIC_SetPriority(I2C3_DMA_RX_IRQn, 0, 0);
+//	HAL_NVIC_EnableIRQ(I2C3_DMA_RX_IRQn);
 }
 
 ///////////////////////////////////////////////////////////////////////
@@ -349,12 +349,12 @@ void I2C1_MspDeInit() {
 	// GPIO DeInit by I2C::deInitI2C()
 
 	// De-Initialize the DMA streams
-	HAL_DMA_DeInit(&hdma_tx);
-	HAL_DMA_DeInit(&hdma_rx);
+//	HAL_DMA_DeInit(&hdma_tx);
+//	HAL_DMA_DeInit(&hdma_rx);
 
 	// Disable the DMA TX/RX Interrupts
-	HAL_NVIC_DisableIRQ(I2C1_DMA_TX_IRQn);
-	HAL_NVIC_DisableIRQ(I2C1_DMA_RX_IRQn);
+//	HAL_NVIC_DisableIRQ(I2C1_DMA_TX_IRQn);
+//	HAL_NVIC_DisableIRQ(I2C1_DMA_RX_IRQn);
 }
 
 void I2C2_MspDeInit() {
@@ -365,12 +365,12 @@ void I2C2_MspDeInit() {
 	// GPIO DeInit by I2C::deInitI2C()
 
 	// De-Initialize the DMA streams
-	HAL_DMA_DeInit(&hdma_tx);
-	HAL_DMA_DeInit(&hdma_rx);
+//	HAL_DMA_DeInit(&hdma_tx);
+//	HAL_DMA_DeInit(&hdma_rx);
 
 	// Disable the DMA TX/RX Interrupts
-	HAL_NVIC_DisableIRQ(I2C2_DMA_TX_IRQn);
-	HAL_NVIC_DisableIRQ(I2C2_DMA_RX_IRQn);
+//	HAL_NVIC_DisableIRQ(I2C2_DMA_TX_IRQn);
+//	HAL_NVIC_DisableIRQ(I2C2_DMA_RX_IRQn);
 }
 
 void I2C3_MspDeInit() {
@@ -381,73 +381,73 @@ void I2C3_MspDeInit() {
 	// GPIO DeInit by I2C::deInitI2C()
 
 	// De-Initialize the DMA streams
-	HAL_DMA_DeInit(&hdma_tx);
-	HAL_DMA_DeInit(&hdma_rx);
+//	HAL_DMA_DeInit(&hdma_tx);
+//	HAL_DMA_DeInit(&hdma_rx);
 
 	// Disable the DMA TX/RX Interrupts
-	HAL_NVIC_DisableIRQ(I2C3_DMA_TX_IRQn);
-	HAL_NVIC_DisableIRQ(I2C3_DMA_RX_IRQn);
+//	HAL_NVIC_DisableIRQ(I2C3_DMA_TX_IRQn);
+//	HAL_NVIC_DisableIRQ(I2C3_DMA_RX_IRQn);
 }
 
 ////////////////////////////////////////////////////////////////////////
 //                         Callback functions                         //
 ////////////////////////////////////////////////////////////////////////
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c) {
-	// TODO: Implement
-}
-
-void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c) {
-	// TODO: Implement
-}
-
-void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c) {
-	// TODO: Implement
-}
-
-void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c) {
-	// TODO: Implement
-}
-
-void HAL_I2C_MemTxCpltCallback(I2C_HandleTypeDef *hi2c) {
-	// TODO: Implement
-}
-
-void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c) {
-	// TODO: Implement
-}
-
-void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c) {
-	// TODO: Implement
-}
-#pragma GCC diagnostic pop
+//#pragma GCC diagnostic push
+//#pragma GCC diagnostic ignored "-Wunused-parameter"
+//void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c) {
+//	// TODO: Implement
+//}
+//
+//void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c) {
+//	// TODO: Implement
+//}
+//
+//void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c) {
+//	// TODO: Implement
+//}
+//
+//void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c) {
+//	// TODO: Implement
+//}
+//
+//void HAL_I2C_MemTxCpltCallback(I2C_HandleTypeDef *hi2c) {
+//	// TODO: Implement
+//}
+//
+//void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c) {
+//	// TODO: Implement
+//}
+//
+//void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c) {
+//	// TODO: Implement
+//}
+//#pragma GCC diagnostic pop
 
 // TODO: Refactor these ISRs
 ///////////////////////////////////////////////////////////////////////
 //                               ISRs                                //
 ///////////////////////////////////////////////////////////////////////
-void I2C1_DMA_RX_IRQHandler(void) {
-	HAL_DMA_IRQHandler(i2cHandle.hdmarx);
-}
-
-void I2C1_DMA_TX_IRQHandler(void) {
-	HAL_DMA_IRQHandler(i2cHandle.hdmatx);
-}
-
-void I2C2_DMA_RX_IRQHandler(void) {
-	HAL_DMA_IRQHandler(i2cHandle.hdmarx);
-}
-
-void I2C2_DMA_TX_IRQHandler(void) {
-	HAL_DMA_IRQHandler(i2cHandle.hdmatx);
-}
-
-void I2C3_DMA_RX_IRQHandler(void) {
-	HAL_DMA_IRQHandler(i2cHandle.hdmarx);
-}
-
-void I2C3_DMA_TX_IRQHandler(void) {
-	HAL_DMA_IRQHandler(i2cHandle.hdmatx);
-}
+//void I2C1_DMA_RX_IRQHandler(void) {
+//	HAL_DMA_IRQHandler(i2cHandle.hdmarx);
+//}
+//
+//void I2C1_DMA_TX_IRQHandler(void) {
+//	HAL_DMA_IRQHandler(i2cHandle.hdmatx);
+//}
+//
+//void I2C2_DMA_RX_IRQHandler(void) {
+//	HAL_DMA_IRQHandler(i2cHandle.hdmarx);
+//}
+//
+//void I2C2_DMA_TX_IRQHandler(void) {
+//	HAL_DMA_IRQHandler(i2cHandle.hdmatx);
+//}
+//
+//void I2C3_DMA_RX_IRQHandler(void) {
+//	HAL_DMA_IRQHandler(i2cHandle.hdmarx);
+//}
+//
+//void I2C3_DMA_TX_IRQHandler(void) {
+//	HAL_DMA_IRQHandler(i2cHandle.hdmatx);
+//}
 
