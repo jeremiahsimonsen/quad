@@ -8,6 +8,7 @@
  * @date Sep 29, 2015
  *
  */
+#if 0
 
 #include "I2C_Msp.h"
 #include "stm32f4xx_hal.h"
@@ -458,3 +459,4 @@ void I2C3_DMA_TX_IRQHandler(void) {
 	HAL_DMA_IRQHandler(i2cHandle.hdmatx);
 }
 
+#endif

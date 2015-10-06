@@ -8,7 +8,7 @@
  * @date Sep 29, 2015
  *
  */
-
+#if 0
 #ifndef _I2C_MSP_H_
 #define _I2C_MSP_H_
 
@@ -72,4 +72,5 @@ extern "C"{
 //  }
 //#endif
 
+#endif
 #endif
