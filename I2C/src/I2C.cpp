@@ -58,7 +58,7 @@ void I2C::memWrite(uint16_t devAddr, uint16_t memAddr, uint8_t *pData, uint16_t 
 //	if (HAL_I2C_Mem_Write_DMA(&i2cHandle, devAddr, memAddr, I2C_MEMADD_SIZE_8BIT, pData, size) != HAL_OK) {
 //		// return error;
 //	}
-	if (HAL_I2C_Mem_Write(&i2cHandle, devAddr, memAddr, I2C_MEMADD_SIZE_8BIT, pData, size, 1000) != HAL_OK) {
+	if (HAL_I2C_Mem_Write_DMA(&i2cHandle, devAddr, memAddr, I2C_MEMADD_SIZE_8BIT, pData, size) != HAL_OK) {
 		while (1);
 	}
 }
@@ -79,7 +79,7 @@ void I2C::memWrite(uint16_t devAddr, uint16_t memAddr, uint8_t *pData, uint16_t 
 
 void I2C::memRead(uint16_t devAddr, uint16_t memAddr, uint8_t *pData, uint16_t size) {
 	while(HAL_I2C_GetState(&i2cHandle) != HAL_I2C_STATE_READY);
-	if (HAL_I2C_Mem_Read(&i2cHandle, devAddr, memAddr, I2C_MEMADD_SIZE_8BIT, pData, size, 1000) != HAL_OK) {
+	if (HAL_I2C_Mem_Read_DMA(&i2cHandle, devAddr, memAddr, I2C_MEMADD_SIZE_8BIT, pData, size) != HAL_OK) {
 		while(1);
 	}
 }
