@@ -20,9 +20,6 @@ static DMA_HandleTypeDef hdma_rx;
 ///////////////////////////////////////////////////////////////////////
 //                     Function Pre-Declarations                     //
 ///////////////////////////////////////////////////////////////////////
-
-//void copyI2CHandle(I2C_HandleTypeDef &hi2c);
-
 void initI2C(int scl, int sda);
 void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c);
 void I2C1_MspInit(I2C_HandleTypeDef *hi2c);
@@ -57,6 +54,20 @@ void I2C3_MspDeInit(void);
 //void copyI2CHandle(I2C_HandleTypeDef *hi2c) {
 //	hi2c = &i2cHandle;
 //}
+
+void I2C_MemWrite(uint16_t devAddr, uint16_t memAddr, uint8_t *pData, uint16_t size) {
+	while(HAL_I2C_GetState(&i2cHandle) != HAL_I2C_STATE_READY);
+	if (HAL_I2C_Mem_Write(&i2cHandle, devAddr, memAddr, I2C_MEMADD_SIZE_8BIT, pData, size, 1000) != HAL_OK) {
+		while (1);
+	}
+}
+
+void I2C_Mem_Read(uint16_t devAddr, uint16_t memAddr, uint8_t *pData, uint16_t size) {
+	while(HAL_I2C_GetState(&i2cHandle) != HAL_I2C_STATE_READY);
+	if (HAL_I2C_Mem_Read(&i2cHandle, devAddr, memAddr, I2C_MEMADD_SIZE_8BIT, pData, size, 1000) != HAL_OK) {
+		while(1);
+	}
+}
 
 ///////////////////////////////////////////////////////////////////////
 //                      Initialization Routines                      //

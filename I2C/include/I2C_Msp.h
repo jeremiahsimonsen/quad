@@ -60,7 +60,10 @@
 
 void initI2C(int scl, int sda);
 void deInitI2C(int scl, int sda);
-void copyI2CHandle(I2C_HandleTypeDef *hi2c);
+
+void I2C_MemWrite(uint16_t devAddr, uint16_t memAddr, uint8_t *pData, uint16_t size);
+void I2C_Mem_Read(uint16_t devAddr, uint16_t memAddr, uint8_t *pData, uint16_t size);
+
 extern "C"{
 	extern I2C_HandleTypeDef i2cHandle;
 };
