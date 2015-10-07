@@ -12,8 +12,10 @@
  *
  */
 
-#ifndef I2C_H_
-#define I2C_H_
+#ifndef LPS25H_H_
+#define LPS25H_H_
+
+#include "I2C.h"
 
 enum class LPS25H_Reg {
 	REF_P_XL 		=	0x08,

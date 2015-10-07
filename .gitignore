@@ -1,1 +1,6 @@
 Debug/
+.project
+.cproject
+.settings/
+RemoteSystemsTempFiles/
+.metadata/

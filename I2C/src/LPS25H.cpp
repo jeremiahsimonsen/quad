@@ -43,7 +43,7 @@ float LPS25H::reatTemperatureRaw(void) {
 
 }
 
-float LPS25H::pressureToAltitudeFeet(float pressure_inHg, float altimeter_setting_inHg = 29.9213) {
+float LPS25H::pressureToAltitudeFeet(float pressure_inHg, float altimeter_setting_inHg) {
 
 }
 
