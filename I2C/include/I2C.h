@@ -60,15 +60,11 @@
 void initI2C(int scl, int sda);
 void deInitI2C(int scl, int sda);
 
-void I2C_MemWrite(uint16_t devAddr, uint16_t memAddr, uint8_t *pData, uint16_t size);
-void I2C_Mem_Read(uint16_t devAddr, uint16_t memAddr, uint8_t *pData, uint16_t size);
-
-extern "C"{
-	extern I2C_HandleTypeDef i2cHandle;
-};
+//extern "C"{
+//	extern I2C_HandleTypeDef i2cHandle;
+//};
 #endif
 //END: I2C_MSP
-#define I2C_USE_DMA
 
 enum class i2cPin {
 	PA8 = 0,// I2C3_SCL
@@ -97,11 +93,11 @@ public:
 	I2C();
 	I2C(i2cPin cl, i2cPin da);
 
-	void write(uint16_t devAddr, uint8_t *pData, uint16_t size);
-	void read(uint16_t devAddr, uint8_t *pData, uint16_t size);
+	uint8_t write(uint16_t devAddr, uint8_t *pData, uint16_t size);
+	uint8_t read(uint16_t devAddr, uint8_t *pData, uint16_t size);
 
-	void memWrite(uint16_t devAddr, uint16_t memAddr, uint8_t *pData, uint16_t size);
-	void memRead(uint16_t devAddr, uint16_t memAddr, uint8_t *pData, uint16_t size);
+	uint8_t memWrite(uint16_t devAddr, uint16_t memAddr, uint8_t *pData, uint16_t size);
+	uint8_t memRead(uint16_t devAddr, uint16_t memAddr, uint8_t *pData1, uint8_t *pData2, uint16_t size);
 };
 
 //extern "C"{
