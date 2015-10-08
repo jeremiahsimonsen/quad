@@ -12,8 +12,8 @@
  *
  */
 
-#include "LPS25H.h"
 #include "I2C.h"
+#include "LPS25H.h"
 
 LPS25H::LPS25H(void) {
 	address = 0b10111010;

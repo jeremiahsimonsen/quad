@@ -85,13 +85,18 @@ enum class i2cPin {
 
 class I2C {
 private:
-//	I2C_HandleTypeDef *hi2c;
+	// Constructors are private so it can't be called from outside code
+	I2C();
+	I2C(i2cPin cl, i2cPin da);
+	I2C(I2C const&);
+	I2C& operator=(I2C const&);
 
 	i2cPin scl, sda;
 
+	static I2C *i2cInstance;
+
 public:
-	I2C();
-	I2C(i2cPin cl, i2cPin da);
+	static I2C* Instance(i2cPin cl, i2cPin da);
 
 	uint8_t write(uint16_t devAddr, uint8_t *pData, uint16_t size);
 	uint8_t read(uint16_t devAddr, uint8_t *pData, uint16_t size);

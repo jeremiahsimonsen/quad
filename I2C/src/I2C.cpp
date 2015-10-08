@@ -10,7 +10,8 @@
  *
  * This file contains functions for interfacing with the STM32Cube_HAL, namely
  * the (de)initialization and callback functions. It also contains an I2C class
- * for additional abstraction.
+ * for additional abstraction. The I2C class uses a singleton pattern to ensure
+ * that only one I2C instance is created.
  *
  * All transfers are done via DMA to reduce CPU load. For memory reads, the DMA
  * transfers are double-buffered (aka "ping-pong buffered") so that one buffer
@@ -25,6 +26,9 @@
 #include "stm32f4xx_hal_gpio.h"
 #include "stm32f4_discovery.h"
 #include "stm32f407xx.h"
+
+// Global static pointer used to ensure a single instance
+I2C* I2C::i2cInstance = NULL;
 
 // Global variables needed by interrupts
 I2C_HandleTypeDef i2cHandle;
@@ -560,6 +564,20 @@ bool isSdaPin(i2cPin p) {
 	bool map[14] = {false, false, true, false, true, false, true, true, true, false, false, true, false, true};
 
 	return map[(int)p];
+}
+
+/**
+ * @brief This function is called to create an instance of the class
+ * @param cl i2cPin to be used for the clock
+ * @param da i2cPin to be used for the data
+ * @return Pointer to a I2C instance
+ */
+I2C* I2C::Instance(i2cPin cl, i2cPin da) {
+	if (i2cInstance == NULL) {
+		i2cInstance = new I2C(cl, da);
+	}
+
+	return i2cInstance;
 }
 
 /**

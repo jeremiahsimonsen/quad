@@ -33,14 +33,15 @@ int main(int argc, char* argv[])
 //	HAL_Init();
 
 	uint8_t slave_addr = 0b10111010;
-	I2C i2c(i2cPin::PB6, i2cPin::PB9);
+//	I2C i2c(i2cPin::PB6, i2cPin::PB9);
+	I2C *i2c = I2C::Instance(i2cPin::PB6, i2cPin::PB9);
 
 	uint8_t data1[3] = {0x0};
 	uint8_t data2[3] = {0x0};
 
 	uint8_t on = 0xB4;
 	// Power on and set output data rate to 12.5 Hz
-	i2c.memWrite(slave_addr, 0x20, &on, 1);
+	i2c->memWrite(slave_addr, 0x20, &on, 1);
 
 	// Infinite loop
 	while (1)
@@ -49,7 +50,7 @@ int main(int argc, char* argv[])
 		uint8_t x;
 
 //		i2c.memRead(slave_addr, 0x28|(1<<7), data, 3);				// read pressure
-		x = i2c.memRead(slave_addr, 0x2B|(1<<7), data1, data2, 2);	// read temperature
+		x = i2c->memRead(slave_addr, 0x2B|(1<<7), data1, data2, 2);	// read temperature
 //		i2c.memRead(slave_addr, 0x0F, &x, 1);						// read WHOAMI
 
 //		trace_printf("Temp_L = %d\n", data[0]);
