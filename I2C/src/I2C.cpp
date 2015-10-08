@@ -574,7 +574,7 @@ bool isSdaPin(i2cPin p) {
  */
 I2C* I2C::Instance(i2cPin cl, i2cPin da) {
 	if (i2cInstance == NULL) {
-		i2cInstance = new I2C(cl, da);
+		i2cInstance = new I2C(cl,da);
 	}
 
 	return i2cInstance;
