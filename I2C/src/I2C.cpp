@@ -673,7 +673,6 @@ uint8_t I2C::memWrite(uint16_t devAddr, uint16_t memAddr, uint8_t *pData, uint16
  * @return		  1 if pData1 contains the valid data
  * 				  2 if pData2 contains the valid data
  * 				  -1 if HAL_Error returned
- * 				  -2 if CT status is invalid (should never happen)
  */
 uint8_t I2C::memRead(uint16_t devAddr, uint16_t memAddr, uint8_t *pData1, uint8_t *pData2, uint16_t size) {
 	// Must wait until the I2C peripheral is ready, i.e., for any previous transfers to finish
@@ -689,7 +688,7 @@ uint8_t I2C::memRead(uint16_t devAddr, uint16_t memAddr, uint8_t *pData1, uint8_
 	if ( (i2cHandle.hdmarx->Instance->CR & DMA_SxCR_CT) == 0) {
 		return 1;
 	} else { //if ( (i2cHandle.hdmarx->Instance->CR & DMA_SxCR_CT) == 1) {
-		return 0;
+		return 2;
 	}
 }
 

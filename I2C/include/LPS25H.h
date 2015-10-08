@@ -58,16 +58,22 @@ private:
 	I2C *i2c;
 	uint8_t address;
 
+	uint8_t pressureBuff1[3];
+	uint8_t pressureBuff2[3];
+
+	uint8_t temperatureBuff1[2];
+	uint8_t temperatureBuff2[2];
+
 public:
 	LPS25H(void);
 
 	void enable(void);
 
-	float readPressureInchesHg(void);
+	float readPressureMillibars(void);
 	int32_t readPressureRaw(void);
 
 	float readTemperatureF(void);
-	float reatTemperatureRaw(void);
+	int16_t readTemperatureRaw(void);
 
 	float pressureToAltitudeFeet(float pressure_inHg, float altimeter_setting_inHg = 29.9213);
 };
