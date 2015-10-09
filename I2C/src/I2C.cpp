@@ -139,7 +139,7 @@ void initI2C(int scl, int sda) {
 	// Setup the i2c peripheral struct
 	i2cHandle.Instance 			   = I2Cx;
 	i2cHandle.Init.AddressingMode  = I2C_ADDRESSINGMODE_7BIT;
-	i2cHandle.Init.ClockSpeed      = 100000;
+	i2cHandle.Init.ClockSpeed      = 400000;
 	i2cHandle.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
 	i2cHandle.Init.DutyCycle       = I2C_DUTYCYCLE_16_9;
 	i2cHandle.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
@@ -686,9 +686,9 @@ uint8_t I2C::memRead(uint16_t devAddr, uint16_t memAddr, uint8_t *pData1, uint8_
 
 	// If current target (CT) is 0, then DMA is writing to pData1
 	if ( (i2cHandle.hdmarx->Instance->CR & DMA_SxCR_CT) == 0) {
-		return 1;
-	} else { //if ( (i2cHandle.hdmarx->Instance->CR & DMA_SxCR_CT) == 1) {
 		return 2;
+	} else { //if ( (i2cHandle.hdmarx->Instance->CR & DMA_SxCR_CT) == 1) {
+		return 1;
 	}
 }
 

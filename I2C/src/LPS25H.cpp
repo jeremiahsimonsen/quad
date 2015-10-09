@@ -15,6 +15,9 @@
 #include "I2C.h"
 #include "LPS25H.h"
 
+/**
+ * @brief Instantiates an object using default I2C pins
+ */
 LPS25H::LPS25H(void) {
 	address = 0b10111010;
 
