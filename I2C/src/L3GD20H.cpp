@@ -49,7 +49,7 @@ void L3GD20H::enable(void) {
  * @brief Initiates a read of all 3 axes
  */
 void L3GD20H::read(void) {
-	buffIndicator = i2c->memRead(address, ( (uint8_t)L3GD20H_Reg::OUT_X_L | (1<<7) ), gBuff1, gBuff2, 6);
+	buffIndicator = i2c->memRead(address, ( (uint8_t)L3GD20H_Reg::OUT_X_L | (1<<7) ), gyroBuff1, gyroBuff2, 6);
 }
 
 /**
@@ -58,9 +58,9 @@ void L3GD20H::read(void) {
  */
 int16_t L3GD20H::getX(void) {
 	if (buffIndicator == 1)
-		return (int16_t) (gBuff1[1]<<8 | gBuff1[0]);
+		return (int16_t) (gyroBuff1[1]<<8 | gyroBuff1[0]);
 	else if (buffIndicator == 2) {
-		return (int16_t) (gBuff2[1]<<8 | gBuff2[0]);
+		return (int16_t) (gyroBuff2[1]<<8 | gyroBuff2[0]);
 	} else {
 		return 0;
 	}
@@ -72,9 +72,9 @@ int16_t L3GD20H::getX(void) {
  */
 int16_t L3GD20H::getY(void) {
 	if (buffIndicator == 1)
-		return (int16_t) (gBuff1[3]<<8 | gBuff1[2]);
+		return (int16_t) (gyroBuff1[3]<<8 | gyroBuff1[2]);
 	else if (buffIndicator == 2) {
-		return (int16_t) (gBuff2[3]<<8 | gBuff2[2]);
+		return (int16_t) (gyroBuff2[3]<<8 | gyroBuff2[2]);
 	} else {
 		return 0;
 	}
@@ -86,9 +86,9 @@ int16_t L3GD20H::getY(void) {
  */
 int16_t L3GD20H::getZ(void) {
 	if (buffIndicator == 1)
-		return (int16_t) (gBuff1[5]<<8 | gBuff1[4]);
+		return (int16_t) (gyroBuff1[5]<<8 | gyroBuff1[4]);
 	else if (buffIndicator == 2) {
-		return (int16_t) (gBuff2[5]<<8 | gBuff2[4]);
+		return (int16_t) (gyroBuff2[5]<<8 | gyroBuff2[4]);
 	} else {
 		return 0;
 	}

@@ -1,5 +1,5 @@
 /**
- * @file h
+ * @file L3GD20H.h
  *
  * @brief Class for interfacing with the ST L3GD20H 3-axis gyroscope
  *
@@ -62,9 +62,9 @@ private:
 	I2C *i2c;
 	uint8_t address;
 
-	uint8_t buffIndicator;
-	uint8_t gBuff1[6];	// Gyro angular velocity buffer 1
-	uint8_t gBuff2[6];	// Gyro angular velocity buffer 2
+	uint8_t buffIndicator;	// Indicates which buffer is readable
+	uint8_t gyroBuff1[6];	// Gyro angular velocity buffer 1
+	uint8_t gyroBuff2[6];	// Gyro angular velocity buffer 2
 
 public:
 	L3GD20H(void);
