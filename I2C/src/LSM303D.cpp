@@ -18,6 +18,7 @@ LSM303D::LSM303D() {
 	address = 0b00111010;
 
 	i2c = I2C::Instance(I2C_SCL_PIN, I2C_SDA_PIN);
+	enable();
 }
 
 void LSM303D::enable(void) {
