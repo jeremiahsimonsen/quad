@@ -21,7 +21,7 @@
 LPS25H::LPS25H(void) {
 	address = 0b10111010;
 
-	i2c = I2C::Instance(i2cPin::PB6, i2cPin::PB9);
+	i2c = I2C::Instance(I2C_SCL_PIN, I2C_SDA_PIN);
 	enable();
 }
 

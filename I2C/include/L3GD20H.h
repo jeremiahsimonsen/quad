@@ -66,12 +66,14 @@ private:
 	uint8_t gyroBuff1[6];	// Gyro angular velocity buffer 1
 	uint8_t gyroBuff2[6];	// Gyro angular velocity buffer 2
 
+	// TODO: Make this configurable; Probably pass an initialization struct to constructor
+	void enable(void);
+
 public:
 	L3GD20H(void);
 
-	void enable(void);
-
 	void read(void);
+	// TODO: Change getters to return rates in dps
 	int16_t getX(void);
 	int16_t getY(void);
 	int16_t getZ(void);

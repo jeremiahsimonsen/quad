@@ -20,7 +20,7 @@
 L3GD20H::L3GD20H(void) {
 	address = 0b11010110;
 
-	i2c = I2C::Instance(i2cPin::PB6, i2cPin::PB9);
+	i2c = I2C::Instance(I2C_SCL_PIN, I2C_SDA_PIN);
 	enable();
 }
 

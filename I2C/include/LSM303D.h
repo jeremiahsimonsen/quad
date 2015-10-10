@@ -103,7 +103,23 @@ private:
 	uint8_t magBuff1[6];		// Magnetometer buffer 1
 	uint8_t magBuff2[6];		// Magnetometer buffer 2
 
+	// TODO: Make this configurable; Probably pass an initialization struct to constructor
+	void enable(void);
+
 public:
+	LSM303D();
+
+	void read(void);
+
+	void readAcc(void);
+	int16_t getAccX(void);
+	int16_t getAccY(void);
+	int16_t getAccZ(void);
+
+	void readMag(void);
+	int16_t getMagX(void);
+	int16_t getMagY(void);
+	int16_t getMagZ(void);
 
 };
 

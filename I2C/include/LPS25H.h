@@ -64,10 +64,10 @@ private:
 	uint8_t temperatureBuff1[2];
 	uint8_t temperatureBuff2[2];
 
+	void enable(void);
+
 public:
 	LPS25H(void);
-
-	void enable(void);
 
 	float readPressureMillibars(void);
 	int32_t readPressureRaw(void);

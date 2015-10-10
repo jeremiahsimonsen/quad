@@ -83,6 +83,9 @@ enum class i2cPin {
 	PH8,	// I2C3_SDA
 };
 
+#define I2C_SCL_PIN (i2cPin::PB6)
+#define I2C_SDA_PIN (i2cPin::PB9)
+
 class I2C {
 private:
 	// Constructors are private so it can't be called from outside code
