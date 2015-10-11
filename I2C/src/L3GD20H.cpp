@@ -21,28 +21,49 @@ L3GD20H::L3GD20H(void) {
 	address = 0b11010110;
 
 	i2c = I2C::Instance(I2C_SCL_PIN, I2C_SDA_PIN);
-	enable();
+
+	L3GD20H_InitStruct init;
+	init.odr_bw_config = L3GD_ODR_BW_Config::EIGHT;
+	init.fs_config = L3GD_FS_Config::MEDIUM;
+	resolution = 17.50e-3;
+	enable(init);
+}
+
+L3GD20H::L3GD20H(L3GD20H_InitStruct init) {
+	address = 0b11010110;
+
+	switch(init.fs_config) {
+	case L3GD_FS_Config::LOW	: resolution = 8.75e-3;  break;
+	case L3GD_FS_Config::MEDIUM	: resolution = 17.50e-3; break;
+	case L3GD_FS_Config::HIGH	: resolution = 70.00e-3; break;
+	default: break;
+	}
+
+	i2c = I2C::Instance(I2C_SCL_PIN, I2C_SDA_PIN);
+	enable(init);
 }
 
 /**
  * @brief Enables the sensor and sets default settings
  */
-void L3GD20H::enable(void) {
-	uint8_t buf = 0x0;
+void L3GD20H::enable(L3GD20H_InitStruct init) {
+	// Set data rate and bandwidth; Enable sensor for 3-axis operation
+	uint8_t buf = L3GD_CTRL1_DR(L3GD_ODR_BW_Config_DR(init.odr_bw_config))
+					| L3GD_CTRL1_BW(L3GD_ODR_BW_Config_BW(init.odr_bw_config))
+					| L3GD_CTRL1_PD_MASK
+					| L3GD_CTRL1_ZEN_MASK
+					| L3GD_CTRL1_YEN_MASK
+					| L3GD_CTRL1_XEN_MASK;
+	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::CTRL1, &buf, 1);
 
-	// Low speed ODR disabled
+	// Set low output data rate configuration
+	buf = L3GD_LOW_ODR_Low_ODR(L3GD_ODR_BW_Config_LOW_ODR(init.odr_bw_config));
 	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::LOW_ODR, &buf, 1);
 
-	// Full-scale of 500 dps
-	buf = 0x10;
+	// Set full scale
+	buf = L3GD_CTRL4_FS(init.fs_config)
+			| L3GD_CTRL4_BDU_MASK;
 	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::CTRL4, &buf, 1);
-
-	// Set data rate to 200 Hz (DR=01)
-	// 	   bandwidth to 12.5 Hz (BW=00)
-	//     enable sensor (PD = 1)
-	//     enable all axes (Zen = Yen = Xen = 1)
-	buf = 0b01001111;
-	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::CTRL1, &buf, 1);
 }
 
 /**
@@ -53,42 +74,42 @@ void L3GD20H::read(void) {
 }
 
 /**
- * @brief  Function to get the raw angular rate about the x axis
- * @return Raw x-axis gyro rate
+ * @brief  Function to get the rate of angular rotation about the x axis (roll)
+ * @return Rate of angular rotation about the x axis (roll) in degrees per second (dps)
  */
-int16_t L3GD20H::getX(void) {
+float L3GD20H::getX(void) {
 	if (buffIndicator == 1)
-		return (int16_t) (gyroBuff1[1]<<8 | gyroBuff1[0]);
+		return (float)(gyroBuff1[1]<<8 | gyroBuff1[0]) * resolution;
 	else if (buffIndicator == 2) {
-		return (int16_t) (gyroBuff2[1]<<8 | gyroBuff2[0]);
+		return (float)(gyroBuff2[1]<<8 | gyroBuff2[0]) * resolution;
 	} else {
 		return 0;
 	}
 }
 
 /**
- * @brief  Function to get the raw angular rate about the y axis
- * @return Raw y-axis gyro rate
+ * @brief  Function to get the rate of angular rotation about the y axis (pitch)
+ * @return Rate of angular rotation about the y axis (pitch) in degrees per second (dps)
  */
-int16_t L3GD20H::getY(void) {
+float L3GD20H::getY(void) {
 	if (buffIndicator == 1)
-		return (int16_t) (gyroBuff1[3]<<8 | gyroBuff1[2]);
+		return (float)(gyroBuff1[3]<<8 | gyroBuff1[2]) * resolution;
 	else if (buffIndicator == 2) {
-		return (int16_t) (gyroBuff2[3]<<8 | gyroBuff2[2]);
+		return (float)(gyroBuff2[3]<<8 | gyroBuff2[2]) * resolution;
 	} else {
 		return 0;
 	}
 }
 
 /**
- * @brief  Function to get the raw angular rate about the z axis
- * @return Raw z-axis gyro rate
+ * @brief  Function to get the rate of angular rotation about the z axis (yaw)
+ * @return Rate of angular rotation about the z axis (yaw) in degrees per second (dps)
  */
-int16_t L3GD20H::getZ(void) {
+float L3GD20H::getZ(void) {
 	if (buffIndicator == 1)
-		return (int16_t) (gyroBuff1[5]<<8 | gyroBuff1[4]);
+		return (float)(gyroBuff1[5]<<8 | gyroBuff1[4]) * resolution;
 	else if (buffIndicator == 2) {
-		return (int16_t) (gyroBuff2[5]<<8 | gyroBuff2[4]);
+		return (float)(gyroBuff2[5]<<8 | gyroBuff2[4]) * resolution;
 	} else {
 		return 0;
 	}
