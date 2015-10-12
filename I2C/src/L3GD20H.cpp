@@ -25,7 +25,7 @@ L3GD20H::L3GD20H(void) {
 	L3GD20H_InitStruct init;
 	init.odr_bw_config = L3GD_ODR_BW_Config::EIGHT;
 	init.fs_config = L3GD_FS_Config::MEDIUM;
-	resolution = 17.50e-3;
+	resolution = 17.50e-3f;
 	enable(init);
 }
 
@@ -33,9 +33,9 @@ L3GD20H::L3GD20H(L3GD20H_InitStruct init) {
 	address = 0b11010110;
 
 	switch(init.fs_config) {
-	case L3GD_FS_Config::LOW	: resolution = 8.75e-3;  break;
-	case L3GD_FS_Config::MEDIUM	: resolution = 17.50e-3; break;
-	case L3GD_FS_Config::HIGH	: resolution = 70.00e-3; break;
+	case L3GD_FS_Config::LOW	: resolution = 8.75e-3f;  break;
+	case L3GD_FS_Config::MEDIUM	: resolution = 17.50e-3f; break;
+	case L3GD_FS_Config::HIGH	: resolution = 70.00e-3f; break;
 	default: break;
 	}
 
