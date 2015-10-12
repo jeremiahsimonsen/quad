@@ -216,6 +216,132 @@ enum class LSM303D_Reg {
 
 // Don't currently care about the other BitFields
 
+/** Acceleration data rate configuration
+ * 	  LSM_AODR_Config AODR3 AODR2 AODR1 AODR0 Power mode selection
+ * 	  		1			0 	  0 	0 	  0 	 Power-down mode
+ * 	  		2			0 	  0 	0 	  1 	 3.125 Hz
+ * 	  		3			0 	  0 	1 	  0 	 6.25 Hz
+ * 	  		4			0 	  0 	1 	  1 	 12.5 Hz
+ * 	  		5			0 	  1 	0 	  0 	 25 Hz
+ * 	  		6			0 	  1 	0 	  1 	 50 Hz
+ * 	  		7			0 	  1 	1 	  0 	 100 Hz
+ * 	  		8			0 	  1 	1 	  1 	 200 Hz
+ * 	  		9			1 	  0 	0 	  0 	 400 Hz
+ * 	  		10			1 	  0 	0 	  1 	 800 Hz
+ * 	  		11			1 	  0 	1 	  0 	 1600 Hz
+ */
+enum class LSM_AODR_Config {
+	ONE		=	0b0000,		// Power-down mode
+	TWO		=	0b0001,		// 3.125 Hz
+	THREE	=	0b0010,		// 6.25 Hz
+	FOUR	=	0b0011,		// 12.5 Hz
+	FIVE 	= 	0b0100,		// 25 Hz
+	SIX		=	0b0101,		// 50 Hz
+	SEVEN	=	0b0110,		// 100 Hz
+	EIGHT	= 	0b0111,		// 200 Hz
+	NINE	=	0b1000,		// 400 Hz
+	TEN		=	0b1001,		// 800 Hz
+	ELEVEN	=	0b1010,		// 1600 Hz
+};
+
+/** Acceleration anti-alias filter bandwidth configuration
+ *	  LSM_ABW_Config ABW1 ABW0 Anti-alias filter bandwidth
+ *	  		1		  0 	0 			773 Hz
+ *	  		2		  0 	1 			194 Hz
+ *	  		3		  1 	0 			362 Hz
+ *	  		4		  1 	1 			50 Hz
+ */
+enum class LSM_ABW_Config {
+	ONE		=	0b00,		// 773 Hz
+	TWO		=	0b01,		// 194 Hz
+	THREE	=	0b10,		// 362 Hz
+	FOUR	=	0b11		// 50 Hz
+};
+
+/** Acceleration full-scale selection
+ *	LSM_AFS_Config AFS2 AFS1 AFS0 Acceleration full-scale
+ *		   TWO		  0 	0 	0 			± 2g
+ *		  FOUR	  	  0 	0 	1 			± 4g
+ *		   SIX		  0 	1 	0 			± 6g
+ *		  EIGHT	  	  0 	1 	1 			± 8g
+ *		 SIXTEEN	  1 	0 	0 			± 16g
+ */
+enum class LSM_AFS_Config {
+	TWO		=	0b000,		// ±2g
+	FOUR	=	0b001,		// ±4g
+	SIX		=	0b010,		// ±6g
+	EIGHT	=	0b011,		// ±8g
+	SIXTEEN	=	0b100,		// ±16g
+};
+
+/** Magnetometer output data rate configuration
+ *	  LSM_MODR_Config MODR2 MODR1 MODR0 Power mode selection
+ *	  		 1			0 	  0 	0 		  3.125 Hz
+ *	  		 2			0 	  0 	1 		  6.25 Hz
+ *	  		 3			0 	  1 	0 		  12.5 Hz
+ *	  		 4			0 	  1 	1 		  25 Hz
+ *	  		 5			1 	  0 	0 		  50 Hz
+ *	  		 6			1 	  0 	1 		  100 Hz(1)
+ *	  1. Available only for accelerometer ODR > 50 Hz or accelerometer in power-down mode
+ */
+enum class LSM_MODR_Config {
+	ONE		=	0b000,		// 3.125 Hz
+	TWO		=	0b001,		// 6.25 Hz
+	THREE	=	0b010,		// 12.5 Hz
+	FOUR	=	0b011,		// 25 Hz
+	FIVE	=	0b100,		// 50 Hz
+	SIX		=	0b101		// 100 Hz
+};
+
+/** Magnetometer resolution configuration
+ *  LSM_MRES_Config M_RES1 M_RES0 Resolution
+ *  	  LOW		  0		  0		 Low
+ *  	  HIGH		  1		  1		 High
+ */
+enum class LSM_MRES_Config {
+	LOW		=	0b00,		// Low resolution mode
+	HIGH	=	0b11		// High resolution mode
+};
+
+/** LSM303D Magnetometer full-scale configuration
+ *	LSM_MFS_Config MFS1 MFS0 Magnetic full-scale
+ *		  TWO		0 	  0 	  ± 2 gauss
+ *		  FOUR		0 	  1 	  ± 4 gauss
+ *		  EIGHT		1 	  0 	  ± 8 gauss
+ *		  TWELVE	1 	  1 	  ± 12 gauss
+ */
+enum class LSM_MFS_Config {
+	TWO		=	0b00,		// ± 2 gauss
+	FOUR	=	0b01,		// ± 4 gauss
+	EIGHT	=	0b10,		// ± 8 gauss
+	TWELVE	=	0b11		// ± 12 gauss
+};
+
+/** LSM303D Magnetic sensor mode configuration
+ *	LSM_MD_Config MD1 MD0 Magnetic sensor mode
+ *	 CONTINUOUS	   0   0 	Continuous-conversion mode
+ *	   SINGLE 	   0   1 	Single-conversion mode
+ *		OFF 	   1   0 	Power-down mode
+ */
+enum class LSM_MD_Config {
+	CONTINUOUS	=	0b00,	// Continuous-conversion mode
+	SINGLE		=	0b01,	// Single-conversion mode
+	OFF			=	0b10	// Power-down mode
+};
+
+/**
+ * Structure for initializing the LSM303D
+ */
+typedef struct {
+	LSM_AODR_Config aodr_config;
+	LSM_ABW_Config	abw_config;
+	LSM_AFS_Config	afs_config;
+	LSM_MODR_Config modr_config;
+	LSM_MRES_Config mres_config;
+	LSM_MFS_Config	mfs_config;
+	LSM_MD_Config	md_config;
+} LSM303D_InitStruct;
+
 class LSM303D {
 private:
 	I2C *i2c;
@@ -231,23 +357,23 @@ private:
 	uint8_t magBuff1[6];		// Magnetometer buffer 1
 	uint8_t magBuff2[6];		// Magnetometer buffer 2
 
-	// TODO: Make this configurable; Probably pass an initialization struct to constructor
-	void enable(void);
+	void enable(LSM303D_InitStruct init);
 
 public:
 	LSM303D();
+	LSM303D(LSM303D_InitStruct);
 
 	void read(void);
 
 	void readAcc(void);
-	int16_t getAccX(void);
-	int16_t getAccY(void);
-	int16_t getAccZ(void);
+	float getAccX(void);
+	float getAccY(void);
+	float getAccZ(void);
 
 	void readMag(void);
-	int16_t getMagX(void);
-	int16_t getMagY(void);
-	int16_t getMagZ(void);
+	float getMagX(void);
+	float getMagY(void);
+	float getMagZ(void);
 
 };
 
