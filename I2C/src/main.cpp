@@ -1,6 +1,8 @@
 #include <I2C.h>
 #include "LPS25H.h"
 #include "L3GD20H.h"
+#include "LSM303D.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "diag/Trace.h"
@@ -19,6 +21,7 @@
 void i2c_lowlevel_test(void);
 void lps_test(void);
 void l3g_test(void);
+void lsm_test(void);
 
 // Sample pragmas to cope with warnings. Please note the related line at
 // the end of this function, used to pop the compiler diagnostics status.
@@ -34,7 +37,8 @@ int main(int argc, char* argv[])
 
 //	i2c_lowlevel_test();
 //	lps_test();
-	l3g_test();
+//	l3g_test();
+	lsm_test();
 
 }
 
@@ -88,7 +92,7 @@ void l3g_test() {
 	L3GD20H l3g;
 
 	while (1) {
-		int16_t x,y,z;
+		float x,y,z;
 
 		l3g.read();
 
@@ -97,8 +101,32 @@ void l3g_test() {
 		z = l3g.getZ();
 
 		char t_str[50];
-		sprintf(t_str, "X: %d\tY: %d\tZ: %d", x, y, z);
+		sprintf(t_str, "X: %f\tY: %f\tZ: %f", x, y, z);
 		trace_printf("%s\n", t_str);
 	}
 }
 
+void lsm_test() {
+	LSM303D lsm;
+
+	while (1) {
+		float accX, accY, accZ;
+		float magX, magY, magZ;
+
+		lsm.read();
+
+		accX = lsm.getAccX();
+		accY = lsm.getAccY();
+		accZ = lsm.getAccZ();
+
+		magX = lsm.getMagX();
+		magY = lsm.getMagY();
+		magZ = lsm.getMagZ();
+
+		char t_str[50];
+		sprintf(t_str, "AccX: %f\tAccY: %f\tAccZ: %f", accX, accY, accZ);
+		trace_printf("%s\n", t_str);
+		sprintf(t_str, "MagX: %f\tMagY: %f\tMagZ: %f", magX, magY, magZ);
+		trace_printf("%s\n\n", t_str);
+	}
+}
