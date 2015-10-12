@@ -27,6 +27,8 @@ LSM303D::LSM303D() {
 	init.mres_config = LSM_MRES_Config::HIGH;		// Magnetometer high-resolution mode
 	init.mfs_config  = LSM_MFS_Config::FOUR;		// ± 4 gauss Magnetometer full-scale
 	init.md_config   = LSM_MD_Config::CONTINUOUS;	// Magnetic sensor continuous mode
+	accResolution    = 0.122e-3f;
+	magResolution	 = 0.160e-3f;
 	enable(init);
 }
 
@@ -34,6 +36,23 @@ LSM303D::LSM303D(LSM303D_InitStruct init) {
 	address = 0b00111010;
 
 	i2c = I2C::Instance(I2C_SCL_PIN, I2C_SDA_PIN);
+
+	switch(init.afs_config) {
+	case LSM_AFS_Config::TWO	: accResolution = 0.061e-3f; break;
+	case LSM_AFS_Config::FOUR	: accResolution = 0.122e-3f; break;
+	case LSM_AFS_Config::SIX	: accResolution = 0.183e-3f; break;
+	case LSM_AFS_Config::EIGHT	: accResolution = 0.244e-3f; break;
+	case LSM_AFS_Config::SIXTEEN: accResolution = 0.732e-3f; break;
+	default: break;
+	}
+
+	switch(init.mfs_config) {
+	case LSM_MFS_Config::TWO	: magResolution = 0.080e-3f; break;
+	case LSM_MFS_Config::FOUR	: magResolution = 0.160e-3f; break;
+	case LSM_MFS_Config::EIGHT	: magResolution = 0.320e-3f; break;
+	case LSM_MFS_Config::TWELVE	: magResolution = 0.479e-3f; break;
+	default: break;
+	}
 
 	enable(init);
 }
@@ -68,39 +87,76 @@ void LSM303D::enable(LSM303D_InitStruct init) {
 }
 
 void LSM303D::read(void) {
-
+	readAcc();
+	readMag();
 }
 
 void LSM303D::readAcc(void) {
-
+	accBuffIndicator = i2c->memRead(address, ( (uint8_t)LSM303D_Reg::OUT_X_L_A | (1<<7) ), accBuff1, accBuff2, 6);
 }
 
-int16_t LSM303D::getAccX(void) {
-
+float LSM303D::getAccX(void) {
+	if (accBuffIndicator == 1)
+		return (float)(accBuff1[1]<<8 | accBuff1[0]) * accResolution;
+	else if (accBuffIndicator == 2) {
+		return (float)(accBuff2[1]<<8 | accBuff2[0]) * accResolution;
+	} else {
+		return 0;
+	}
 }
 
-int16_t LSM303D::getAccY(void) {
-
+float LSM303D::getAccY(void) {
+	if (accBuffIndicator == 1)
+		return (float)(accBuff1[3]<<8 | accBuff1[2]) * accResolution;
+	else if (accBuffIndicator == 2) {
+		return (float)(accBuff2[3]<<8 | accBuff2[2]) * accResolution;
+	} else {
+		return 0;
+	}
 }
 
-int16_t LSM303D::getAccZ(void) {
-
+float LSM303D::getAccZ(void) {
+	if (accBuffIndicator == 1)
+		return (float)(accBuff1[5]<<8 | accBuff1[4]) * accResolution;
+	else if (accBuffIndicator == 2) {
+		return (float)(accBuff2[5]<<8 | accBuff2[4]) * accResolution;
+	} else {
+		return 0;
+	}
 }
 
 void LSM303D::readMag(void) {
-
+	magBuffIndicator = i2c->memRead(address, ( (uint8_t)LSM303D_Reg::OUT_X_L_M | (1<<7) ), magBuff1, magBuff2, 6);
 }
 
-int16_t LSM303D::getMagX(void) {
-
+float LSM303D::getMagX(void) {
+	if (magBuffIndicator == 1)
+		return (float)(magBuff1[1]<<8 | magBuff1[0]) * magResolution;
+	else if (magBuffIndicator == 2) {
+		return (float)(magBuff2[1]<<8 | magBuff2[0]) * magResolution;
+	} else {
+		return 0;
+	}
 }
 
-int16_t LSM303D::getMagY(void) {
-
+float LSM303D::getMagY(void) {
+	if (magBuffIndicator == 1)
+		return (float)(magBuff1[3]<<8 | magBuff1[2]) * magResolution;
+	else if (magBuffIndicator == 2) {
+		return (float)(magBuff2[3]<<8 | magBuff2[2]) * magResolution;
+	} else {
+		return 0;
+	}
 }
 
-int16_t LSM303D::getMagZ(void) {
-
+float LSM303D::getMagZ(void) {
+	if (magBuffIndicator == 1)
+		return (float)(magBuff1[5]<<8 | magBuff1[4]) * magResolution;
+	else if (magBuffIndicator == 2) {
+		return (float)(magBuff2[5]<<8 | magBuff2[4]) * magResolution;
+	} else {
+		return 0;
+	}
 }
 
 
