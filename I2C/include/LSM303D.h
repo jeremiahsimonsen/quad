@@ -359,6 +359,10 @@ private:
 
 	void enable(LSM303D_InitStruct init);
 
+	int16_t getAccXRaw(void);
+	int16_t getAccYRaw(void);
+	int16_t getAccZRaw(void);
+
 public:
 	LSM303D();
 	LSM303D(LSM303D_InitStruct);

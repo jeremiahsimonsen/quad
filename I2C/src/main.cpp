@@ -113,20 +113,20 @@ void lsm_test() {
 		float accX, accY, accZ;
 		float magX, magY, magZ;
 
-		lsm.read();
+		lsm.readAcc();
 
 		accX = lsm.getAccX();
 		accY = lsm.getAccY();
 		accZ = lsm.getAccZ();
 
-		magX = lsm.getMagX();
-		magY = lsm.getMagY();
-		magZ = lsm.getMagZ();
+//		magX = lsm.getMagX();
+//		magY = lsm.getMagY();
+//		magZ = lsm.getMagZ();
 
 		char t_str[50];
 		sprintf(t_str, "AccX: %f\tAccY: %f\tAccZ: %f", accX, accY, accZ);
 		trace_printf("%s\n", t_str);
-		sprintf(t_str, "MagX: %f\tMagY: %f\tMagZ: %f", magX, magY, magZ);
-		trace_printf("%s\n\n", t_str);
+//		sprintf(t_str, "MagX: %f\tMagY: %f\tMagZ: %f", magX, magY, magZ);
+//		trace_printf("%s\n\n", t_str);
 	}
 }
