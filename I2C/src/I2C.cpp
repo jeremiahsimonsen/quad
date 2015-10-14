@@ -212,7 +212,11 @@ void I2C1_MspInit(I2C_HandleTypeDef *hi2c) {
 	hdma_rx.Init.MemInc              = DMA_MINC_ENABLE;
 	hdma_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
 	hdma_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
+#if USE_DOUBLE_BUFFERING
 	hdma_rx.Init.Mode                = DMA_CIRCULAR;
+#else
+	hdma_rx.Init.Mode				 = DMA_NORMAL;
+#endif
 	hdma_rx.Init.Priority            = DMA_PRIORITY_HIGH;
 	hdma_rx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
 	hdma_rx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
@@ -272,7 +276,11 @@ void I2C2_MspInit(I2C_HandleTypeDef *hi2c) {
 	hdma_rx.Init.MemInc              = DMA_MINC_ENABLE;
 	hdma_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
 	hdma_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
+#if USE_DOUBLE_BUFFERING
 	hdma_rx.Init.Mode                = DMA_CIRCULAR;
+#else
+	hdma_rx.Init.Mode				 = DMA_NORMAL;
+#endif
 	hdma_rx.Init.Priority            = DMA_PRIORITY_HIGH;
 	hdma_rx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
 	hdma_rx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
@@ -332,7 +340,11 @@ void I2C3_MspInit(I2C_HandleTypeDef *hi2c) {
 	hdma_rx.Init.MemInc              = DMA_MINC_ENABLE;
 	hdma_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
 	hdma_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
+#if USE_DOUBLE_BUFFERING
 	hdma_rx.Init.Mode                = DMA_CIRCULAR;
+#else
+	hdma_rx.Init.Mode				 = DMA_NORMAL;
+#endif
 	hdma_rx.Init.Priority            = DMA_PRIORITY_HIGH;
 	hdma_rx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
 	hdma_rx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
@@ -663,8 +675,9 @@ uint8_t I2C::memWrite(uint16_t devAddr, uint16_t memAddr, uint8_t *pData, uint16
 	return 0;
 }
 
+#if USE_DOUBLE_BUFFERING
 /**
- * @brief Member function to read a register from an i2c slave device
+ * @brief Member function to read a register from an i2c slave device (Using DMA double buffering)
  * @param devAddr i2c slave address of the device to read from (left-justified)
  * @param memAddr Address of the device register to read
  * @param pData1  Pointer to data ping-pong buffer 1
@@ -691,6 +704,33 @@ uint8_t I2C::memRead(uint16_t devAddr, uint16_t memAddr, uint8_t *pData1, uint8_
 		return 1;
 	}
 }
+#else
+/**
+ * @brief Member function to read a register from an i2c slave device
+ * @param devAddr i2c slave address of the device to read from (left-justified)
+ * @param memAddr Address of the device register to read
+ * @param pData1  Pointer to data buffer
+ * @param size    Number of bytes to be read
+ * @return		  0 on success
+ * 				  -1 if HAL_Error returned
+ */
+uint8_t I2C::memRead(uint16_t devAddr, uint16_t memAddr, uint8_t *pData1, uint16_t size) {
+	// Must wait until the I2C peripheral is ready, i.e., for any previous transfers to finish
+	while(HAL_I2C_GetState(&i2cHandle) != HAL_I2C_STATE_READY);
 
+	// Initiate a memory read
+	if (HAL_I2C_Mem_Read_DMA(&i2cHandle, devAddr, memAddr, I2C_MEMADD_SIZE_8BIT, pData1, size) != HAL_OK) {
+		return -1;
+	}
 
+	return 0;
+}
+#endif
 
+/**
+ * @brief Function to block until the peripheral is ready
+ */
+void I2C::readyWait(void) {
+	// Must wait until the I2C peripheral is ready, i.e., for any previous transfers to finish
+	while(HAL_I2C_GetState(&i2cHandle) != HAL_I2C_STATE_READY);
+}
