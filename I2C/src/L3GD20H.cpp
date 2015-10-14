@@ -75,6 +75,7 @@ void L3GD20H::enable(L3GD20H_InitStruct init) {
  * @return The return value of I2C::memRead()
  * 			DOUBLE BUFFERING: 1 or 2 means which buffer is readable, -1 means HAL_ERROR
  * 			ELSE: 0 on success, -1 on HAL_ERROR
+ * 			Updates data in gyroBuff
  */
 uint8_t L3GD20H::read(void) {
 #if USE_DOUBLE_BUFFERING
