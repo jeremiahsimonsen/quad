@@ -58,7 +58,7 @@ void i2c_lowlevel_test() {
 		while(1) {
 			int16_t temperature;
 			uint8_t x;
-
+#if USE_DOUBLE_BUFFERING
 			x = i2c->memRead(slave_addr, 0x2B|(1<<7), data1, data2, 2);	// read temperature
 
 			if (x == 1) {
@@ -66,6 +66,12 @@ void i2c_lowlevel_test() {
 			} else if (x == 2) {
 				temperature = (int16_t) (data2[1]<<8 | data2[0]);
 			}
+#else
+			i2c->memRead(slave_addr, 0x2B|(1<<7), data1, 2);			// read temperature
+
+			i2c->readyWait();
+			temperature = (int16_t) (data1[1]<<8 | data1[0]);
+#endif
 
 			float t = 108.5f + (float)temperature / 480.0f * 1.8f;
 
@@ -113,20 +119,22 @@ void lsm_test() {
 		float accX, accY, accZ;
 		float magX, magY, magZ;
 
-		lsm.readAcc();
+		lsm.read();
+//		lsm.readAcc();
+//		lsm.readMag();
 
 		accX = lsm.getAccX();
 		accY = lsm.getAccY();
 		accZ = lsm.getAccZ();
 
-//		magX = lsm.getMagX();
-//		magY = lsm.getMagY();
-//		magZ = lsm.getMagZ();
+		magX = lsm.getMagX();
+		magY = lsm.getMagY();
+		magZ = lsm.getMagZ();
 
 		char t_str[50];
 		sprintf(t_str, "AccX: %f\tAccY: %f\tAccZ: %f", accX, accY, accZ);
 		trace_printf("%s\n", t_str);
-//		sprintf(t_str, "MagX: %f\tMagY: %f\tMagZ: %f", magX, magY, magZ);
-//		trace_printf("%s\n\n", t_str);
+		sprintf(t_str, "MagX: %f\tMagY: %f\tMagZ: %f", magX, magY, magZ);
+		trace_printf("%s\n\n", t_str);
 	}
 }
