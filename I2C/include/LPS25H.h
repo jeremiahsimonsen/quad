@@ -58,11 +58,16 @@ private:
 	I2C *i2c;
 	uint8_t address;
 
+#if USE_DOUBLE_BUFFERING
 	uint8_t pressureBuff1[3];
 	uint8_t pressureBuff2[3];
 
 	uint8_t temperatureBuff1[2];
 	uint8_t temperatureBuff2[2];
+#else
+	uint8_t pressureBuff[3];
+	uint8_t temperatureBuff[2];
+#endif
 
 	void enable(void);
 

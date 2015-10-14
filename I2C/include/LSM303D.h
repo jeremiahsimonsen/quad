@@ -348,14 +348,20 @@ private:
 	uint8_t address;
 
 	float accResolution;
+	float magResolution;
+#if USE_DOUBLE_BUFFERING
 	uint8_t accBuffIndicator;	// Indicates which buffer is readable
 	uint8_t accBuff1[6];		// Accelerometer buffer 1
 	uint8_t accBuff2[6];		// Accelerometer buffer 2
 
-	float magResolution;
 	uint8_t magBuffIndicator;	// Indicates which buffer is readable
 	uint8_t magBuff1[6];		// Magnetometer buffer 1
 	uint8_t magBuff2[6];		// Magnetometer buffer 2
+#else
+	uint8_t accBuff[6];			// Accelerometer buffer
+
+	uint8_t magBuff[6];			// Magnetometer buffer
+#endif
 
 	void enable(LSM303D_InitStruct init);
 
@@ -363,18 +369,22 @@ private:
 	int16_t getAccYRaw(void);
 	int16_t getAccZRaw(void);
 
+	int16_t getMagXRaw(void);
+	int16_t getMagYRaw(void);
+	int16_t getMagZRaw(void);
+
 public:
 	LSM303D();
 	LSM303D(LSM303D_InitStruct);
 
 	void read(void);
 
-	void readAcc(void);
+	uint8_t readAcc(void);
 	float getAccX(void);
 	float getAccY(void);
 	float getAccZ(void);
 
-	void readMag(void);
+	uint8_t readMag(void);
 	float getMagX(void);
 	float getMagY(void);
 	float getMagZ(void);

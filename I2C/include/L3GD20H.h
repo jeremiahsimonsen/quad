@@ -434,18 +434,26 @@ private:
 
 	float resolution;
 
+#if USE_DOUBLE_BUFFERING
 	uint8_t buffIndicator;	// Indicates which buffer is readable
 	uint8_t gyroBuff1[6];	// Gyro angular velocity buffer 1
 	uint8_t gyroBuff2[6];	// Gyro angular velocity buffer 2
+#else
+	uint8_t gyroBuff[6];	// Gyro angular velocity buffer
+#endif
 
 	void enable(L3GD20H_InitStruct init);
+
+	int16_t getXRaw(void);		// Roll
+	int16_t getYRaw(void);		// Pitch
+	int16_t getZRaw(void);		// Yaw
 
 public:
 	L3GD20H(void);
 	L3GD20H(L3GD20H_InitStruct init);
 
-	void read(void);
-	// TODO: Change getters to return rates in dps
+	uint8_t read(void);
+
 	float getX(void);		// Roll
 	float getY(void);		// Pitch
 	float getZ(void);		// Yaw
