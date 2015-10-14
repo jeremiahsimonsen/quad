@@ -15,7 +15,7 @@
 #include "L3GD20H.h"
 
 /**
- * @brief Instantiates an object using default I2C pins
+ * @brief Instantiates an object using default I2C pins and configures the sensor to default
  */
 L3GD20H::L3GD20H(void) {
 	address = 0b11010110;
@@ -29,6 +29,10 @@ L3GD20H::L3GD20H(void) {
 	enable(init);
 }
 
+/**
+ * @brief Configures the sensor according to the parameters
+ * @param init Sensor configuration parameters
+ */
 L3GD20H::L3GD20H(L3GD20H_InitStruct init) {
 	address = 0b11010110;
 
@@ -44,7 +48,7 @@ L3GD20H::L3GD20H(L3GD20H_InitStruct init) {
 }
 
 /**
- * @brief Enables the sensor and sets default settings
+ * @brief Configures the sensor operation
  */
 void L3GD20H::enable(L3GD20H_InitStruct init) {
 	// Set data rate and bandwidth; Enable sensor for 3-axis operation
@@ -68,51 +72,99 @@ void L3GD20H::enable(L3GD20H_InitStruct init) {
 
 /**
  * @brief Initiates a read of all 3 axes
+ * @return The return value of I2C::memRead()
+ * 			DOUBLE BUFFERING: 1 or 2 means which buffer is readable, -1 means HAL_ERROR
+ * 			ELSE: 0 on success, -1 on HAL_ERROR
  */
-void L3GD20H::read(void) {
+uint8_t L3GD20H::read(void) {
+#if USE_DOUBLE_BUFFERING
 	buffIndicator = i2c->memRead(address, ( (uint8_t)L3GD20H_Reg::OUT_X_L | (1<<7) ), gyroBuff1, gyroBuff2, 6);
+	return buffIndicator;
+#else
+	return i2c->memRead(address, ( (uint8_t)L3GD20H_Reg::OUT_X_L | (1<<7) ), gyroBuff, 6);
+#endif
+}
+
+/**
+ * @brief  Function to get the rate of angular rotation about the x axis (roll)
+ * @return Raw rate of angular rotation about the x axis (roll) (register values)
+ */
+int16_t L3GD20H::getXRaw(void) {
+#if USE_DOUBLE_BUFFERING
+	if (buffIndicator == 1)
+		return (gyroBuff1[1]<<8 | gyroBuff1[0]);
+	else if (buffIndicator == 2) {
+		return (gyroBuff2[1]<<8 | gyroBuff2[0]);
+	} else {
+		return 0;
+	}
+#else
+	i2c->readyWait();
+	return gyroBuff[1]<<8 | gyroBuff[0];
+#endif
 }
 
 /**
  * @brief  Function to get the rate of angular rotation about the x axis (roll)
  * @return Rate of angular rotation about the x axis (roll) in degrees per second (dps)
  */
-float L3GD20H::getX(void) {
+float L3GD20H::getX() {
+	float retVal = (float)getXRaw() * resolution;
+	return retVal;
+}
+
+/**
+ * @brief  Function to get the rate of angular rotation about the y axis (pitch)
+ * @return Raw rate of angular rotation about the y axis (pitch) (register values)
+ */
+int16_t L3GD20H::getYRaw(void) {
+#if USE_DOUBLE_BUFFERING
 	if (buffIndicator == 1)
-		return (float)(gyroBuff1[1]<<8 | gyroBuff1[0]) * resolution;
+		return (gyroBuff1[3]<<8 | gyroBuff1[2]);
 	else if (buffIndicator == 2) {
-		return (float)(gyroBuff2[1]<<8 | gyroBuff2[0]) * resolution;
+		return (gyroBuff2[3]<<8 | gyroBuff2[2]);
 	} else {
 		return 0;
 	}
+#else
+	i2c->readyWait();
+	return gyroBuff[3]<<8 | gyroBuff[2];
+#endif
 }
 
 /**
  * @brief  Function to get the rate of angular rotation about the y axis (pitch)
  * @return Rate of angular rotation about the y axis (pitch) in degrees per second (dps)
  */
-float L3GD20H::getY(void) {
+float L3GD20H::getY() {
+	float retVal = (float)getYRaw() * resolution;
+	return retVal;
+}
+
+/**
+ * @brief  Function to get the rate of angular rotation about the z axis (yaw)
+ * @return Raw rate of angular rotation about the z axis (yaw) (register values)
+ */
+int16_t L3GD20H::getZRaw(void) {
+#if USE_DOUBLE_BUFFERING
 	if (buffIndicator == 1)
-		return (float)(gyroBuff1[3]<<8 | gyroBuff1[2]) * resolution;
+		return (gyroBuff1[5]<<8 | gyroBuff1[4]);
 	else if (buffIndicator == 2) {
-		return (float)(gyroBuff2[3]<<8 | gyroBuff2[2]) * resolution;
+		return (gyroBuff2[5]<<8 | gyroBuff2[4]);
 	} else {
 		return 0;
 	}
+#else
+	i2c->readyWait();
+	return gyroBuff[5]<<8 | gyroBuff[4];
+#endif
 }
 
 /**
  * @brief  Function to get the rate of angular rotation about the z axis (yaw)
  * @return Rate of angular rotation about the z axis (yaw) in degrees per second (dps)
  */
-float L3GD20H::getZ(void) {
-	if (buffIndicator == 1)
-		return (float)(gyroBuff1[5]<<8 | gyroBuff1[4]) * resolution;
-	else if (buffIndicator == 2) {
-		return (float)(gyroBuff2[5]<<8 | gyroBuff2[4]) * resolution;
-	} else {
-		return 0;
-	}
+float L3GD20H::getZ() {
+	float retVal = (float)getZRaw() * resolution;
+	return retVal;
 }
-
-

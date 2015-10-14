@@ -14,11 +14,17 @@
 
 #include "LSM303D.h"
 
+/**
+ * @brief Instantiates sensor with default configuration
+ */
 LSM303D::LSM303D() {
+	// Save the i2c slave address of the sensor
 	address = 0b00111010;
 
+	// Initialize the I2C pointer
 	i2c = I2C::Instance(I2C_SCL_PIN, I2C_SDA_PIN);
 
+	// Default settings
 	LSM303D_InitStruct init;
 	init.aodr_config = LSM_AODR_Config::EIGHT;		// 200 Hz Accelerometer output data rate
 	init.abw_config  = LSM_ABW_Config::ONE;			// 773 Hz Acceleration anti-alias filter bandwidth
@@ -27,36 +33,50 @@ LSM303D::LSM303D() {
 	init.mres_config = LSM_MRES_Config::HIGH;		// Magnetometer high-resolution mode
 	init.mfs_config  = LSM_MFS_Config::FOUR;		// ± 4 gauss Magnetometer full-scale
 	init.md_config   = LSM_MD_Config::CONTINUOUS;	// Magnetic sensor continuous mode
-	accResolution    = 0.122f;
-	magResolution	 = 0.160f;
+	accResolution    = 0.122e-3f;
+	magResolution	 = 0.160e-3f;
+
+	// Perform i2c writes to setup the sensor
 	enable(init);
 }
 
+/**
+ * @brief Instantiates sensor with given configuration parameters
+ * @param init Sensor configuration parameters
+ */
 LSM303D::LSM303D(LSM303D_InitStruct init) {
+	// Save the i2c slave address of the sensor
 	address = 0b00111010;
 
+	// Initialize the I2C pointer
 	i2c = I2C::Instance(I2C_SCL_PIN, I2C_SDA_PIN);
 
+	// Determine the appropriate resolutions
 	switch(init.afs_config) {
-	case LSM_AFS_Config::TWO	: accResolution = 0.061f; break;
-	case LSM_AFS_Config::FOUR	: accResolution = 0.122f; break;
-	case LSM_AFS_Config::SIX	: accResolution = 0.183f; break;
-	case LSM_AFS_Config::EIGHT	: accResolution = 0.244f; break;
-	case LSM_AFS_Config::SIXTEEN: accResolution = 0.732f; break;
+	case LSM_AFS_Config::TWO	: accResolution = 0.061e-3f; break;
+	case LSM_AFS_Config::FOUR	: accResolution = 0.122e-3f; break;
+	case LSM_AFS_Config::SIX	: accResolution = 0.183e-3f; break;
+	case LSM_AFS_Config::EIGHT	: accResolution = 0.244e-3f; break;
+	case LSM_AFS_Config::SIXTEEN: accResolution = 0.732e-3f; break;
 	default: break;
 	}
 
 	switch(init.mfs_config) {
-	case LSM_MFS_Config::TWO	: magResolution = 0.080f; break;
-	case LSM_MFS_Config::FOUR	: magResolution = 0.160f; break;
-	case LSM_MFS_Config::EIGHT	: magResolution = 0.320f; break;
-	case LSM_MFS_Config::TWELVE	: magResolution = 0.479f; break;
+	case LSM_MFS_Config::TWO	: magResolution = 0.080e-3f; break;
+	case LSM_MFS_Config::FOUR	: magResolution = 0.160e-3f; break;
+	case LSM_MFS_Config::EIGHT	: magResolution = 0.320e-3f; break;
+	case LSM_MFS_Config::TWELVE	: magResolution = 0.479e-3f; break;
 	default: break;
 	}
 
+	// Perform i2c writes to setup the sensor
 	enable(init);
 }
 
+/**
+ * @brief Configure the sensor operation
+ * @param init Sensor operation parameters
+ */
 void LSM303D::enable(LSM303D_InitStruct init) {
 	uint8_t buf;
 
@@ -86,16 +106,36 @@ void LSM303D::enable(LSM303D_InitStruct init) {
 	i2c->memWrite(address, (uint8_t)LSM303D_Reg::CTRL7, &buf, 1);
 }
 
+/**
+ * @brief Initiates a read of the accelerometer and magnetometer
+ */
 void LSM303D::read(void) {
 	readAcc();
 	readMag();
 }
 
-void LSM303D::readAcc(void) {
+/**
+ * @brief  Initiates a read of the accelerometer data registers
+ * @return  The return value of I2C::memRead()
+ * 			DOUBLE BUFFERING: 1 or 2 means which buffer is readable, -1 means HAL_ERROR
+ * 			ELSE: 0 on success, -1 on HAL_ERROR
+ * 			Updates data in accBuff
+ */
+uint8_t LSM303D::readAcc(void) {
+#if USE_DOUBLE_BUFFERING
 	accBuffIndicator = i2c->memRead(address, ( (uint8_t)LSM303D_Reg::OUT_X_L_A | (1<<7) ), accBuff1, accBuff2, 6);
+	return accBuffIndicator;
+#else
+	return i2c->memRead(address, ( (uint8_t)LSM303D_Reg::OUT_X_L_A | (1<<7) ), accBuff, 6);
+#endif
 }
 
+/**
+ * @brief  Function to get the acceleration on the x axis
+ * @return Raw x axis acceleration (register values)
+ */
 int16_t LSM303D::getAccXRaw(void) {
+#if USE_DOUBLE_BUFFERING
 	if (accBuffIndicator == 1) {
 		return (accBuff1[1]<<8 | accBuff1[0]);
 	}
@@ -104,16 +144,27 @@ int16_t LSM303D::getAccXRaw(void) {
 	} else {
 		return 0;
 	}
+#else
+	i2c->readyWait();
+	return accBuff[1]<<8 | accBuff[0];
+#endif
 }
 
+/**
+ * @brief  Function to get the acceleration on the x axis
+ * @return X axis acceleration (g)
+ */
 float LSM303D::getAccX() {
 	float retVal = (float)getAccXRaw() * accResolution;
 	return retVal;
 }
 
+/**
+ * @brief  Function to get the acceleration on the y axis
+ * @return Raw y axis acceleration (register values)
+ */
 int16_t LSM303D::getAccYRaw(void) {
-	uint16_t raw;
-	float retVal;
+#if USE_DOUBLE_BUFFERING
 	if (accBuffIndicator == 1) {
 		return (accBuff1[3]<<8 | accBuff1[2]);
 	}
@@ -122,16 +173,27 @@ int16_t LSM303D::getAccYRaw(void) {
 	} else {
 		return 0;
 	}
+#else
+	i2c->readyWait();
+	return accBuff[3]<<8 | accBuff[2];
+#endif
 }
 
+/**
+ * @brief  Function to get the acceleration on the y axis
+ * @return Y axis acceleration (g)
+ */
 float LSM303D::getAccY() {
 	float retVal = (float)getAccYRaw() * accResolution;
 	return retVal;
 }
 
+/**
+ * @brief  Function to get the acceleration on the z axis
+ * @return Raw z axis acceleration (register values)
+ */
 int16_t LSM303D::getAccZRaw(void) {
-	uint16_t raw;
-	float retVal;
+#if USE_DOUBLE_BUFFERING
 	if (accBuffIndicator == 1) {
 		return accBuff1[5]<<8 | accBuff1[4];
 	}
@@ -140,56 +202,115 @@ int16_t LSM303D::getAccZRaw(void) {
 	} else {
 		return 0;
 	}
+#else
+	i2c->readyWait();
+	return accBuff[5]<<8 | accBuff[4];
+#endif
 }
 
+/**
+ * @brief  Function to get the acceleration on the z axis
+ * @return Z axis acceleration (g)
+ */
 float LSM303D::getAccZ() {
 	float retVal = (float)getAccZRaw() * accResolution;
 	return retVal;
 }
 
-void LSM303D::readMag(void) {
+uint8_t LSM303D::readMag(void) {
+#if USE_DOUBLE_BUFFERING
 	magBuffIndicator = i2c->memRead(address, ( (uint8_t)LSM303D_Reg::OUT_X_L_M | (1<<7) ), magBuff1, magBuff2, 6);
+	return magBuffIndicator;
+#else
+	return i2c->memRead(address, ( (uint8_t)LSM303D_Reg::OUT_X_L_M | (1<<7) ), magBuff, 6);
+#endif
 }
 
-float LSM303D::getMagX(void) {
+/**
+ * @brief  Function to get the magnetic field strength on the x axis
+ * @return Raw x axis magnetic field (register values)
+ */
+int16_t LSM303D::getMagXRaw(void) {
+#if USE_DOUBLE_BUFFERING
 	if (magBuffIndicator == 1) {
-		return (float)(magBuff1[1]<<8 | magBuff1[0]) * magResolution;
-//		return magBuff1[1]<<8 | magBuff1[0];
+		return magBuff1[1]<<8 | magBuff1[0];
 	}
 	else if (magBuffIndicator == 2) {
-		return (float)(magBuff2[1]<<8 | magBuff2[0]) * magResolution;
-//		return magBuff2[1]<<8 | magBuff2[0];
+		return magBuff2[1]<<8 | magBuff2[0];
 	} else {
 		return 0;
 	}
+#else
+	i2c->readyWait();
+	return magBuff[1]<<8 | magBuff[0];
+#endif
 }
 
-float LSM303D::getMagY(void) {
+/**
+ * @brief  Function to get the magnetic field strength on the x axis
+ * @return X axis magnetic field (gauss)
+ */
+float LSM303D::getMagX() {
+	float retVal = (float)getMagXRaw() * magResolution;
+	return retVal;
+}
+
+/**
+ * @brief  Function to get the magnetic field strength on the y axis
+ * @return Raw y axis magnetic field (register values)
+ */
+int16_t LSM303D::getMagYRaw(void) {
+#if USE_DOUBLE_BUFFERING
 	if (magBuffIndicator == 1) {
-		return (float)(magBuff1[3]<<8 | magBuff1[2]) * magResolution;
-//		return magBuff1[3]<<8 | magBuff1[2];
+		return magBuff1[3]<<8 | magBuff1[2];
 	}
 	else if (magBuffIndicator == 2) {
-		return (float)(magBuff2[3]<<8 | magBuff2[2]) * magResolution;
-//		return magBuff2[3]<<8 | magBuff2[2];
+		return magBuff2[3]<<8 | magBuff2[2];
 	} else {
 		return 0;
 	}
+#else
+	i2c->readyWait();
+	return magBuff[3]<<8 | magBuff[2];
+#endif
 }
 
-float LSM303D::getMagZ(void) {
+/**
+ * @brief  Function to get the magnetic field strength on the y axis
+ * @return Y axis magnetic field (gauss)
+ */
+float LSM303D::getMagY() {
+	float retVal = (float)getMagYRaw() * magResolution;
+	return retVal;
+}
+
+/**
+ * @brief  Function to get the magnetic field strength on the z axis
+ * @return Raw z axis magnetic field (register values)
+ */
+int16_t LSM303D::getMagZRaw(void) {
+#if USE_DOUBLE_BUFFERING
 	if (magBuffIndicator == 1) {
-		return (float)(magBuff1[5]<<8 | magBuff1[4]) * magResolution;
-//		return magBuff1[5]<<8 | magBuff1[4];
+		return magBuff1[5]<<8 | magBuff1[4];
 	}
 	else if (magBuffIndicator == 2) {
-		return (float)(magBuff2[5]<<8 | magBuff2[4]) * magResolution;
-//		return magBuff2[5]<<8 | magBuff2[4];
+		return magBuff2[5]<<8 | magBuff2[4];
 	} else {
 		return 0;
 	}
+#else
+	i2c->readyWait();
+	return magBuff[5]<<8 | magBuff[4];
+#endif
 }
 
-
+/**
+ * @brief  Function to get the magnetic field strength on the z axis
+ * @return Z axis magnetic field (gauss)
+ */
+float LSM303D::getMagZ() {
+	float retVal = (float)getMagZRaw() * magResolution;
+	return retVal;
+}
 
 

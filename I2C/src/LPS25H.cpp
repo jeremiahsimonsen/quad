@@ -8,7 +8,7 @@
  *
  * @date Oct 5, 2015
  *
- * Based on lps-arduino library from Pololu Corp. See license.txt for details
+ * Based in part on lps-arduino library from Pololu Corp. See license.txt for details
  *
  */
 
@@ -25,6 +25,9 @@ LPS25H::LPS25H(void) {
 	enable();
 }
 
+/**
+ * @brief Powers on the sensor and sets ODR to 12.5 Hz with BDU enabled
+ */
 void LPS25H::enable(void) {
 	uint8_t buff = 0xB4;
 
@@ -44,6 +47,7 @@ float LPS25H::readPressureMillibars(void) {
  * @return The latest complete raw pressure reading or -1 on error
  */
 int32_t LPS25H::readPressureRaw(void) {
+#if USE_DOUBLE_BUFFERING
 	uint8_t buffIndicator;
 
 	buffIndicator = i2c->memRead(address, ( (uint8_t)LPS25H_Reg::PRESS_OUT_XL | (1<<7) ), pressureBuff1, pressureBuff2, 3);
@@ -54,6 +58,14 @@ int32_t LPS25H::readPressureRaw(void) {
 		return pressureBuff2[2] << 16 | pressureBuff2[1] << 8 | pressureBuff2[0];
 	else
 		return -1;
+#else
+	uint8_t retVal = i2c->memRead(address, ( (uint8_t)LPS25H_Reg::PRESS_OUT_XL | (1<<7) ), pressureBuff, 3);
+	if (retVal < 0) {
+		return retVal;
+	}
+	i2c->readyWait();
+	return pressureBuff[2] << 16 | pressureBuff[1] << 8 | pressureBuff[0];
+#endif
 }
 
 /**
@@ -69,6 +81,7 @@ float LPS25H::readTemperatureF(void) {
  * @return The latest complete raw temperature reading or -1 on error
  */
 int16_t LPS25H::readTemperatureRaw(void) {
+#if USE_DOUBLE_BUFFERING
 	uint8_t buffIndicator;
 
 	buffIndicator = i2c->memRead(address, ( (uint8_t)LPS25H_Reg::TEMP_OUT_L | (1<<7) ), temperatureBuff1, temperatureBuff2, 2);
@@ -79,6 +92,14 @@ int16_t LPS25H::readTemperatureRaw(void) {
 		return temperatureBuff2[1] << 8 | temperatureBuff2[0];
 	else
 		return -1;
+#else
+	uint8_t retVal = i2c->memRead(address, ( (uint8_t)LPS25H_Reg::TEMP_OUT_L | (1<<7) ), temperatureBuff, 2);
+	if (retVal < 0) {
+		return retVal;
+	}
+	i2c->readyWait();
+	return temperatureBuff[1] << 8 | temperatureBuff[0];
+#endif
 }
 
 float LPS25H::pressureToAltitudeFeet(float pressure_inHg, float altimeter_setting_inHg) {
