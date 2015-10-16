@@ -2,7 +2,7 @@
 #include "LPS25H.h"
 #include "L3GD20H.h"
 #include "LSM303D.h"
-
+#include "LidarLite.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include "diag/Trace.h"
@@ -22,7 +22,7 @@ void i2c_lowlevel_test(void);
 void lps_test(void);
 void l3g_test(void);
 void lsm_test(void);
-
+void lidar_test(void);
 // Sample pragmas to cope with warnings. Please note the related line at
 // the end of this function, used to pop the compiler diagnostics status.
 #pragma GCC diagnostic push
@@ -38,8 +38,8 @@ int main(int argc, char* argv[])
 //	i2c_lowlevel_test();
 //	lps_test();
 //	l3g_test();
-	lsm_test();
-
+//	lsm_test();
+	lidar_test();
 }
 
 #pragma GCC diagnostic pop
@@ -136,5 +136,14 @@ void lsm_test() {
 		trace_printf("%s\n", t_str);
 		sprintf(t_str, "MagX: %f\tMagY: %f\tMagZ: %f", magX, magY, magZ);
 		trace_printf("%s\n\n", t_str);
+	}
+}
+
+void lidar_test() {
+	LidarLite lidar;
+	int accel;
+	while(1) {
+		accel = lidar.lidar_read();
+		trace_printf("%d\n", accel);
 	}
 }
