@@ -9,13 +9,14 @@
 #ifndef LIDARLITE_H
 #define LIDARLITE_H
 
-#define LIDAR_LITE_ADRS 0x62
+#define LIDAR_LITE_ADRS 0xC4
 
 #define MEASURE_VAL 0x04
 #define MEASURE_REG 0x00
 #define STATUS_REG  0x47
 #define DISTANCE_REG_HI 0x0f
 #define DISTANCE_REG_LO 0x10
+#define DISTANCE_REG_HILO 0x8f
 #define VERSION_REG 0x41
 
 #define ERROR_READ -1
@@ -43,5 +44,9 @@ private:
 public:
 	LidarLite(void);
 	int lidar_read(void);
+	unsigned char lidar_status();
 };
+
+void lidar_status_print(unsigned char status);
+
 #endif // LIDARLITE_H

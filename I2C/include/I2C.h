@@ -103,15 +103,15 @@ private:
 public:
 	static I2C* Instance(i2cPin cl, i2cPin da);
 
-	uint8_t write(uint16_t devAddr, uint8_t *pData, uint16_t size);
-	uint8_t read(uint16_t devAddr, uint8_t *pData, uint16_t size);
+	int8_t write(uint16_t devAddr, uint8_t *pData, uint16_t size);
+	int8_t read(uint16_t devAddr, uint8_t *pData, uint16_t size);
 
-	uint8_t memWrite(uint16_t devAddr, uint16_t memAddr, uint8_t *pData, uint16_t size);
+	int8_t memWrite(uint16_t devAddr, uint16_t memAddr, uint8_t *pData, uint16_t size);
 
 #if USE_DOUBLE_BUFFERING
-	uint8_t memRead(uint16_t devAddr, uint16_t memAddr, uint8_t *pData1, uint8_t *pData2, uint16_t size);
+	int8_t memRead(uint16_t devAddr, uint16_t memAddr, uint8_t *pData1, uint8_t *pData2, uint16_t size);
 #else
-	uint8_t memRead(uint16_t devAddr, uint16_t memAddr, uint8_t *pData1, uint16_t size);
+	int8_t memRead(uint16_t devAddr, uint16_t memAddr, uint8_t *pData1, uint16_t size);
 #endif
 
 	void readyWait(void);

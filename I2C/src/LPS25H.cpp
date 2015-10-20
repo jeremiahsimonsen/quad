@@ -59,7 +59,7 @@ int32_t LPS25H::readPressureRaw(void) {
 	else
 		return -1;
 #else
-	uint8_t retVal = i2c->memRead(address, ( (uint8_t)LPS25H_Reg::PRESS_OUT_XL | (1<<7) ), pressureBuff, 3);
+	int8_t retVal = i2c->memRead(address, ( (uint8_t)LPS25H_Reg::PRESS_OUT_XL | (1<<7) ), pressureBuff, 3);
 	if (retVal < 0) {
 		return retVal;
 	}
@@ -93,12 +93,12 @@ int16_t LPS25H::readTemperatureRaw(void) {
 	else
 		return -1;
 #else
-	uint8_t retVal = i2c->memRead(address, ( (uint8_t)LPS25H_Reg::TEMP_OUT_L | (1<<7) ), temperatureBuff, 2);
+	int8_t retVal = i2c->memRead(address, ( (uint8_t)LPS25H_Reg::TEMP_OUT_L | (1<<7) ), temperatureBuff, 2);
 	if (retVal < 0) {
 		return retVal;
 	}
 	i2c->readyWait();
-	return temperatureBuff[1] << 8 | temperatureBuff[0];
+	return (int16_t) (temperatureBuff[1] << 8 | temperatureBuff[0]);
 #endif
 }
 

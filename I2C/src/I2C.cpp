@@ -139,7 +139,7 @@ void initI2C(int scl, int sda) {
 	// Setup the i2c peripheral struct
 	i2cHandle.Instance 			   = I2Cx;
 	i2cHandle.Init.AddressingMode  = I2C_ADDRESSINGMODE_7BIT;
-	i2cHandle.Init.ClockSpeed      = 400000;
+	i2cHandle.Init.ClockSpeed      = 100000;
 	i2cHandle.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
 	i2cHandle.Init.DutyCycle       = I2C_DUTYCYCLE_16_9;
 	i2cHandle.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
@@ -628,7 +628,7 @@ I2C::I2C(i2cPin cl, i2cPin da) {
  * @param size    Number of bytes to write
  * @return 0 on success, -1 on error
  */
-uint8_t I2C::write(uint16_t devAddr, uint8_t *pData, uint16_t size) {
+int8_t I2C::write(uint16_t devAddr, uint8_t *pData, uint16_t size) {
 	// Must wait until the I2C peripheral is ready, i.e., for any previous transfers to finish
 	while (HAL_I2C_GetState(&i2cHandle) != HAL_I2C_STATE_READY);
 
@@ -649,13 +649,29 @@ uint8_t I2C::write(uint16_t devAddr, uint8_t *pData, uint16_t size) {
  * @param size    Number of bytes to read
  * @return 0 on success, -1 on error
  */
-uint8_t I2C::read(uint16_t devAddr, uint8_t *pData, uint16_t size) {
+int8_t I2C::read(uint16_t devAddr, uint8_t *pData, uint16_t size) {
 	while (HAL_I2C_GetState(&i2cHandle) != HAL_I2C_STATE_READY);
 	if (HAL_I2C_Master_Receive_DMA(&i2cHandle, devAddr, pData, size) != HAL_OK) {
 		return -1;
 	}
 
 	return 0;
+}
+
+void I2C_DMAError(DMA_HandleTypeDef *hdma)
+{
+  I2C_HandleTypeDef* hi2c = (I2C_HandleTypeDef*)((DMA_HandleTypeDef*)hdma)->Parent;
+
+  /* Disable Acknowledge */
+  hi2c->Instance->CR1 &= ~I2C_CR1_ACK;
+
+  hi2c->XferCount = 0;
+
+  hi2c->State = HAL_I2C_STATE_READY;
+
+  hi2c->ErrorCode |= HAL_I2C_ERROR_DMA;
+
+  HAL_I2C_ErrorCallback(hi2c);
 }
 
 /**
@@ -666,9 +682,10 @@ uint8_t I2C::read(uint16_t devAddr, uint8_t *pData, uint16_t size) {
  * @param size    Number of bytes to write
  * @return 0 on success, -1 on error
  */
-uint8_t I2C::memWrite(uint16_t devAddr, uint16_t memAddr, uint8_t *pData, uint16_t size) {
+int8_t I2C::memWrite(uint16_t devAddr, uint16_t memAddr, uint8_t *pData, uint16_t size) {
 	while (HAL_I2C_GetState(&i2cHandle) != HAL_I2C_STATE_READY);
 	if (HAL_I2C_Mem_Write_DMA(&i2cHandle, devAddr, memAddr, I2C_MEMADD_SIZE_8BIT, pData, size) != HAL_OK) {
+		I2C_DMAError(i2cHandle.hdmarx);
 		return -1;
 	}
 
@@ -687,7 +704,7 @@ uint8_t I2C::memWrite(uint16_t devAddr, uint16_t memAddr, uint8_t *pData, uint16
  * 				  2 if pData2 contains the valid data
  * 				  -1 if HAL_Error returned
  */
-uint8_t I2C::memRead(uint16_t devAddr, uint16_t memAddr, uint8_t *pData1, uint8_t *pData2, uint16_t size) {
+int8_t I2C::memRead(uint16_t devAddr, uint16_t memAddr, uint8_t *pData1, uint8_t *pData2, uint16_t size) {
 	// Must wait until the I2C peripheral is ready, i.e., for any previous transfers to finish
 	while(HAL_I2C_GetState(&i2cHandle) != HAL_I2C_STATE_READY);
 
@@ -714,7 +731,7 @@ uint8_t I2C::memRead(uint16_t devAddr, uint16_t memAddr, uint8_t *pData1, uint8_
  * @return		  0 on success
  * 				  -1 if HAL_Error returned
  */
-uint8_t I2C::memRead(uint16_t devAddr, uint16_t memAddr, uint8_t *pData1, uint16_t size) {
+int8_t I2C::memRead(uint16_t devAddr, uint16_t memAddr, uint8_t *pData1, uint16_t size) {
 	// Must wait until the I2C peripheral is ready, i.e., for any previous transfers to finish
 	while(HAL_I2C_GetState(&i2cHandle) != HAL_I2C_STATE_READY);
 

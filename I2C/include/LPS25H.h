@@ -80,7 +80,7 @@ public:
 	float readTemperatureF(void);
 	int16_t readTemperatureRaw(void);
 
-	float pressureToAltitudeFeet(float pressure_inHg, float altimeter_setting_inHg = 29.9213);
+	float pressureToAltitudeFeet(float pressure_inHg, float altimeter_setting_inHg = 29.9213f);
 };
 
 #endif

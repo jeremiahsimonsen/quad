@@ -157,10 +157,17 @@ void imu_test() {
 
 void lidar_test() {
 	LidarLite lidar;
-	int accel;
+	int x =0;
+	int dist;
 	while(1) {
-		accel = lidar.lidar_read();
-		if(accel<0) trace_printf("error sending read");
-		trace_printf("%d\n", accel);
+		dist = lidar.lidar_read();
+		x++;
+		if(dist<0) {
+			trace_printf("error sending read");
+//			dist = lidar.lidar_status();
+//			lidar_status_print(dist);
+		}
+		trace_printf("%d\t%d\n", dist,x);
+		HAL_Delay(100);
 	}
 }
