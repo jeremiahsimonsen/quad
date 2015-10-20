@@ -160,6 +160,7 @@ void lidar_test() {
 	int accel;
 	while(1) {
 		accel = lidar.lidar_read();
+		if(accel<0) trace_printf("error sending read");
 		trace_printf("%d\n", accel);
 	}
 }
