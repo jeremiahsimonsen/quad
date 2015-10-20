@@ -1,7 +1,8 @@
-#include <I2C.h>
+#include "I2C.h"
 #include "LPS25H.h"
 #include "L3GD20H.h"
 #include "LSM303D.h"
+#include "IMU.h"
 #include "LidarLite.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,6 +23,7 @@ void i2c_lowlevel_test(void);
 void lps_test(void);
 void l3g_test(void);
 void lsm_test(void);
+void imu_test(void);
 void lidar_test(void);
 // Sample pragmas to cope with warnings. Please note the related line at
 // the end of this function, used to pop the compiler diagnostics status.
@@ -136,6 +138,20 @@ void lsm_test() {
 		trace_printf("%s\n", t_str);
 		sprintf(t_str, "MagX: %f\tMagY: %f\tMagZ: %f", magX, magY, magZ);
 		trace_printf("%s\n\n", t_str);
+	}
+}
+
+void imu_test() {
+	IMU imu;
+	float roll, pitch;
+
+	while (1) {
+		roll = imu.getRoll();
+		pitch = imu.getPitch();
+
+		char str[50];
+		sprintf(str, "Roll: %f\tPitch: %f", roll, pitch);
+		trace_printf("%s\n", str);
 	}
 }
 
