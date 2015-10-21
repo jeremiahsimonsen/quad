@@ -104,6 +104,7 @@ int16_t LPS25H::readTemperatureRaw(void) {
 
 float LPS25H::pressureToAltitudeFeet(float pressure_inHg, float altimeter_setting_inHg) {
 	// TODO: Implement
+	return 0.0;
 }
 
 
