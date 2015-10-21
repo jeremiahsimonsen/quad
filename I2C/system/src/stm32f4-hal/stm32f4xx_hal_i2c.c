@@ -182,6 +182,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
+#include "diag/Trace.h"
 
 /** @addtogroup STM32F4xx_HAL_Driver
   * @{
@@ -2601,6 +2602,7 @@ void HAL_I2C_ER_IRQHandler(I2C_HandleTypeDef *hi2c)
   /* I2C Bus error interrupt occurred ----------------------------------------*/
   if((tmp1 == SET) && (tmp2 == SET))
   {
+	  trace_printf("I2C Bus Error\n");
     hi2c->ErrorCode |= HAL_I2C_ERROR_BERR;
 
     /* Clear BERR flag */
@@ -2612,6 +2614,7 @@ void HAL_I2C_ER_IRQHandler(I2C_HandleTypeDef *hi2c)
   /* I2C Arbitration Loss error interrupt occurred ---------------------------*/
   if((tmp1 == SET) && (tmp2 == SET))
   {
+	  trace_printf("I2C Arbitration Loss\n");
     hi2c->ErrorCode |= HAL_I2C_ERROR_ARLO;
 
     /* Clear ARLO flag */
@@ -2623,6 +2626,7 @@ void HAL_I2C_ER_IRQHandler(I2C_HandleTypeDef *hi2c)
   /* I2C Acknowledge failure error interrupt occurred ------------------------*/
   if((tmp1 == SET) && (tmp2 == SET))
   {
+	  trace_printf("I2C Acknowledge Failure\n");
     tmp1 = __HAL_I2C_GET_FLAG(hi2c, I2C_FLAG_MSL);
     tmp2 = hi2c->XferCount;
     tmp3 = hi2c->State;
@@ -2643,6 +2647,7 @@ void HAL_I2C_ER_IRQHandler(I2C_HandleTypeDef *hi2c)
   /* I2C Over-Run/Under-Run interrupt occurred -------------------------------*/
   if((tmp1 == SET) && (tmp2 == SET))
   {
+	  trace_printf("I2C Over/Under Run\n");
     hi2c->ErrorCode |= HAL_I2C_ERROR_OVR;
     /* Clear OVR flag */
     __HAL_I2C_CLEAR_FLAG(hi2c, I2C_FLAG_OVR);

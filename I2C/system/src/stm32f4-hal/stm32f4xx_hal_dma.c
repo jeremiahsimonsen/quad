@@ -115,6 +115,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
+#include "diag/Trace.h"
 
 /** @addtogroup STM32F4xx_HAL_Driver
   * @{
@@ -657,6 +658,8 @@ void HAL_DMA_IRQHandler(DMA_HandleTypeDef *hdma)
       /* Process Unlocked */
       __HAL_UNLOCK(hdma); 
 
+//      trace_printf("HAL_DMA_IRQHandler: Transfer Error: DMA Unlocked");
+
       if(hdma->XferErrorCallback != NULL)
       {
         /* Transfer error callback */
@@ -684,6 +687,8 @@ void HAL_DMA_IRQHandler(DMA_HandleTypeDef *hdma)
       /* Process Unlocked */
       __HAL_UNLOCK(hdma);
 
+//      trace_printf("HAL_DMA_IRQHandler: FIFO Error: DMA Unlocked");
+
       if(hdma->XferErrorCallback != NULL)
       {
         /* Transfer error callback */
@@ -710,6 +715,8 @@ void HAL_DMA_IRQHandler(DMA_HandleTypeDef *hdma)
 
       /* Process Unlocked */
       __HAL_UNLOCK(hdma);
+
+//      trace_printf("HAL_DMA_IRQHandler: Direct Mode Error: DMA Unlocked\n");
 
       if(hdma->XferErrorCallback != NULL)
       {
@@ -812,6 +819,8 @@ void HAL_DMA_IRQHandler(DMA_HandleTypeDef *hdma)
 
         /* Process Unlocked */
         __HAL_UNLOCK(hdma);      
+
+        trace_printf("HAL_DMA_IRQHandler: Transfer complete: DMA unlocked\n");
 
         if(hdma->XferCpltCallback != NULL)
         {
