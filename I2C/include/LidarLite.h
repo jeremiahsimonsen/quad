@@ -5,10 +5,15 @@
  *      Author: Jasmine
  */
 #include "I2C.h"
+#include "stm32f4xx_hal.h"
+#include "stm32f4_discovery.h"
+#include "stm32f4xx_hal_gpio.h"
+#include "stm32f4xx_hal_tim.h"
 
 #ifndef LIDARLITE_H
 #define LIDARLITE_H
 
+#ifdef LIDAR_I2C
 #define MEASURE_VAL 0x04
 #define MEASURE_REG 0x00
 #define STATUS_REG  0x47
@@ -47,6 +52,17 @@ public:
 	int16_t getDistRaw(void);
 	float getDistIn(void);
 };
+#endif
 
+class LidarLite {
+private:
+//	TIM_HandleTypeDef TimHandle;
+
+public:
+	LidarLite(void);
+
+	int16_t getDistRaw(void);
+	float getDistIn(void);
+};
 
 #endif // LIDARLITE_H

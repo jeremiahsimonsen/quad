@@ -157,26 +157,26 @@ void imu_test() {
 }
 
 void lidar_test() {
-	LidarLite lidar;
-	int x =0;
-	int dist, retVal;
-
-	while(1) {
-		retVal = lidar.startMeasure();
-		if (retVal < 0) {
-			trace_printf("Failed to start measurement\n");
-		}
-		do {
-			retVal = lidar.read();
-		} while (retVal < 0);
-
-		x++;
-		if(retVal < 0) {
-			trace_printf("error sending read");
-		}
-
-		dist = lidar.getDistRaw();
-		trace_printf("%d\t%d\n", dist,x);
-		HAL_Delay(100);
-	}
+//	LidarLite lidar;
+//	int x =0;
+//	int dist, retVal;
+//
+//	while(1) {
+//		retVal = lidar.startMeasure();
+//		if (retVal < 0) {
+//			trace_printf("Failed to start measurement\n");
+//		}
+//		do {
+//			retVal = lidar.read();
+//		} while (retVal < 0);
+//
+//		x++;
+//		if(retVal < 0) {
+//			trace_printf("error sending read");
+//		}
+//
+//		dist = lidar.getDistRaw();
+//		trace_printf("%d\t%d\n", dist,x);
+//		HAL_Delay(100);
+//	}
 }
