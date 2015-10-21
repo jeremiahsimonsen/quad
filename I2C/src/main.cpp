@@ -41,7 +41,8 @@ int main(int argc, char* argv[])
 //	lps_test();
 //	l3g_test();
 //	lsm_test();
-	lidar_test();
+	imu_test();
+//	lidar_test();
 }
 
 #pragma GCC diagnostic pop
@@ -158,15 +159,23 @@ void imu_test() {
 void lidar_test() {
 	LidarLite lidar;
 	int x =0;
-	int dist;
+	int dist, retVal;
+
 	while(1) {
-		dist = lidar.lidar_read();
-		x++;
-		if(dist<0) {
-			trace_printf("error sending read");
-//			dist = lidar.lidar_status();
-//			lidar_status_print(dist);
+		retVal = lidar.startMeasure();
+		if (retVal < 0) {
+			trace_printf("Failed to start measurement\n");
 		}
+		do {
+			retVal = lidar.read();
+		} while (retVal < 0);
+
+		x++;
+		if(retVal < 0) {
+			trace_printf("error sending read");
+		}
+
+		dist = lidar.getDistRaw();
 		trace_printf("%d\t%d\n", dist,x);
 		HAL_Delay(100);
 	}
