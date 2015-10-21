@@ -9,8 +9,6 @@
 #ifndef LIDARLITE_H
 #define LIDARLITE_H
 
-#define LIDAR_LITE_ADRS 0xC4
-
 #define MEASURE_VAL 0x04
 #define MEASURE_REG 0x00
 #define STATUS_REG  0x47
@@ -34,19 +32,21 @@
 class LidarLite {
 
 private:
-
 	I2C *i2c;
-//	unsigned char  _read_byte(int, int);
-//	unsigned char  _read_byteNZ(int, int);
-//	unsigned char  _read_byte_raw(int, int, bool);
-//	unsigned char lidar_version(int) ;
-//	unsigned char lidar_status(int);
+	uint8_t address;
+
+	uint8_t dataBuff[2];
+
+
+
 public:
 	LidarLite(void);
-	int lidar_read(void);
-	unsigned char lidar_status();
+	int8_t startMeasure(void);
+	int8_t read(void);
+
+	int16_t getDistRaw(void);
+	float getDistIn(void);
 };
 
-void lidar_status_print(unsigned char status);
 
 #endif // LIDARLITE_H
