@@ -63,6 +63,8 @@ void HAL_I2C_MemTxCpltCallback(I2C_HandleTypeDef *hi2c);
 void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c);
 void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c);
 
+void I2C1_ER_IRQHandler(void);
+
 void I2C1_DMA_RX_IRQHandler(void);
 void I2C1_DMA_TX_IRQHandler(void);
 
@@ -152,6 +154,14 @@ void initI2C(int scl, int sda) {
 		// TODO: ErrorHandler();
 		while(1);
 	}
+
+	i2cHandle.Instance->CR2 |= 1<<8;	// Interrupt error enable
+	HAL_NVIC_SetPriority(I2C1_ER_IRQn,2,0);
+	HAL_NVIC_EnableIRQ(I2C1_ER_IRQn);
+}
+
+void I2C1_ER_IRQHandler() {
+	HAL_I2C_ER_IRQHandler(&i2cHandle);
 }
 
 /**
@@ -658,22 +668,6 @@ int8_t I2C::read(uint16_t devAddr, uint8_t *pData, uint16_t size) {
 	return 0;
 }
 
-void I2C_DMAError(DMA_HandleTypeDef *hdma)
-{
-  I2C_HandleTypeDef* hi2c = (I2C_HandleTypeDef*)((DMA_HandleTypeDef*)hdma)->Parent;
-
-  /* Disable Acknowledge */
-  hi2c->Instance->CR1 &= ~I2C_CR1_ACK;
-
-  hi2c->XferCount = 0;
-
-  hi2c->State = HAL_I2C_STATE_READY;
-
-  hi2c->ErrorCode |= HAL_I2C_ERROR_DMA;
-
-  HAL_I2C_ErrorCallback(hi2c);
-}
-
 /**
  * @brief Member function to write to a register on an i2c slave device
  * @param devAddr i2c slave address of the device to write to (left-justified)
@@ -685,7 +679,6 @@ void I2C_DMAError(DMA_HandleTypeDef *hdma)
 int8_t I2C::memWrite(uint16_t devAddr, uint16_t memAddr, uint8_t *pData, uint16_t size) {
 	while (HAL_I2C_GetState(&i2cHandle) != HAL_I2C_STATE_READY);
 	if (HAL_I2C_Mem_Write_DMA(&i2cHandle, devAddr, memAddr, I2C_MEMADD_SIZE_8BIT, pData, size) != HAL_OK) {
-		I2C_DMAError(i2cHandle.hdmarx);
 		return -1;
 	}
 

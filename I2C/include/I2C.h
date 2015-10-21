@@ -117,8 +117,5 @@ public:
 	void readyWait(void);
 };
 
-//extern "C"{
-//	extern I2C_HandleTypeDef i2cHandle;
-//};
 
 #endif
