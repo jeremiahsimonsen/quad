@@ -60,7 +60,7 @@ int main(void)
   BSP_LED_Init(LED5);
   BSP_LED_Init(LED6);
 
-  init_USART(4,2);
+  init_USART(3,2);
 
   /* Configure USER Button */
   BSP_PB_Init(BUTTON_KEY, BUTTON_MODE_GPIO);
