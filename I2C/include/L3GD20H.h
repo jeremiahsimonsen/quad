@@ -452,7 +452,7 @@ public:
 	L3GD20H(void);
 	L3GD20H(L3GD20H_InitStruct init);
 
-	uint8_t read(void);
+	int8_t read(void);
 
 	float getX(void);		// Roll
 	float getY(void);		// Pitch

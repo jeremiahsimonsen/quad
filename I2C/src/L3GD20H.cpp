@@ -52,12 +52,12 @@ L3GD20H::L3GD20H(L3GD20H_InitStruct init) {
  */
 void L3GD20H::enable(L3GD20H_InitStruct init) {
 	// Set data rate and bandwidth; Enable sensor for 3-axis operation
-	uint8_t buf = L3GD_CTRL1_DR(L3GD_ODR_BW_Config_DR(init.odr_bw_config))
+	uint8_t buf = (uint8_t)(L3GD_CTRL1_DR(L3GD_ODR_BW_Config_DR(init.odr_bw_config))
 					| L3GD_CTRL1_BW(L3GD_ODR_BW_Config_BW(init.odr_bw_config))
 					| L3GD_CTRL1_PD_MASK
 					| L3GD_CTRL1_ZEN_MASK
 					| L3GD_CTRL1_YEN_MASK
-					| L3GD_CTRL1_XEN_MASK;
+					| L3GD_CTRL1_XEN_MASK);
 	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::CTRL1, &buf, 1);
 
 	// Set low output data rate configuration
@@ -65,8 +65,8 @@ void L3GD20H::enable(L3GD20H_InitStruct init) {
 	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::LOW_ODR, &buf, 1);
 
 	// Set full scale
-	buf = L3GD_CTRL4_FS(init.fs_config)
-			| L3GD_CTRL4_BDU_MASK;
+	buf = (uint8_t)(L3GD_CTRL4_FS(init.fs_config)
+			| L3GD_CTRL4_BDU_MASK);
 	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::CTRL4, &buf, 1);
 }
 
@@ -77,7 +77,7 @@ void L3GD20H::enable(L3GD20H_InitStruct init) {
  * 			ELSE: 0 on success, -1 on HAL_ERROR
  * 			Updates data in gyroBuff
  */
-uint8_t L3GD20H::read(void) {
+int8_t L3GD20H::read(void) {
 #if USE_DOUBLE_BUFFERING
 	buffIndicator = i2c->memRead(address, ( (uint8_t)L3GD20H_Reg::OUT_X_L | (1<<7) ), gyroBuff1, gyroBuff2, 6);
 	return buffIndicator;
@@ -101,7 +101,7 @@ int16_t L3GD20H::getXRaw(void) {
 	}
 #else
 	i2c->readyWait();
-	return gyroBuff[1]<<8 | gyroBuff[0];
+	return (int16_t)(gyroBuff[1]<<8 | gyroBuff[0]);
 #endif
 }
 
@@ -129,7 +129,7 @@ int16_t L3GD20H::getYRaw(void) {
 	}
 #else
 	i2c->readyWait();
-	return gyroBuff[3]<<8 | gyroBuff[2];
+	return (int16_t)(gyroBuff[3]<<8 | gyroBuff[2]);
 #endif
 }
 
@@ -157,7 +157,7 @@ int16_t L3GD20H::getZRaw(void) {
 	}
 #else
 	i2c->readyWait();
-	return gyroBuff[5]<<8 | gyroBuff[4];
+	return (int16_t)(gyroBuff[5]<<8 | gyroBuff[4]);
 #endif
 }
 
