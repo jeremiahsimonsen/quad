@@ -65,7 +65,7 @@ int16_t LidarLite::getDistRaw(void) {
 float LidarLite::getDistIn(void) {
 	return 0.0f;
 }
-#endif
+#else
 
 extern "C" {
 void HAL_TIM_IC_MspInit(TIM_HandleTypeDef *htim);
@@ -75,12 +75,39 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim);
 
 static TIM_HandleTypeDef TimHandle;
 static TIM_IC_InitTypeDef sConfig;
-static volatile uint32_t oldIC2 = 0;
-static volatile uint32_t newIC2 = 0;
+static volatile uint32_t pWidth = 0;
+static HAL_LockTypeDef Lock = HAL_UNLOCKED;
+
+#define _GET_LOCK_RETURN(__LOCK__)                                           \
+							do{                                        \
+								if((__LOCK__) == HAL_LOCKED)   \
+								{                                      \
+								   return HAL_BUSY;                    \
+								}                                      \
+								else                                   \
+								{                                      \
+								   (__LOCK__) = HAL_LOCKED;    \
+								}                                      \
+							  }while (0)
+#define _GET_LOCK_NORETURN(__LOCK__)                                           \
+							do{                                        \
+								if((__LOCK__) == HAL_LOCKED)   \
+								{                                      \
+								   return;                    \
+								}                                      \
+								else                                   \
+								{                                      \
+								   (__LOCK__) = HAL_LOCKED;    \
+								}                                      \
+							  }while (0)
+#define _UNLOCK(__LOCK__)												\
+							do{											\
+								(__LOCK__) = HAL_UNLOCKED;				\
+							} while (0)
 
 LidarLite::LidarLite() {
 	TimHandle.Instance = TIM2;
-	TimHandle.Init.Period = 0xFFFF;
+	TimHandle.Init.Period = 0xFFFFFFFF;
 	TimHandle.Init.Prescaler = 0;
 	TimHandle.Init.ClockDivision = 0;
 	TimHandle.Init.CounterMode = TIM_COUNTERMODE_UP;
@@ -93,8 +120,13 @@ LidarLite::LidarLite() {
 	sConfig.ICPrescaler = TIM_ICPSC_DIV1;
 	sConfig.ICFilter = 0;
 	sConfig.ICPolarity = TIM_ICPOLARITY_RISING;
-	sConfig.ICSelection = TIM_ICSELECTION_DIRECTTI;
+	sConfig.ICSelection = TIM_ICSELECTION_INDIRECTTI;
+	if (HAL_TIM_IC_ConfigChannel(&TimHandle, &sConfig, TIM_CHANNEL_1) != HAL_OK) {
+		// Error
+	}
 
+	sConfig.ICPolarity = TIM_ICPOLARITY_FALLING;
+	sConfig.ICSelection = TIM_ICSELECTION_DIRECTTI;
 	if (HAL_TIM_IC_ConfigChannel(&TimHandle, &sConfig, TIM_CHANNEL_2) != HAL_OK) {
 		// Error
 	}
@@ -112,21 +144,30 @@ LidarLite::LidarLite() {
 
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);	// Pull low for continuous sampling
 
+	if (HAL_TIM_IC_Start_IT(&TimHandle, TIM_CHANNEL_1) != HAL_OK) {
+		// Error
+	}
 	if (HAL_TIM_IC_Start_IT(&TimHandle, TIM_CHANNEL_2) != HAL_OK) {
 		// Error
 	}
 }
 
-int16_t LidarLite::getDistRaw() {
+uint32_t LidarLite::getDistRaw() {
+	_GET_LOCK_RETURN(Lock);
 
+	uint32_t tmp = pWidth;
+
+	_UNLOCK(Lock);
+
+	return tmp;
 }
 
 float LidarLite::getDistIn() {
-	return 0.0f;
-	// TODO: Implement
+	float dist = (float)getDistRaw() / 84e6 / 25.4e-6;
+	return dist;
 }
 
-// Input Capture using TIM2CH2 on PB3
+// Input Capture using TIM2CH1 and TIM2CH2 on PB3
 void HAL_TIM_IC_MspInit(TIM_HandleTypeDef *htim) {
 	GPIO_InitTypeDef GPIO_InitStruct;
 
@@ -149,29 +190,24 @@ void TIM2_IRQHandler() {
 }
 
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
+	// If falling edge
 	if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2)
 	{
-		/* Get the Input Capture value */
-		oldIC2 = newIC2;
-		newIC2 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
+		_GET_LOCK_NORETURN(Lock);
 
-//		if (uwIC2Value != 0)
-//		{
-//			/* Duty cycle computation */
-//			uwDutyCycle = ((HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1)) * 100) / uwIC2Value;
-//
-//			/* uwFrequency computation
-//			TIM4 counter clock = (RCC_Clocks.HCLK_Frequency)/2 */
-//			uwFrequency = (HAL_RCC_GetHCLKFreq())/2 / uwIC2Value;
-//		}
-//		else
-//		{
-//			uwDutyCycle = 0;
-//			uwFrequency = 0;
-//		}
+		uint32_t riseVal = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
+		uint32_t fallVal = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
+
+		if (riseVal <= fallVal) {
+			pWidth = fallVal - riseVal;
+		}
+
+//		pWidth = fallVal - riseVal;
+
+		_UNLOCK(Lock);
 	}
 }
 
-
+#endif
 
 

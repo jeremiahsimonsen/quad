@@ -41,8 +41,8 @@ int main(int argc, char* argv[])
 //	lps_test();
 //	l3g_test();
 //	lsm_test();
-	imu_test();
-//	lidar_test();
+//	imu_test();
+	lidar_test();
 }
 
 #pragma GCC diagnostic pop
@@ -157,10 +157,11 @@ void imu_test() {
 }
 
 void lidar_test() {
-//	LidarLite lidar;
+	LidarLite lidar;
 //	int x =0;
-//	int dist, retVal;
-//
+	float dist;
+
+	// i2c implementation
 //	while(1) {
 //		retVal = lidar.startMeasure();
 //		if (retVal < 0) {
@@ -179,4 +180,17 @@ void lidar_test() {
 //		trace_printf("%d\t%d\n", dist,x);
 //		HAL_Delay(100);
 //	}
+
+	while (1) {
+		dist = lidar.getDistIn();
+		char str[50];
+		sprintf(str, "%f",dist);
+//		trace_printf("%\n",dist);
+		trace_printf("%s\n",str);
+	}
 }
+
+
+
+
+
