@@ -21,7 +21,7 @@
  *
  */
 
-#include "PwmTimer.h"
+#include <PwmTimer.h>
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_hal_tim.h"
 #include "stm32f4xx_hal_rcc.h"
@@ -206,7 +206,7 @@ void PwmTimer::initTimer(float f, float w, TimerPin p) {
 		while(1);
 	}
 
-	setWidth(w);
+	setWidth(1.0f);
 }
 
 /**

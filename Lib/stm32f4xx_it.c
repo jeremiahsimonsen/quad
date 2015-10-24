@@ -167,38 +167,7 @@ void SysTick_Handler(void)
 /*  available peripheral interrupt handler's name please refer to the startup */
 /*  file (startup_stm32f4xx.s).                                               */
 /******************************************************************************/
-#define USE_UART_H
-#ifndef USE_UART_H
-/**
-  * @brief  This function handles DMA RX interrupt request.  
-  * @param  None
-  * @retval None   
-  */
-void USARTx_DMA_RX_IRQHandler(void)
-{
-  HAL_DMA_IRQHandler(UartHandle.hdmarx);
-}
 
-/**
-  * @brief  This function handles DMA TX interrupt request.
-  * @param  None
-  * @retval None   
-  */
-void USARTx_DMA_TX_IRQHandler(void)
-{
-  HAL_DMA_IRQHandler(UartHandle.hdmatx);
-}
-
-/**
-  * @brief  This function handles USARTx interrupt request.
-  * @param  None
-  * @retval None
-  */
-void USARTx_IRQHandler(void)
-{
-  HAL_UART_IRQHandler(&UartHandle);
-}
-#endif
 /**
   * @brief  This function handles PPP interrupt request.
   * @param  None

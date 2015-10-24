@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static UART_HandleTypeDef UartHandle;
+UART_HandleTypeDef UartHandle;
 static __IO ITStatus UartReady = RESET;
 static DMA_HandleTypeDef hdma_tx;
 static DMA_HandleTypeDef hdma_rx;
