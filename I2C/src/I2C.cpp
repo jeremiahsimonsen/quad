@@ -142,7 +142,7 @@ void initI2C(int scl, int sda) {
 	// Setup the i2c peripheral struct
 	i2cHandle.Instance 			   = I2Cx;
 	i2cHandle.Init.AddressingMode  = I2C_ADDRESSINGMODE_7BIT;
-	i2cHandle.Init.ClockSpeed      = 100000;
+	i2cHandle.Init.ClockSpeed      = 400000;
 	i2cHandle.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
 	i2cHandle.Init.DutyCycle       = I2C_DUTYCYCLE_16_9;
 	i2cHandle.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
