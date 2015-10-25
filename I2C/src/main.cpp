@@ -4,6 +4,12 @@
 #include "LSM303D.h"
 #include "IMU.h"
 #include "LidarLite.h"
+#include "uart.h"
+//extern "C" {
+//	void init_USART(int uart_num, int num_args, ...);
+//	void usart_transmit(uint8_t *s);
+//};
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "diag/Trace.h"
@@ -41,8 +47,8 @@ int main(int argc, char* argv[])
 //	lps_test();
 //	l3g_test();
 //	lsm_test();
-//	imu_test();
-	lidar_test();
+	imu_test();
+//	lidar_test();
 }
 
 #pragma GCC diagnostic pop
@@ -143,6 +149,12 @@ void lsm_test() {
 }
 
 void imu_test() {
+	char str[50];
+	sprintf(str, "USART working.\r\n");
+
+	init_USART(3,2);
+	usart_transmit((uint8_t *)str);
+
 	IMU imu;
 	float roll, pitch;
 
@@ -150,9 +162,9 @@ void imu_test() {
 		roll = imu.getRoll();
 		pitch = imu.getPitch();
 
-		char str[50];
-		sprintf(str, "Roll: %f\tPitch: %f", roll, pitch);
-		trace_printf("%s\n", str);
+		sprintf(str, "Roll: %f\tPitch: %f\r\n", roll, pitch);
+		trace_printf("%s", str);
+		usart_transmit((uint8_t *)str);
 	}
 }
 

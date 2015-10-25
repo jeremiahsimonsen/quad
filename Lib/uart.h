@@ -14,6 +14,9 @@
 #include "stm32f4xx_hal_dma.h"
 #include "stm32f4_discovery.h"
 
+#include "DMA_IT.h"
+
+//extern UART_HandleTypeDef UartHandle;
 
 /**
 * @brief Initializes the U(S)ART port specified by @uart_num

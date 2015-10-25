@@ -820,7 +820,7 @@ void HAL_DMA_IRQHandler(DMA_HandleTypeDef *hdma)
         /* Process Unlocked */
         __HAL_UNLOCK(hdma);      
 
-        trace_printf("HAL_DMA_IRQHandler: Transfer complete: DMA unlocked\n");
+//        trace_printf("HAL_DMA_IRQHandler: Transfer complete: DMA unlocked\n");
 
         if(hdma->XferCpltCallback != NULL)
         {

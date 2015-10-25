@@ -19,7 +19,8 @@
  *
  */
 
-#include <I2C.h>
+#include "I2C.h"
+#include "DMA_IT.h"
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_hal_i2c.h"
 #include "stm32f4xx_hal_rcc.h"
@@ -31,7 +32,7 @@
 I2C* I2C::i2cInstance = NULL;
 
 // Global variables needed by interrupts
-I2C_HandleTypeDef i2cHandle;
+//I2C_HandleTypeDef i2cHandle;
 static DMA_HandleTypeDef hdma_tx;
 static DMA_HandleTypeDef hdma_rx;
 
@@ -65,14 +66,14 @@ void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c);
 
 void I2C1_ER_IRQHandler(void);
 
-void I2C1_DMA_RX_IRQHandler(void);
-void I2C1_DMA_TX_IRQHandler(void);
-
-void I2C2_DMA_RX_IRQHandler(void);
-void I2C2_DMA_TX_IRQHandler(void);
-
-void I2C3_DMA_RX_IRQHandler(void);
-void I2C3_DMA_TX_IRQHandler(void);
+//void I2C1_DMA_RX_IRQHandler(void);
+//void I2C1_DMA_TX_IRQHandler(void);
+//
+//void I2C2_DMA_RX_IRQHandler(void);
+//void I2C2_DMA_TX_IRQHandler(void);
+//
+//void I2C3_DMA_RX_IRQHandler(void);
+//void I2C3_DMA_TX_IRQHandler(void);
 };
 
 ///////////////////////////////////////////////////////////////////////
@@ -552,6 +553,7 @@ void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c) {
 ///////////////////////////////////////////////////////////////////////
 //                               ISRs                                //
 ///////////////////////////////////////////////////////////////////////
+#if 0
 void I2C1_DMA_RX_IRQHandler(void) {
 	HAL_DMA_IRQHandler(i2cHandle.hdmarx);
 }
@@ -575,6 +577,7 @@ void I2C3_DMA_RX_IRQHandler(void) {
 void I2C3_DMA_TX_IRQHandler(void) {
 	HAL_DMA_IRQHandler(i2cHandle.hdmatx);
 }
+#endif
 
 bool isSclPin(i2cPin p) {
 	bool map[14] = {true, true, false, true, false, true, false, false, false, true, true, false, true, false};

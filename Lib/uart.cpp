@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-UART_HandleTypeDef UartHandle;
+//UART_HandleTypeDef UartHandle;
 static __IO ITStatus UartReady = RESET;
 static DMA_HandleTypeDef hdma_tx;
 static DMA_HandleTypeDef hdma_rx;
@@ -27,33 +27,39 @@ void UART4MspDeInit(void);
 void UART5MspDeInit(void);
 void USART6MspDeInit(void);
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *UartHandle);
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle);
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *UartHandle);
 
-void USART1_TX_DMA_IRQHandler(void);
-void USART1_RX_DMA_IRQHandler(void);
+//void USART1_TX_DMA_IRQHandler(void);
+//void USART1_RX_DMA_IRQHandler(void);
 void USART1_IRQHandler(void);
 
-void USART2_TX_DMA_IRQHandler(void);
-void USART2_RX_DMA_IRQHandler(void);
+//void USART2_TX_DMA_IRQHandler(void);
+//void USART2_RX_DMA_IRQHandler(void);
 void USART2_IRQHandler(void);
 
-void USART3_TX_DMA_IRQHandler(void);
-void USART3_RX_DMA_IRQHandler(void);
+//void USART3_TX_DMA_IRQHandler(void);
+//void USART3_RX_DMA_IRQHandler(void);
 void USART3_IRQHandler(void);
 
-void UART4_TX_DMA_IRQHandler(void);
-void UART4_RX_DMA_IRQHandler(void);
+//void UART4_TX_DMA_IRQHandler(void);
+//void UART4_RX_DMA_IRQHandler(void);
 void UART4_IRQHandler(void);
 
-void UART5_TX_DMA_IRQHandler(void);
-void UART5_RX_DMA_IRQHandler(void);
+//void UART5_TX_DMA_IRQHandler(void);
+//void UART5_RX_DMA_IRQHandler(void);
 void UART5_IRQHandler(void);
 
-void USART6_TX_DMA_IRQHandler(void);
-void USART6_RX_DMA_IRQHandler(void);
+//void USART6_TX_DMA_IRQHandler(void);
+//void USART6_RX_DMA_IRQHandler(void);
 void USART6_IRQHandler(void);
+#ifdef __cplusplus
+}
+#endif
 
 ///////////////////////////////////////////////////////////////////////
 //                      Initialization Routines                      //
@@ -880,6 +886,7 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 //                               ISRs                                //
 ///////////////////////////////////////////////////////////////////////
 
+#if 0
 void USART1_TX_DMA_IRQHandler(void)
 {
 	HAL_DMA_IRQHandler(UartHandle.hdmatx);
@@ -889,12 +896,14 @@ void USART1_RX_DMA_IRQHandler(void)
 {
 	HAL_DMA_IRQHandler(UartHandle.hdmarx);
 }
+#endif
 
 void USART1_IRQHandler(void)
 {
 	HAL_UART_IRQHandler(&UartHandle);
 }
 
+#if 0
 void USART2_TX_DMA_IRQHandler(void)
 {
 	HAL_DMA_IRQHandler(UartHandle.hdmatx);
@@ -904,12 +913,14 @@ void USART2_RX_DMA_IRQHandler(void)
 {
 	HAL_DMA_IRQHandler(UartHandle.hdmarx);
 }
+#endif
 
 void USART2_IRQHandler(void)
 {
 	HAL_UART_IRQHandler(&UartHandle);
 }
 
+#if 0
 void USART3_TX_DMA_IRQHandler(void)
 {
 	HAL_DMA_IRQHandler(UartHandle.hdmatx);
@@ -919,12 +930,14 @@ void USART3_RX_DMA_IRQHandler(void)
 {
 	HAL_DMA_IRQHandler(UartHandle.hdmarx);
 }
+#endif
 
 void USART3_IRQHandler(void)
 {
 	HAL_UART_IRQHandler(&UartHandle);
 }
 
+#if 0
 void UART4_TX_DMA_IRQHandler(void)
 {
 	HAL_DMA_IRQHandler(UartHandle.hdmatx);
@@ -934,12 +947,14 @@ void UART4_RX_DMA_IRQHandler(void)
 {
 	HAL_DMA_IRQHandler(UartHandle.hdmarx);
 }
+#endif
 
 void UART4_IRQHandler(void)
 {
 	HAL_UART_IRQHandler(&UartHandle);
 }
 
+#if 0
 void UART5_TX_DMA_IRQHandler(void)
 {
 	HAL_DMA_IRQHandler(UartHandle.hdmatx);
@@ -949,12 +964,14 @@ void UART5_RX_DMA_IRQHandler(void)
 {
 	HAL_DMA_IRQHandler(UartHandle.hdmarx);
 }
+#endif
 
 void UART5_IRQHandler(void)
 {
 	HAL_UART_IRQHandler(&UartHandle);
 }
 
+#if 0
 void USART6_TX_DMA_IRQHandler(void)
 {
 	HAL_DMA_IRQHandler(UartHandle.hdmatx);
@@ -964,6 +981,7 @@ void USART6_RX_DMA_IRQHandler(void)
 {
 	HAL_DMA_IRQHandler(UartHandle.hdmarx);
 }
+#endif
 
 void USART6_IRQHandler(void)
 {

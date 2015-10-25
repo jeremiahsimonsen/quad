@@ -75,9 +75,19 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Lib/stm32f4xx_it.h</locationURI>
 		</link>
 		<link>
+			<name>include/uart.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Lib/uart.h</locationURI>
+		</link>
+		<link>
 			<name>src/stm32f4xx_it.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Lib/stm32f4xx_it.c</locationURI>
+		</link>
+		<link>
+			<name>src/uart.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Lib/uart.cpp</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
