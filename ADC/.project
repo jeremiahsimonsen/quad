@@ -26,9 +26,34 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>include/Adc.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Lib/Adc.h</locationURI>
+		</link>
+		<link>
+			<name>include/Motor.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Lib/Motor.h</locationURI>
+		</link>
+		<link>
+			<name>include/PwmTimer.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Lib/PwmTimer.h</locationURI>
+		</link>
+		<link>
+			<name>include/stm32f4xx_hal_conf.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Lib/stm32f4xx_hal_conf.h</locationURI>
+		</link>
+		<link>
 			<name>include/stm32f4xx_it.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Lib/stm32f4xx_it.h</locationURI>
+		</link>
+		<link>
+			<name>src/Adc.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Lib/Adc.cpp</locationURI>
 		</link>
 		<link>
 			<name>src/Motor.cpp</name>

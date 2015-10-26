@@ -28,8 +28,8 @@
  * NOTE: ESC must be re-calibrated each time these are changed to allow full
  * throttle range.
  */
-#define FULL_SPEED_WIDTH 2.5f
-#define ZERO_SPEED_WIDTH 0.5f
+#define FULL_SPEED_WIDTH 2.0f
+#define ZERO_SPEED_WIDTH 1.0f
 
 class Motor {
 private:

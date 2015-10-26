@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
 	// at high speed.
 
 	Adc adc(AdcPin::PA2);
-	Motor m(TimerPin::PB7);
+	Motor m(TimerPin::PC9);
 
 	// Infinite loop
 	while (1)
@@ -47,6 +47,8 @@ int main(int argc, char* argv[])
 		uint32_t adcVal = adc.read();
 		float speed = mapAdcValToMotorSpeed(adcVal);
 		m.setSpeed(speed);
+
+		HAL_Delay(40);
 	}
 }
 

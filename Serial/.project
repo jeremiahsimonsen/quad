@@ -26,6 +26,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>include/DMA_IT.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Lib/DMA_IT.h</locationURI>
+		</link>
+		<link>
 			<name>include/stm32f4xx_hal_conf.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Lib/stm32f4xx_hal_conf.h</locationURI>
@@ -39,6 +44,11 @@
 			<name>include/uart.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Lib/uart.h</locationURI>
+		</link>
+		<link>
+			<name>src/DMA_IT.c</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Lib/DMA_IT.c</locationURI>
 		</link>
 		<link>
 			<name>src/stm32f4xx_it.c</name>
