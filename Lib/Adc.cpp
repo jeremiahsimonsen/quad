@@ -80,6 +80,7 @@ void Adc::initAdc(AdcPin p) {
 	AdcHandle.Init.NbrOfDiscConversion = 1;
 	AdcHandle.Init.ExternalTrigConv = ADC_SOFTWARE_START;
 	AdcHandle.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+	AdcHandle.State = HAL_ADC_STATE_RESET;
 
 	if (HAL_ADC_Init(&AdcHandle) != HAL_OK) {
 		// TODO: Error_Handler();
