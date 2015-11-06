@@ -47,8 +47,8 @@ int main(int argc, char* argv[])
 //	lps_test();
 //	l3g_test();
 //	lsm_test();
-	imu_test();
-//	lidar_test();
+//	imu_test();
+	lidar_test();
 }
 
 #pragma GCC diagnostic pop

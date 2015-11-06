@@ -12,6 +12,8 @@
 #include "Adc.h"
 #include "Motor.h"
 #include "IMU.h"
+#include "LidarLite.h"
+#include "uart.h"
 
 // ----------------------------------------------------------------------------
 //
@@ -40,25 +42,52 @@ int main(int argc, char* argv[])
 	// At this stage the system clock should have already been configured
 	// at high speed.
 
-	Motor m(TimerPin::PC9);
+	Motor m1(TimerPin::PC9);
+	Motor m2(TimerPin::PC7);
 	IMU imu;
-	Adc adc(AdcPin::PA2);
-	float roll;//, pitch;
+	Adc vSense(AdcPin::PA2);
+	Adc iSense(AdcPin::PA3);
+	LidarLite lidar;
+	init_USART(3, 3, 115200);
+
+	float roll, pitch;
+	float height;
+	float v;//, i;
+	uint32_t iter = 0;
+	char txBuff[50];
 
 	// Infinite loop
 	while (1)
 	{
-//		pitch = imu.getPitch();
-
-		uint32_t adcVal = adc.read();
-
-		float maxSpeed = mapAdcValToMotorSpeed(adcVal);
-
 		roll = imu.getRoll();
+		pitch = imu.getPitch();
+
+		height = lidar.getDistIn();
+
+		uint32_t vRaw = vSense.read();
+//		uint32_t iRaw = iSense.read();
+		v = (float)vRaw * 3.0f / 4096.0f / 63.69e-3f;
+//		i = (float)iRaw * 3.0f / 4096.0f / 18.30e-3f;
+
+//		uint32_t adcVal = adc.read();
+
+//		float maxSpeed = mapAdcValToMotorSpeed(adcVal);
+		float maxSpeed = 0.5f;
+
 		float speed = (roll + 90.0f) / 180.0f * maxSpeed;
 
-		m.setSpeed(speed);
+		m1.setSpeed(speed);
+		m2.setSpeed(maxSpeed-speed);
 
+		if (iter % 10 == 0) {
+//			sprintf(txBuff, "Height: %f\tRoll: %f\tPitch: %f\n\r", height, roll, pitch);
+			sprintf(txBuff, "Height: %f\tRoll: %f\tPitch: %f\tVoltage: %f\n\r", height, roll, pitch, v);
+//			sprintf(txBuff, "Height: %f\tRoll: %f\tPitch: %f\tVoltage: %f\tCurrent%f\n\r", height, roll, pitch, v, i);
+			usart_transmit((uint8_t *)txBuff);
+//			trace_printf("%s", txBuff);
+		}
+
+		iter++;
 		HAL_Delay(40);
 	}
 }
