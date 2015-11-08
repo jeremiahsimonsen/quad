@@ -430,7 +430,6 @@ typedef struct {
 class L3GD20H {
 private:
 	I2C *i2c;
-	uint8_t address;
 
 	float resolution;
 
@@ -441,6 +440,8 @@ private:
 #else
 	uint8_t gyroBuff[6];	// Gyro angular velocity buffer
 #endif
+
+	uint8_t address;
 
 	void enable(L3GD20H_InitStruct init);
 

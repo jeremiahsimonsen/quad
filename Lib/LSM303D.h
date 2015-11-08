@@ -345,7 +345,6 @@ typedef struct {
 class LSM303D {
 private:
 	I2C *i2c;
-	uint8_t address;
 
 	float accResolution;
 	float magResolution;
@@ -362,6 +361,8 @@ private:
 
 	uint8_t magBuff[6];			// Magnetometer buffer
 #endif
+
+	uint8_t address;
 
 	void enable(LSM303D_InitStruct init);
 
