@@ -61,7 +61,7 @@ private:
 public:
 	LidarLite(void);
 
-	uint32_t getDistRaw(void);
+	float getDistRaw(void);
 	float getDistIn(void);
 };
 

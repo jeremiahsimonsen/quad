@@ -73,10 +73,12 @@ void TIM2_IRQHandler(void);
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim);
 };
 
+#define NUM_SAMPLES 25
+
 static TIM_HandleTypeDef TimHandle;
 static TIM_IC_InitTypeDef sConfig;
-static volatile uint32_t pWidth = 0;
-static HAL_LockTypeDef Lock = HAL_UNLOCKED;
+static volatile uint32_t pWidthBuff[NUM_SAMPLES];
+static HAL_LockTypeDef pWidthLock = HAL_UNLOCKED;
 
 #define _GET_LOCK_RETURN(__LOCK__)                                           \
 							do{                                        \
@@ -152,18 +154,24 @@ LidarLite::LidarLite() {
 	}
 }
 
-uint32_t LidarLite::getDistRaw() {
-	_GET_LOCK_RETURN(Lock);
+float LidarLite::getDistRaw() {
+	_GET_LOCK_RETURN(pWidthLock);
 
-	uint32_t tmp = pWidth;
+	uint32_t pWidthSum = 0;
 
-	_UNLOCK(Lock);
+	for (int i = 0; i < NUM_SAMPLES; i++) {
+		pWidthSum += pWidthBuff[i];
+	}
 
-	return tmp;
+	_UNLOCK(pWidthLock);
+
+	float dist = (float)pWidthSum / (float)NUM_SAMPLES;
+
+	return dist;
 }
 
 float LidarLite::getDistIn() {
-	float dist = (float)getDistRaw() / 84e6 / 25.4e-6;
+	float dist = getDistRaw() / 84e6 / 25.4e-6;
 	return dist;
 }
 
@@ -190,21 +198,35 @@ void TIM2_IRQHandler() {
 }
 
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
+	static uint32_t cntValBuff[4];
+	static uint8_t cntValBuffIndex = 0;
+	static uint8_t pWidthBuffIndex = 0;
+
 	// If falling edge
 	if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2)
 	{
-		_GET_LOCK_NORETURN(Lock);
+		_GET_LOCK_NORETURN(pWidthLock);
 
-		uint32_t riseVal = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
-		uint32_t fallVal = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
+		// Read and store the CCR values
+		cntValBuff[cntValBuffIndex++] = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);		// Rising edge CNT value
+		cntValBuff[cntValBuffIndex++] = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);		// Falling edge CNT value
 
-		if (riseVal <= fallVal) {
-			pWidth = fallVal - riseVal;
+		// Reset circular buffer index
+		if (cntValBuffIndex == 4)
+			cntValBuffIndex = 0;
+
+		// Calculate new positive pulse width and store in circular history buffer
+		if (cntValBuffIndex == 2) {
+			pWidthBuff[pWidthBuffIndex++] = cntValBuff[1] - cntValBuff[0];
+		} else if (cntValBuffIndex == 0) {
+			pWidthBuff[pWidthBuffIndex++] = cntValBuff[3] - cntValBuff[2];
 		}
 
-//		pWidth = fallVal - riseVal;
+		// Reset circular buffer index
+		if (pWidthBuffIndex == NUM_SAMPLES)
+			pWidthBuffIndex = 0;
 
-		_UNLOCK(Lock);
+		_UNLOCK(pWidthLock);
 	}
 }
 
