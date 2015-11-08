@@ -22,6 +22,7 @@ IMU::IMU()
 
 float IMU::getRoll(void) {
 	accel.read();
+	gyro.read();
 
 	float accX, accY, accZ;
 	accX = accel.getAccX();
@@ -39,6 +40,7 @@ float IMU::getRoll(void) {
 
 float IMU::getPitch(void) {
 	accel.read();
+	gyro.read();
 
 	float accX, accY, accZ;
 	accX = accel.getAccX();

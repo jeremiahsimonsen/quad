@@ -88,13 +88,13 @@ void LSM303D::enable(LSM303D_InitStruct init) {
 	i2c->memWrite(address, (uint8_t)LSM303D_Reg::CTRL1, &buf, 1);
 
 	// Set accelerometer anti-alias filter bandwidth and full-scale
-	buf = LSM303D_CTRL2_ABW(init.abw_config)
-			| LSM303D_CTRL2_AFS(init.afs_config);
+	buf = (uint8_t)(LSM303D_CTRL2_ABW(init.abw_config)
+			| LSM303D_CTRL2_AFS(init.afs_config));
 	i2c->memWrite(address, (uint8_t)LSM303D_Reg::CTRL2, &buf, 1);
 
 	// Set magnetometer resolution and output data rate
-	buf = LSM303D_CTRL5_M_RES(init.mres_config)
-			| LSM303D_CTRL5_M_ODR(init.modr_config);
+	buf = (uint8_t)(LSM303D_CTRL5_M_RES(init.mres_config)
+			| LSM303D_CTRL5_M_ODR(init.modr_config));
 	i2c->memWrite(address, (uint8_t)LSM303D_Reg::CTRL5, &buf, 1);
 
 	// Set magnetic full-scale
@@ -146,7 +146,7 @@ int16_t LSM303D::getAccXRaw(void) {
 	}
 #else
 	i2c->readyWait();
-	return accBuff[1]<<8 | accBuff[0];
+	return (int16_t)(accBuff[1]<<8 | accBuff[0]);
 #endif
 }
 
@@ -175,7 +175,7 @@ int16_t LSM303D::getAccYRaw(void) {
 	}
 #else
 	i2c->readyWait();
-	return accBuff[3]<<8 | accBuff[2];
+	return (int16_t)(accBuff[3]<<8 | accBuff[2]);
 #endif
 }
 
@@ -204,7 +204,7 @@ int16_t LSM303D::getAccZRaw(void) {
 	}
 #else
 	i2c->readyWait();
-	return accBuff[5]<<8 | accBuff[4];
+	return (int16_t)(accBuff[5]<<8 | accBuff[4]);
 #endif
 }
 
@@ -242,7 +242,7 @@ int16_t LSM303D::getMagXRaw(void) {
 	}
 #else
 	i2c->readyWait();
-	return magBuff[1]<<8 | magBuff[0];
+	return (int16_t)(magBuff[1]<<8 | magBuff[0]);
 #endif
 }
 
@@ -271,7 +271,7 @@ int16_t LSM303D::getMagYRaw(void) {
 	}
 #else
 	i2c->readyWait();
-	return magBuff[3]<<8 | magBuff[2];
+	return (int16_t)(magBuff[3]<<8 | magBuff[2]);
 #endif
 }
 
@@ -300,7 +300,7 @@ int16_t LSM303D::getMagZRaw(void) {
 	}
 #else
 	i2c->readyWait();
-	return magBuff[5]<<8 | magBuff[4];
+	return (int16_t)(magBuff[5]<<8 | magBuff[4]);
 #endif
 }
 
