@@ -68,6 +68,19 @@ void L3GD20H::enable(L3GD20H_InitStruct init) {
 	buf = (uint8_t)(L3GD_CTRL4_FS(init.fs_config)
 			| L3GD_CTRL4_BDU_MASK);
 	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::CTRL4, &buf, 1);
+
+	// GPIO Initialization for sample time measurement
+	GPIO_InitTypeDef GPIO_InitStruct;
+
+	__HAL_RCC_GPIOA_CLK_ENABLE();
+
+	GPIO_InitStruct.Pin = GPIO_PIN_4;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
 }
 
 /**
@@ -82,6 +95,8 @@ int8_t L3GD20H::read(void) {
 	buffIndicator = i2c->memRead(address, ( (uint8_t)L3GD20H_Reg::OUT_X_L | (1<<7) ), gyroBuff1, gyroBuff2, 6);
 	return buffIndicator;
 #else
+	HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_4);
+
 	return i2c->memRead(address, ( (uint8_t)L3GD20H_Reg::OUT_X_L | (1<<7) ), gyroBuff, 6);
 #endif
 }
