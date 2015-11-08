@@ -73,7 +73,7 @@ void TIM2_IRQHandler(void);
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim);
 };
 
-#define NUM_SAMPLES 25
+#define NUM_SAMPLES 15
 
 static TIM_HandleTypeDef TimHandle;
 static TIM_IC_InitTypeDef sConfig;
