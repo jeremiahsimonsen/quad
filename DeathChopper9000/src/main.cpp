@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
 		m1.setSpeed(speed);
 		m2.setSpeed(maxSpeed-speed);
 
-		if (iter % 10 == 0) {
+		if (iter % 30 == 0) {
 //			sprintf(txBuff, "Height: %f\tRoll: %f\tPitch: %f\n\r", height, roll, pitch);
 			sprintf(txBuff, "Height: %f\tRoll: %f\tPitch: %f\tVoltage: %f\n\r", height, roll, pitch, v);
 //			sprintf(txBuff, "Height: %f\tRoll: %f\tPitch: %f\tVoltage: %f\tCurrent%f\n\r", height, roll, pitch, v, i);
@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
 		}
 
 		iter++;
-		HAL_Delay(40);
+//		HAL_Delay(40);
 	}
 }
 
