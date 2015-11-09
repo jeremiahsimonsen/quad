@@ -171,7 +171,7 @@ float LidarLite::getDistRaw() {
 }
 
 float LidarLite::getDistIn() {
-	float dist = getDistRaw() / 84e6 / 25.4e-6;
+	float dist = getDistRaw() / 84e6f / 25.4e-6f;
 	return dist;
 }
 
