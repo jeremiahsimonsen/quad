@@ -442,6 +442,9 @@ private:
 #endif
 
 	uint8_t address;
+	uint32_t prevTick;
+	uint32_t dt;
+	TIM_HandleTypeDef TimHandle;
 
 	void enable(L3GD20H_InitStruct init);
 
@@ -452,6 +455,8 @@ private:
 public:
 	L3GD20H(void);
 	L3GD20H(L3GD20H_InitStruct init);
+
+	float getDT(void);
 
 	int8_t read(void);
 
