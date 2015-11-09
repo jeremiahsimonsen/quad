@@ -22,7 +22,7 @@ enum class AdcPin {
 
 class Adc {
 private:
-	ADC_HandleTypeDef AdcHandle;
+//	ADC_HandleTypeDef AdcHandle;
 
 	AdcPin pin;
 

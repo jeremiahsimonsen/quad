@@ -114,6 +114,7 @@ LidarLite::LidarLite() {
 	TimHandle.Init.ClockDivision = 0;
 	TimHandle.Init.CounterMode = TIM_COUNTERMODE_UP;
 	TimHandle.Init.RepetitionCounter = 0;
+	TimHandle.State = HAL_TIM_STATE_RESET;
 
 	if (HAL_TIM_IC_Init(&TimHandle) != HAL_OK) {
 		// Error

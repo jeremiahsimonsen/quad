@@ -17,6 +17,8 @@
 #include "stm32f4_discovery.h"
 #include "stm32f407xx.h"
 
+static ADC_HandleTypeDef AdcHandle;
+
 Adc::Adc() {
 	pin = AdcPin::PA2;
 

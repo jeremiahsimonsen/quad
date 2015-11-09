@@ -13,6 +13,8 @@
 #include "IMU.h"
 #include <math.h>
 
+#include "diag/Trace.h"
+
 #define PI 3.1415927f
 
 IMU::IMU()
@@ -29,9 +31,15 @@ void IMU::enable() {
 // TODO: Was going to set up input capture for gyro rate...leads to problem w/PCB...
 }
 
+float IMU::getDT(void) {
+	return gyro.getDT();
+}
+
 float IMU::getRoll(void) {
 	accel.read();
 	gyro.read();
+
+//	trace_printf("DT: %f\n", gyro.getDT());
 
 	float accX, accY, accZ;
 	accX = accel.getAccX();

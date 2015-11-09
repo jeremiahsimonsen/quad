@@ -95,8 +95,10 @@ int main(int argc, char* argv[])
 
 		if (iter % 30 == 0) {
 //			sprintf(txBuff, "Height: %f\tRoll: %f\tPitch: %f\n\r", height, roll, pitch);
-			sprintf(txBuff, "Height: %f\tRoll: %f\tPitch: %f\tVoltage: %f\n\r", height, roll, pitch, v);
+//			sprintf(txBuff, "Height: %f\tRoll: %f\tPitch: %f\tVoltage: %f\n\r", height, roll, pitch, v);
 //			sprintf(txBuff, "Height: %f\tRoll: %f\tPitch: %f\tVoltage: %f\tCurrent%f\n\r", height, roll, pitch, v, i);
+			float dt = imu.getDT();
+			sprintf(txBuff, "DT: %f\n\r", dt);
 			usart_transmit((uint8_t *)txBuff);
 //			trace_printf("%s", txBuff);
 		}

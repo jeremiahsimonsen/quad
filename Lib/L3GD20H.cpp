@@ -85,17 +85,20 @@ void L3GD20H::enable(L3GD20H_InitStruct init) {
 	// TIM initialization for alternative sample time measurement
 	TimHandle.Instance = TIM6;
 	TimHandle.Init.Period = 0xFFFF;
-	TimHandle.Init.Prescaler = 0;
+	TimHandle.Init.Prescaler = 1;
 	TimHandle.Init.ClockDivision = 0;
 	TimHandle.Init.CounterMode = TIM_COUNTERMODE_UP;
 	TimHandle.Init.RepetitionCounter = 0;
+	TimHandle.State = HAL_TIM_STATE_RESET;
 
 	if (HAL_TIM_Base_Init(&TimHandle) != HAL_OK) {
 		// Error
+		while(1);
 	}
 
 	if (HAL_TIM_Base_Start(&TimHandle) != HAL_OK) {
 		// Error
+		while(1);
 	}
 }
 
@@ -108,7 +111,7 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim) {
 }
 
 float L3GD20H::getDT() {
-	return (float)dt / 32e6f;
+	return (float)dt / 16e6f;
 }
 
 /**
@@ -125,17 +128,14 @@ int8_t L3GD20H::read(void) {
 #else
 	HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_4);
 
-	if (HAL_TIM_Base_Stop(&TimHandle) != HAL_OK) {
-		// Error
-	}
+	uint32_t tmp = __HAL_TIM_GetCounter(&TimHandle);
 
-	uint32_t tmp = TimHandle.Instance->CNT;
-	dt = tmp - prevTick;
+	if (tmp >= prevTick) {
+		dt = tmp - prevTick;
+	} else {
+		dt = 65536 - prevTick + tmp;
+	}
 	prevTick = tmp;
-
-	if (HAL_TIM_Base_Start(&TimHandle) != HAL_OK) {
-		// Error
-	}
 
 	return i2c->memRead(address, ( (uint8_t)L3GD20H_Reg::OUT_X_L | (1<<7) ), gyroBuff, 6);
 #endif
