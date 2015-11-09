@@ -44,7 +44,21 @@ int main(int argc, char* argv[])
 
 	Motor m1(TimerPin::PC9);
 	Motor m2(TimerPin::PC7);
-	IMU imu;
+
+	L3GD20H_InitStruct gyroConfig;
+	gyroConfig.fs_config = L3GD_FS_Config::MEDIUM;
+	gyroConfig.odr_bw_config = L3GD_ODR_BW_Config::NINETEEN;
+
+	LSM303D_InitStruct accelConfig;
+	accelConfig.aodr_config = LSM_AODR_Config::ELEVEN;
+	accelConfig.abw_config = LSM_ABW_Config::ONE;
+	accelConfig.afs_config = LSM_AFS_Config::FOUR;
+	accelConfig.modr_config = LSM_MODR_Config::SIX;
+	accelConfig.mres_config = LSM_MRES_Config::HIGH;
+	accelConfig.mfs_config = LSM_MFS_Config::FOUR;
+	accelConfig.md_config = LSM_MD_Config::CONTINUOUS;
+
+	IMU imu(gyroConfig, accelConfig);
 	Adc vSense(AdcPin::PA2);
 	Adc iSense(AdcPin::PA3);
 	LidarLite lidar;

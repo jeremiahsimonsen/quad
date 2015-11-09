@@ -20,6 +20,15 @@ IMU::IMU()
 {
 }
 
+IMU::IMU(L3GD20H_InitStruct gyroConfig, LSM303D_InitStruct accelConfig)
+	: barometer(), gyro(gyroConfig), accel(accelConfig)
+{
+}
+
+void IMU::enable() {
+// TODO: Was going to set up input capture for gyro rate...leads to problem w/PCB...
+}
+
 float IMU::getRoll(void) {
 	accel.read();
 	gyro.read();

@@ -23,8 +23,11 @@ private:
 	L3GD20H gyro;
 	LSM303D accel;
 
+	void enable(void);
+
 public:
 	IMU();
+	IMU(L3GD20H_InitStruct gyroConfig, LSM303D_InitStruct accelConfig);
 
 	float getRoll(void);
 	float getPitch(void);
