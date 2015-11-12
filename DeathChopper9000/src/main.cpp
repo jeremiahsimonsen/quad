@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
 	gyroConfig.odr_bw_config = L3GD_ODR_BW_Config::NINETEEN;
 
 	LSM303D_InitStruct accelConfig;
-	accelConfig.aodr_config = LSM_AODR_Config::ELEVEN;
+	accelConfig.aodr_config = LSM_AODR_Config::FOUR;
 	accelConfig.abw_config = LSM_ABW_Config::ONE;
 	accelConfig.afs_config = LSM_AFS_Config::FOUR;
 	accelConfig.modr_config = LSM_MODR_Config::SIX;
@@ -97,14 +97,15 @@ int main(int argc, char* argv[])
 //			sprintf(txBuff, "Height: %f\tRoll: %f\tPitch: %f\n\r", height, roll, pitch);
 //			sprintf(txBuff, "Height: %f\tRoll: %f\tPitch: %f\tVoltage: %f\n\r", height, roll, pitch, v);
 //			sprintf(txBuff, "Height: %f\tRoll: %f\tPitch: %f\tVoltage: %f\tCurrent%f\n\r", height, roll, pitch, v, i);
-			float dt = imu.getDT();
-			sprintf(txBuff, "DT: %f\n\r", dt);
+//			float dt = imu.getDT();
+//			sprintf(txBuff, "DT: %f\n\r", dt);
+			sprintf(txBuff, "!ANG:%f,%f,%f\n", roll, pitch, 0.0f);
 			usart_transmit((uint8_t *)txBuff);
 //			trace_printf("%s", txBuff);
 		}
 
 		iter++;
-//		HAL_Delay(40);
+		HAL_Delay(40);
 	}
 }
 

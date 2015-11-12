@@ -13,8 +13,6 @@
 #include "IMU.h"
 #include <math.h>
 
-#include "diag/Trace.h"
-
 #define PI 3.1415927f
 
 IMU::IMU()
@@ -38,8 +36,6 @@ float IMU::getDT(void) {
 float IMU::getRoll(void) {
 	accel.read();
 	gyro.read();
-
-//	trace_printf("DT: %f\n", gyro.getDT());
 
 	float accX, accY, accZ;
 	accX = accel.getAccX();

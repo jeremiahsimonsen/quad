@@ -5,10 +5,7 @@
 #include "IMU.h"
 #include "LidarLite.h"
 #include "uart.h"
-//extern "C" {
-//	void init_USART(int uart_num, int num_args, ...);
-//	void usart_transmit(uint8_t *s);
-//};
+#include "Motor.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,6 +28,7 @@ void l3g_test(void);
 void lsm_test(void);
 void imu_test(void);
 void lidar_test(void);
+void raw_imu_data(void);
 // Sample pragmas to cope with warnings. Please note the related line at
 // the end of this function, used to pop the compiler diagnostics status.
 #pragma GCC diagnostic push
@@ -48,7 +46,8 @@ int main(int argc, char* argv[])
 //	l3g_test();
 //	lsm_test();
 //	imu_test();
-	lidar_test();
+//	lidar_test();
+	raw_imu_data();
 }
 
 #pragma GCC diagnostic pop
@@ -202,7 +201,58 @@ void lidar_test() {
 	}
 }
 
+void raw_imu_data(void) {
+	Motor m1(TimerPin::PC9);
+	Motor m2(TimerPin::PC7);
 
+	L3GD20H_InitStruct gyroConfig;
+	gyroConfig.fs_config = L3GD_FS_Config::MEDIUM;
+	gyroConfig.odr_bw_config = L3GD_ODR_BW_Config::NINETEEN;
+
+	LSM303D_InitStruct accelConfig;
+	accelConfig.aodr_config = LSM_AODR_Config::ELEVEN;
+	accelConfig.abw_config = LSM_ABW_Config::FOUR;
+	accelConfig.afs_config = LSM_AFS_Config::FOUR;
+	accelConfig.modr_config = LSM_MODR_Config::SIX;
+	accelConfig.mres_config = LSM_MRES_Config::HIGH;
+	accelConfig.mfs_config = LSM_MFS_Config::FOUR;
+	accelConfig.md_config = LSM_MD_Config::CONTINUOUS;
+
+	L3GD20H l3g(gyroConfig);
+	LSM303D lsm(accelConfig);
+
+	init_USART(3, 3, 115200);
+
+	m1.setSpeed(0.5f);
+	m2.setSpeed(0.5f);
+
+	while(1) {
+		float accX, accY, accZ;
+		float gyroX, gyroY, gyroZ;
+		float magX, magY, magZ;
+
+		l3g.read();
+		lsm.read();
+
+		gyroX = l3g.getX();
+		gyroY = l3g.getY();
+		gyroZ = l3g.getZ();
+
+		accX = lsm.getAccX();
+		accY = lsm.getAccY();
+		accZ = lsm.getAccZ();
+
+		magX = lsm.getMagX();
+		magY = lsm.getMagY();
+		magZ = lsm.getMagZ();
+
+		char txBuff[200];
+		sprintf(txBuff, "%f %f %f %f %f %f %f %f %f\n\r", accX, accY, accZ, gyroX, gyroY, gyroZ, magX, magY, magZ);
+		usart_transmit((uint8_t *)txBuff);
+
+		HAL_Delay(20);
+	}
+}
 
 
 

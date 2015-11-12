@@ -155,6 +155,16 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Lib/LidarLite.cpp</locationURI>
 		</link>
 		<link>
+			<name>src/Motor.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Lib/Motor.cpp</locationURI>
+		</link>
+		<link>
+			<name>src/PwmTimer.cpp</name>
+			<type>1</type>
+			<locationURI>copy_PARENT/Lib/PwmTimer.cpp</locationURI>
+		</link>
+		<link>
 			<name>src/stm32f4xx_it.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Lib/stm32f4xx_it.c</locationURI>
@@ -165,4 +175,10 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Lib/uart.cpp</locationURI>
 		</link>
 	</linkedResources>
+	<variableList>
+		<variable>
+			<name>copy_PARENT</name>
+			<value>$%7BPARENT-2-PROJECT_LOC%7D/quad-45aaabefba0f0ce6b25789a646c8e2a6434c712b</value>
+		</variable>
+	</variableList>
 </projectDescription>
