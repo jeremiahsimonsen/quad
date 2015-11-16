@@ -46,28 +46,28 @@ t = [1:length(ax)] * DT;
 
 for k = 1:length(fileNames)
 % 	figure(3*(k-1)+1);
-	figure(1);
-	subplot(2,length(fileNames)/2,k);
-	plot(t,ax(:,k),t,ay(:,k),t,az(:,k));
+% 	figure(1);
+% 	subplot(2,length(fileNames)/2,k);
+% 	plot(t,ax(:,k),t,ay(:,k),t,az(:,k));
+% 	xlabel('Time (s)');
+% 	ylabel('Accelerometer output (g)');
+% 	title(strcat(fileNames(k).name, 'Accelerometer data'));
+% 	grid on;
+	
+	figure(3*(k-1)+2);
+	plot(t,gx(:,k),t,gy(:,k),t,gz(:,k));
 	xlabel('Time (s)');
-	ylabel('Accelerometer output (g)');
-	title(strcat(fileNames(k).name, 'Accelerometer data'));
+	ylabel('Gyroscope output (^\circ/s)');
+	title(strcat(fileNames(k).name, 'Gyroscope data'));
 	grid on;
 	
-% 	figure(3*(k-1)+2);
-% 	plot(t,gx(:,k),t,gy(:,k),t,gz(:,k));
+% 	figure (3);
+% 	subplot(2,length(fileNames)/2,k);
+% 	plot(t,mx(:,k),t,my(:,k),t,mz(:,k));
 % 	xlabel('Time (s)');
-% 	ylabel('Gyroscope output (^\circ/s)');
-% 	title(strcat(fileNames(k).name, 'Gyroscope data'));
+% 	ylabel('Magnetometer output (gauss)');
+% 	title(strcat(fileNames(k).name, 'Magnetometer data'));
 % 	grid on;
-% 	
-	figure (3);
-	subplot(2,length(fileNames)/2,k);
-	plot(t,mx(:,k),t,my(:,k),t,mz(:,k));
-	xlabel('Time (s)');
-	ylabel('Magnetometer output (gauss)');
-	title(strcat(fileNames(k).name, 'Magnetometer data'));
-	grid on;
 end
 
 

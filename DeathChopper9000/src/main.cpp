@@ -42,8 +42,8 @@ int main(int argc, char* argv[])
 	// At this stage the system clock should have already been configured
 	// at high speed.
 
-	Motor m1(TimerPin::PC9);
-	Motor m2(TimerPin::PC7);
+	Motor m1(TimerPin::PC8);
+	Motor m2(TimerPin::PC6);
 
 	L3GD20H_InitStruct gyroConfig;
 	gyroConfig.fs_config = L3GD_FS_Config::MEDIUM;
@@ -62,7 +62,9 @@ int main(int argc, char* argv[])
 	Adc vSense(AdcPin::PA2);
 	Adc iSense(AdcPin::PA3);
 	LidarLite lidar;
-	init_USART(3, 3, 115200);
+	init_USART(3, 6, 57600, UART_WORDLENGTH_9B, UART_STOPBITS_1, UART_PARITY_EVEN);
+
+	usart_transmit((uint8_t *)"Hello world!\n\r");
 
 	float roll, pitch;
 	float height;
@@ -95,11 +97,12 @@ int main(int argc, char* argv[])
 
 		if (iter % 30 == 0) {
 //			sprintf(txBuff, "Height: %f\tRoll: %f\tPitch: %f\n\r", height, roll, pitch);
-//			sprintf(txBuff, "Height: %f\tRoll: %f\tPitch: %f\tVoltage: %f\n\r", height, roll, pitch, v);
+			sprintf(txBuff, "Height: %f\tRoll: %f\tPitch: %f\tVoltage: %f\n\r", height, roll, pitch, v);
 //			sprintf(txBuff, "Height: %f\tRoll: %f\tPitch: %f\tVoltage: %f\tCurrent%f\n\r", height, roll, pitch, v, i);
 //			float dt = imu.getDT();
 //			sprintf(txBuff, "DT: %f\n\r", dt);
-			sprintf(txBuff, "!ANG:%f,%f,%f\n", roll, pitch, 0.0f);
+//			sprintf(txBuff, "!ANG:%f,%f,%f\n\r", roll, pitch, 0.0f);
+//			sprintf(txBuff, "Speed: %f\n\r", speed);
 			usart_transmit((uint8_t *)txBuff);
 //			trace_printf("%s", txBuff);
 		}

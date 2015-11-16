@@ -202,8 +202,8 @@ void lidar_test() {
 }
 
 void raw_imu_data(void) {
-	Motor m1(TimerPin::PC9);
-	Motor m2(TimerPin::PC7);
+//	Motor m1(TimerPin::PC9);
+//	Motor m2(TimerPin::PC7);
 
 	L3GD20H_InitStruct gyroConfig;
 	gyroConfig.fs_config = L3GD_FS_Config::MEDIUM;
@@ -221,10 +221,11 @@ void raw_imu_data(void) {
 	L3GD20H l3g(gyroConfig);
 	LSM303D lsm(accelConfig);
 
-	init_USART(3, 3, 115200);
+	init_USART(3, 6, 57600, UART_WORDLENGTH_9B, UART_STOPBITS_1, UART_PARITY_EVEN);
+	usart_transmit((uint8_t *)"Hello beautiful world!\n\r");
 
-	m1.setSpeed(0.5f);
-	m2.setSpeed(0.5f);
+//	m1.setSpeed(0.5f);
+//	m2.setSpeed(0.5f);
 
 	while(1) {
 		float accX, accY, accZ;

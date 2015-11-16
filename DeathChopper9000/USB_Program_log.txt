@@ -1,0 +1,10 @@
+Opening Port 				 [OK] 
+Activating device 				 [OK] 
+
+ DOWNLOADING ... 
+
+downloading 	 page/sector 0 	 @0x  8000000 	 size 1.02(KB) 	 [OK] 
+downloading 	 page/sector 1 	 @0x  8000418 	 size 14.98(KB) 	 [OK] 
+downloading 	 page/sector 2 	 @0x  8004000 	 size 16.00(KB) 	 [OK] 
+downloading 	 page/sector 3 	 @0x  8008000 	 size 16.00(KB) 	 [OK] 
+downloading 	 page/sector 4 	 @0x  800C000 	 size 6.56(KB) 	 [OK] 

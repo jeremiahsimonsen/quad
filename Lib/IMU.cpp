@@ -23,6 +23,7 @@ IMU::IMU()
 IMU::IMU(L3GD20H_InitStruct gyroConfig, LSM303D_InitStruct accelConfig)
 	: barometer(), gyro(gyroConfig), accel(accelConfig)
 {
+	// TODO: Add calibration
 }
 
 void IMU::enable() {
