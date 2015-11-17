@@ -15,18 +15,13 @@
 #include "LidarLite.h"
 #include "uart.h"
 
-// ----------------------------------------------------------------------------
-//
-// Standalone STM32F4 empty sample (trace via DEBUG).
-//
-// Trace support is enabled by adding the TRACE macro definition.
-// By default the trace messages are forwarded to the DEBUG output,
-// but can be rerouted to any device or completely suppressed, by
-// changing the definitions required in system/src/diag/trace_impl.c
-// (currently OS_USE_TRACE_ITM, OS_USE_TRACE_SEMIHOSTING_DEBUG/_STDOUT).
-//
+static bool enableMotors = false;
 
-// ----- main() ---------------------------------------------------------------
+void EXTILine0_Config(void);
+extern "C" {
+	void EXTI0_IRQHandler(void);
+	void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
+}
 
 // Sample pragmas to cope with warnings. Please note the related line at
 // the end of this function, used to pop the compiler diagnostics status.
@@ -42,8 +37,8 @@ int main(int argc, char* argv[])
 	// At this stage the system clock should have already been configured
 	// at high speed.
 
-	Motor m1(TimerPin::PC8);
-	Motor m2(TimerPin::PC6);
+	Motor m1(TimerPin::PC9);
+	Motor m2(TimerPin::PC7);
 
 	L3GD20H_InitStruct gyroConfig;
 	gyroConfig.fs_config = L3GD_FS_Config::MEDIUM;
@@ -75,6 +70,8 @@ int main(int argc, char* argv[])
 	// Infinite loop
 	while (1)
 	{
+		EXTILine0_Config();
+
 		roll = imu.getRoll();
 		pitch = imu.getPitch();
 
@@ -92,10 +89,15 @@ int main(int argc, char* argv[])
 
 		float speed = (roll + 90.0f) / 180.0f * maxSpeed;
 
-		m1.setSpeed(speed);
-		m2.setSpeed(maxSpeed-speed);
+		if (enableMotors == true) {
+			m1.setSpeed(speed);
+			m2.setSpeed(maxSpeed-speed);
+		} else {
+			m1.setSpeed(0.0f);
+			m2.setSpeed(0.0f);
+		}
 
-		if (iter % 30 == 0) {
+		if (iter % 2 == 0) {
 //			sprintf(txBuff, "Height: %f\tRoll: %f\tPitch: %f\n\r", height, roll, pitch);
 			sprintf(txBuff, "Height: %f\tRoll: %f\tPitch: %f\tVoltage: %f\n\r", height, roll, pitch, v);
 //			sprintf(txBuff, "Height: %f\tRoll: %f\tPitch: %f\tVoltage: %f\tCurrent%f\n\r", height, roll, pitch, v, i);
@@ -108,7 +110,7 @@ int main(int argc, char* argv[])
 		}
 
 		iter++;
-		HAL_Delay(40);
+		HAL_Delay(500);
 	}
 }
 
@@ -117,5 +119,30 @@ float mapAdcValToMotorSpeed(uint32_t val) {
 }
 
 #pragma GCC diagnostic pop
+
+void EXTILine0_Config(void) {
+	GPIO_InitTypeDef GPIO_InitStruct;
+
+	__HAL_RCC_GPIOA_CLK_ENABLE();
+
+	GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Pin = GPIO_PIN_0;
+	GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+	HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+}
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+	if (GPIO_Pin == KEY_BUTTON_PIN) {
+		enableMotors = enableMotors == true? false : true;
+	}
+}
+
+void EXTI0_IRQHandler(void) {
+	HAL_GPIO_EXTI_IRQHandler(KEY_BUTTON_PIN);
+}
 
 // ----------------------------------------------------------------------------
