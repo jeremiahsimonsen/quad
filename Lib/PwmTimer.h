@@ -36,7 +36,7 @@
  */
 enum class TimerPin {
 	PA0 = 0,// TIM5_CH1
-	PA1,	// TIM2_CH2
+	PA1,	// TIM5_CH2
 	PA2,	// TIM2_CH3
 	PA3,	// TIM2_CH4
 	PA6,	// TIM3_CH1

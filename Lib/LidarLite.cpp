@@ -7,6 +7,8 @@
 
 
 #include "LidarLite.h"
+#include "PwmTimer.h"
+
 #include "diag/Trace.h"
 
 #ifdef LIDAR_I2C
@@ -75,7 +77,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim);
 
 #define NUM_SAMPLES 15
 
-static TIM_HandleTypeDef TimHandle;
+static TIM_HandleTypeDef Tim2Handle;
 static TIM_IC_InitTypeDef sConfig;
 static volatile uint32_t pWidthBuff[NUM_SAMPLES];
 static HAL_LockTypeDef pWidthLock = HAL_UNLOCKED;
@@ -108,15 +110,15 @@ static HAL_LockTypeDef pWidthLock = HAL_UNLOCKED;
 							} while (0)
 
 LidarLite::LidarLite() {
-	TimHandle.Instance = TIM2;
-	TimHandle.Init.Period = 0xFFFFFFFF;
-	TimHandle.Init.Prescaler = 0;
-	TimHandle.Init.ClockDivision = 0;
-	TimHandle.Init.CounterMode = TIM_COUNTERMODE_UP;
-	TimHandle.Init.RepetitionCounter = 0;
-	TimHandle.State = HAL_TIM_STATE_RESET;
+	Tim2Handle.Instance = TIM2;
+	Tim2Handle.Init.Period = 0xFFFFFFFF;
+	Tim2Handle.Init.Prescaler = 0;
+	Tim2Handle.Init.ClockDivision = 0;
+	Tim2Handle.Init.CounterMode = TIM_COUNTERMODE_UP;
+	Tim2Handle.Init.RepetitionCounter = 0;
+	Tim2Handle.State = HAL_TIM_STATE_RESET;
 
-	if (HAL_TIM_IC_Init(&TimHandle) != HAL_OK) {
+	if (HAL_TIM_IC_Init(&Tim2Handle) != HAL_OK) {
 		// Error
 	}
 
@@ -124,35 +126,38 @@ LidarLite::LidarLite() {
 	sConfig.ICFilter = 0;
 	sConfig.ICPolarity = TIM_ICPOLARITY_RISING;
 	sConfig.ICSelection = TIM_ICSELECTION_INDIRECTTI;
-	if (HAL_TIM_IC_ConfigChannel(&TimHandle, &sConfig, TIM_CHANNEL_1) != HAL_OK) {
+	if (HAL_TIM_IC_ConfigChannel(&Tim2Handle, &sConfig, TIM_CHANNEL_1) != HAL_OK) {
 		// Error
 	}
 
 	sConfig.ICPolarity = TIM_ICPOLARITY_FALLING;
 	sConfig.ICSelection = TIM_ICSELECTION_DIRECTTI;
-	if (HAL_TIM_IC_ConfigChannel(&TimHandle, &sConfig, TIM_CHANNEL_2) != HAL_OK) {
+	if (HAL_TIM_IC_ConfigChannel(&Tim2Handle, &sConfig, TIM_CHANNEL_2) != HAL_OK) {
 		// Error
 	}
 
 	// Use PB5 as Trigger
-	GPIO_InitTypeDef GPIO_InitStruct;
+//	GPIO_InitTypeDef GPIO_InitStruct;
+//
+//	__HAL_RCC_GPIOB_CLK_ENABLE();
+//
+//	GPIO_InitStruct.Pin = GPIO_PIN_5;
+//	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+//	GPIO_InitStruct.Pull = GPIO_NOPULL;
+//	GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+//	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+//
+//	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);		// Pull low for continuous
 
-	__HAL_RCC_GPIOB_CLK_ENABLE();
-
-	GPIO_InitStruct.Pin = GPIO_PIN_5;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
-	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);		// Pull low for continuous
-
-	if (HAL_TIM_IC_Start_IT(&TimHandle, TIM_CHANNEL_1) != HAL_OK) {
+	if (HAL_TIM_IC_Start_IT(&Tim2Handle, TIM_CHANNEL_1) != HAL_OK) {
 		// Error
 	}
-	if (HAL_TIM_IC_Start_IT(&TimHandle, TIM_CHANNEL_2) != HAL_OK) {
+	if (HAL_TIM_IC_Start_IT(&Tim2Handle, TIM_CHANNEL_2) != HAL_OK) {
 		// Error
 	}
+
+	PwmTimer trigger(50.0f, TimerPin::PA1);
+	trigger.setWidth(0.011f);
 }
 
 float LidarLite::getDistRaw() {
@@ -172,7 +177,8 @@ float LidarLite::getDistRaw() {
 }
 
 float LidarLite::getDistIn() {
-	float dist = getDistRaw() / 84e6f / 25.4e-6f;
+//	float dist = getDistRaw() / 84e6f / 25.4e-6f;
+	float dist = getDistRaw() / 84e6f * 340 / 2 * 39.37f;
 	return dist;
 }
 
@@ -195,7 +201,7 @@ void HAL_TIM_IC_MspInit(TIM_HandleTypeDef *htim) {
 }
 
 void TIM2_IRQHandler() {
-	HAL_TIM_IRQHandler(&TimHandle);
+	HAL_TIM_IRQHandler(&Tim2Handle);
 }
 
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
@@ -204,7 +210,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 	static uint8_t pWidthBuffIndex = 0;
 
 	// If falling edge
-	if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2)
+	if (htim->Instance == TIM2 && htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2)
 	{
 		_GET_LOCK_NORETURN(pWidthLock);
 
@@ -218,9 +224,17 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 
 		// Calculate new positive pulse width and store in circular history buffer
 		if (cntValBuffIndex == 2) {
-			pWidthBuff[pWidthBuffIndex++] = cntValBuff[1] - cntValBuff[0];
+			if (cntValBuff[1] >= cntValBuff[0]) {
+				pWidthBuff[pWidthBuffIndex++] = cntValBuff[1] - cntValBuff[0];
+			} else {
+//				pWidthBuff[pWidthBuffIndex++] = 4294967296 - cntValBuff[0] + cntValBuff[1];
+			}
 		} else if (cntValBuffIndex == 0) {
-			pWidthBuff[pWidthBuffIndex++] = cntValBuff[3] - cntValBuff[2];
+			if (cntValBuff[3] >= cntValBuff[2]) {
+				pWidthBuff[pWidthBuffIndex++] = cntValBuff[3] - cntValBuff[2];
+			} else {
+//				pWidthBuff[pWidthBuffIndex++] = 4294967296 - cntValBuff[2] + cntValBuff[3];
+			}
 		}
 
 		// Reset circular buffer index
