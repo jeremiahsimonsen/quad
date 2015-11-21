@@ -141,9 +141,6 @@ void init_USART(int uart_num, int num_args, ...)
 
 	va_end(ap);
 
-	// Note that HAL_UART_DeInit() calls HAL_UART_MspDeInit()
-	HAL_UART_DeInit(&UartHandle);
-
 	// Note that HAL_UART_Init() calls HAL_UART_MspInit() (MPU-specific initialization)
 	if(HAL_UART_Init(&UartHandle) != HAL_OK)
 	{
@@ -1006,7 +1003,14 @@ void usart_transmit(uint8_t *s)
 	}
 }
 
+void usart_receive(uint8_t *s, uint32_t size) {
+	while (UartReady != SET);
+	UartReady = RESET;
 
+	if (HAL_UART_Receive_DMA(&UartHandle, s, size)) {
+		// TODO: Error_Handler();
+	}
+}
 
 
 
