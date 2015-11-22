@@ -1,4 +1,13 @@
-Debug/
-.settings/
-RemoteSystemsTempFiles/
 .metadata/
+RemoteControl/Debug/
+ADC/.settings/
+DeathChopper9000/.settings/
+I2C/.settings/
+PCB_test/.settings/
+PCB_test2/.settings/
+PWM/.settings/
+RemoteControl/.settings/
+*.asv
+RemoteSystemsTempFiles/
+Serial/.settings/
+contract/.settings/
