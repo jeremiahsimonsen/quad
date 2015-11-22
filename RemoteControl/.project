@@ -31,6 +31,16 @@
 			<locationURI>PARENT-1-PROJECT_LOC/lib/DMA_IT.h</locationURI>
 		</link>
 		<link>
+			<name>include/Motor.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Lib/Motor.h</locationURI>
+		</link>
+		<link>
+			<name>include/PwmTimer.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Lib/PwmTimer.h</locationURI>
+		</link>
+		<link>
 			<name>include/stm32f4xx_hal_conf.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/lib/stm32f4xx_hal_conf.h</locationURI>
@@ -49,6 +59,16 @@
 			<name>src/DMA_IT.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/lib/DMA_IT.c</locationURI>
+		</link>
+		<link>
+			<name>src/Motor.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Lib/Motor.cpp</locationURI>
+		</link>
+		<link>
+			<name>src/PwmTimer.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Lib/PwmTimer.cpp</locationURI>
 		</link>
 		<link>
 			<name>src/stm32f4xx_it.c</name>

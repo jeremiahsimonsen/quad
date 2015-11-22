@@ -11,7 +11,9 @@
 
 #include "stm32f4xx_hal.h"
 #include "stm32f4_discovery.h"
+
 #include "uart.h"
+#include "Motor.h"
 
 // ----------------------------------------------------------------------------
 //
@@ -23,15 +25,6 @@
 // changing the definitions required in system/src/diag/trace_impl.c
 // (currently OS_USE_TRACE_ITM, OS_USE_TRACE_SEMIHOSTING_DEBUG/_STDOUT).
 //
-
-// ----- main() ---------------------------------------------------------------
-
-#define TXBUFFERSIZE                     (COUNTOF(txBuff) - 1)
-/* Size of Reception buffer */
-#define RXBUFFERSIZE                     TXBUFFERSIZE
-
-/* Exported macro ------------------------------------------------------------*/
-#define COUNTOF(__BUFFER__)   (sizeof(__BUFFER__) / sizeof(*(__BUFFER__)))
 
 // Sample pragmas to cope with warnings. Please note the related line at
 // the end of this function, used to pop the compiler diagnostics status.
@@ -45,18 +38,40 @@ int main(int argc, char* argv[])
 	// At this stage the system clock should have already been configured
 	// at high speed.
 
+	Motor m1(TimerPin::PC9);
+	Motor m2(TimerPin::PC7);
+	Motor m3(TimerPin::PC6);
+	Motor m4(TimerPin::PC8);
+
 	init_USART(3, 6, 57600, UART_WORDLENGTH_9B, UART_STOPBITS_1, UART_PARITY_EVEN);
 
 	uint8_t txBuff[] = "Hello world";
-	uint8_t rxBuff[15] = {0};
+	uint8_t transferSize = 4;
+	uint8_t DmaBuff[2*transferSize] = {0};
+	uint8_t readBuff[transferSize] = {0};
 
 	//	usart_transmit(txBuff);
+	usart_receive_begin(DmaBuff, 2*transferSize);
 
-	// Infinite loop
+	float s1 = 0.0f, s2 = 0.0f, s3 = 0.0f, s4 = 0.0f;
 	while (1)
 	{
-		usart_receive(rxBuff, 14);
-		trace_printf("%s",(char *)rxBuff);
+		if (usart_read(DmaBuff, readBuff, transferSize) > 0) {
+//			trace_printf("%d %d %d %d\n", readBuff[0], readBuff[1], readBuff[2], readBuff[3]);
+			char txBuff[50];
+			sprintf(txBuff, "%d %d %d %d\n", readBuff[0], readBuff[1], readBuff[2], readBuff[3]);
+			usart_transmit((uint8_t *)txBuff);
+
+			s1 = (float)readBuff[0] / 255.0f;
+			s2 = (float)readBuff[1] / 255.0f;
+			s3 = (float)readBuff[2] / 255.0f;
+			s4 = (float)readBuff[3] / 255.0f;
+
+			m1.setSpeed(s1);
+			m2.setSpeed(s2);
+			m3.setSpeed(s3);
+			m4.setSpeed(s4);
+		}
 	}
 }
 
