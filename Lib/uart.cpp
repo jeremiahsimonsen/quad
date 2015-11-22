@@ -7,6 +7,36 @@
 static __IO ITStatus UartReady = RESET;
 static DMA_HandleTypeDef hdma_tx;
 static DMA_HandleTypeDef hdma_rx;
+static volatile int8_t validRx = -1;
+static volatile bool dataRead = false;
+static HAL_LockTypeDef rxLock = HAL_UNLOCKED;
+
+#define _GET_LOCK_RETURN(__LOCK__)								\
+							do{									\
+								if((__LOCK__) == HAL_LOCKED)	\
+								{								\
+								   return -HAL_BUSY;			\
+								}								\
+								else							\
+								{								\
+								   (__LOCK__) = HAL_LOCKED;		\
+								}								\
+							  }while (0)
+#define _GET_LOCK_NORETURN(__LOCK__)							\
+							do{									\
+								if((__LOCK__) == HAL_LOCKED)	\
+								{								\
+								   return;						\
+								}								\
+								else							\
+								{								\
+								   (__LOCK__) = HAL_LOCKED;		\
+								}								\
+							  }while (0)
+#define _UNLOCK(__LOCK__)										\
+							do{									\
+								(__LOCK__) = HAL_UNLOCKED;		\
+							} while (0)
 
 ///////////////////////////////////////////////////////////////////////
 //                     Function Pre-Declarations                     //
@@ -31,6 +61,7 @@ void USART6MspDeInit(void);
 extern "C" {
 #endif
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *UartHandle);
+void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart);
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle);
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *UartHandle);
 
@@ -145,7 +176,6 @@ void init_USART(int uart_num, int num_args, ...)
 	if(HAL_UART_Init(&UartHandle) != HAL_OK)
 	{
 		//TODO: Change to global error handler
-		BSP_LED_On(LED5);
 		while(1);
 	}
 
@@ -242,7 +272,7 @@ void USART1MspInit()
 	hdma_rx.Init.MemInc              = DMA_MINC_ENABLE;
 	hdma_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
 	hdma_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
-	hdma_rx.Init.Mode                = DMA_NORMAL;
+	hdma_rx.Init.Mode                = DMA_CIRCULAR;
 	hdma_rx.Init.Priority            = DMA_PRIORITY_HIGH;
 	hdma_rx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
 	hdma_rx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
@@ -325,7 +355,7 @@ void USART2MspInit()
 	hdma_rx.Init.MemInc              = DMA_MINC_ENABLE;
 	hdma_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
 	hdma_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
-	hdma_rx.Init.Mode                = DMA_NORMAL;
+	hdma_rx.Init.Mode                = DMA_CIRCULAR;
 	hdma_rx.Init.Priority            = DMA_PRIORITY_HIGH;
 	hdma_rx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
 	hdma_rx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
@@ -408,7 +438,7 @@ void USART3MspInit()
 	hdma_rx.Init.MemInc              = DMA_MINC_ENABLE;
 	hdma_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
 	hdma_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
-	hdma_rx.Init.Mode                = DMA_NORMAL;
+	hdma_rx.Init.Mode                = DMA_CIRCULAR;
 	hdma_rx.Init.Priority            = DMA_PRIORITY_HIGH;
 	hdma_rx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
 	hdma_rx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
@@ -491,7 +521,7 @@ void UART4MspInit()
 	hdma_rx.Init.MemInc              = DMA_MINC_ENABLE;
 	hdma_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
 	hdma_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
-	hdma_rx.Init.Mode                = DMA_NORMAL;
+	hdma_rx.Init.Mode                = DMA_CIRCULAR;
 	hdma_rx.Init.Priority            = DMA_PRIORITY_HIGH;
 	hdma_rx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
 	hdma_rx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
@@ -574,7 +604,7 @@ void UART5MspInit()
 	hdma_rx.Init.MemInc              = DMA_MINC_ENABLE;
 	hdma_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
 	hdma_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
-	hdma_rx.Init.Mode                = DMA_NORMAL;
+	hdma_rx.Init.Mode                = DMA_CIRCULAR;
 	hdma_rx.Init.Priority            = DMA_PRIORITY_HIGH;
 	hdma_rx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
 	hdma_rx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
@@ -657,7 +687,7 @@ void USART6MspInit()
 	hdma_rx.Init.MemInc              = DMA_MINC_ENABLE;
 	hdma_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
 	hdma_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
-	hdma_rx.Init.Mode                = DMA_NORMAL;
+	hdma_rx.Init.Mode                = DMA_CIRCULAR;
 	hdma_rx.Init.Priority            = DMA_PRIORITY_HIGH;
 	hdma_rx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
 	hdma_rx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
@@ -859,19 +889,30 @@ void USART6MspDeInit()
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
 	UartReady = SET;
-	BSP_LED_On(LED6);
+//	BSP_LED_On(LED6);
+}
+
+void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart) {
+//	_GET_LOCK_NORETURN(rxLock);
+	validRx = 0;
+	dataRead = false;
+//	_UNLOCK(rxLock);
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-	UartReady = SET;
+//	UartReady = SET;
+//	_GET_LOCK_NORETURN(rxLock);
+	validRx = 1;
+	dataRead = false;
+//	_UNLOCK(rxLock);
 }
 
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 {
 	// TODO: Change to Error_Handler() after refactoring to error.h
 	/* Turn LED5 on */
-	  BSP_LED_On(LED5);
+//	  BSP_LED_On(LED5);
 	  while(1)
 	  {
 	  }
@@ -1003,16 +1044,33 @@ void usart_transmit(uint8_t *s)
 	}
 }
 
-void usart_receive(uint8_t *s, uint32_t size) {
-	while (UartReady != SET);
-	UartReady = RESET;
+void usart_receive_begin(uint8_t *s, uint32_t size) {
+//	while (UartReady != SET);
+//	UartReady = RESET;
 
 	if (HAL_UART_Receive_DMA(&UartHandle, s, size)) {
 		// TODO: Error_Handler();
 	}
 }
 
+int8_t usart_read(uint8_t *DmaBuff, uint8_t *readBuff, uint8_t transferSize) {
+	int8_t retVal;
 
+//	_GET_LOCK_RETURN(rxLock);
+
+	if (validRx >= 0 && dataRead == false) {
+		for (int i = 0; i < transferSize; i++) {
+			readBuff[i] = DmaBuff[validRx*transferSize + i];
+			retVal = i;
+		}
+		dataRead = true;
+	} else {
+		retVal = -1;
+	}
+
+//	_UNLOCK(rxLock);
+	return retVal;
+}
 
 
 

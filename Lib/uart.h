@@ -32,8 +32,9 @@ void init_USART(int uart_num, int num_args, ...);
 
 void usart_transmit(uint8_t *s);
 
-void usart_receive(uint8_t *s, uint32_t size);
+void usart_receive_begin(uint8_t *s, uint32_t size);
 
+int8_t usart_read(uint8_t *DmaBuff, uint8_t *readBuff, uint8_t transferSize);
 
 //////////////////////////////////////////////////////////////////////
 //                      Definitions for USART1                      //
