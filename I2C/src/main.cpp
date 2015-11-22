@@ -46,8 +46,8 @@ int main(int argc, char* argv[])
 //	l3g_test();
 //	lsm_test();
 //	imu_test();
-	lidar_test();
-//	raw_imu_data();
+//	lidar_test();
+	raw_imu_data();
 }
 
 #pragma GCC diagnostic pop
@@ -151,10 +151,23 @@ void imu_test() {
 	char str[50];
 	sprintf(str, "USART working.\r\n");
 
-	init_USART(3,2);
+	init_USART(3, 6, 57600, UART_WORDLENGTH_9B, UART_STOPBITS_1, UART_PARITY_EVEN);
 	usart_transmit((uint8_t *)str);
 
-	IMU imu;
+	L3GD20H_InitStruct gyroConfig;
+	gyroConfig.fs_config = L3GD_FS_Config::MEDIUM;
+	gyroConfig.odr_bw_config = L3GD_ODR_BW_Config::NINETEEN;
+
+	LSM303D_InitStruct accelConfig;
+	accelConfig.aodr_config = LSM_AODR_Config::ELEVEN;
+	accelConfig.abw_config = LSM_ABW_Config::FOUR;
+	accelConfig.afs_config = LSM_AFS_Config::FOUR;
+	accelConfig.modr_config = LSM_MODR_Config::SIX;
+	accelConfig.mres_config = LSM_MRES_Config::HIGH;
+	accelConfig.mfs_config = LSM_MFS_Config::FOUR;
+	accelConfig.md_config = LSM_MD_Config::CONTINUOUS;
+
+	IMU imu(gyroConfig, accelConfig);
 	float roll, pitch;
 
 	while (1) {
@@ -162,8 +175,10 @@ void imu_test() {
 		pitch = imu.getPitch();
 
 		sprintf(str, "Roll: %f\tPitch: %f\r\n", roll, pitch);
-		trace_printf("%s", str);
+//		trace_printf("%s", str);
 		usart_transmit((uint8_t *)str);
+
+		HAL_Delay(20);
 	}
 }
 
@@ -222,7 +237,6 @@ void raw_imu_data(void) {
 	LSM303D lsm(accelConfig);
 
 	init_USART(3, 6, 57600, UART_WORDLENGTH_9B, UART_STOPBITS_1, UART_PARITY_EVEN);
-	usart_transmit((uint8_t *)"Hello beautiful world!\n\r");
 
 //	m1.setSpeed(0.5f);
 //	m2.setSpeed(0.5f);
@@ -235,13 +249,13 @@ void raw_imu_data(void) {
 		l3g.read();
 		lsm.read();
 
-		gyroX = l3g.getX();
-		gyroY = l3g.getY();
-		gyroZ = l3g.getZ();
+		gyroX = l3g.getXFiltered();
+		gyroY = l3g.getYFiltered();
+		gyroZ = l3g.getZFiltered();
 
-		accX = lsm.getAccX();
-		accY = lsm.getAccY();
-		accZ = lsm.getAccZ();
+		accX = lsm.getAccXFiltered();
+		accY = lsm.getAccYFiltered();
+		accZ = lsm.getAccZFiltered();
 
 		magX = lsm.getMagX();
 		magY = lsm.getMagY();
@@ -251,7 +265,7 @@ void raw_imu_data(void) {
 		sprintf(txBuff, "%f %f %f %f %f %f %f %f %f\n\r", accX, accY, accZ, gyroX, gyroY, gyroZ, magX, magY, magZ);
 		usart_transmit((uint8_t *)txBuff);
 
-		HAL_Delay(20);
+		HAL_Delay(30);
 	}
 }
 

@@ -39,7 +39,7 @@ void DMA1_Stream1_IRQHandler(void) {
  * 		UART4_RX
  */
 void DMA1_Stream2_IRQHandler(void) {
-	if (i2cHandle.hdmarx->State != HAL_DMA_STATE_READY) {
+	if (i2cHandle.hdmarx->State != HAL_DMA_STATE_READY && i2cHandle.hdmarx->State != HAL_DMA_STATE_RESET) {
 		HAL_DMA_IRQHandler(i2cHandle.hdmarx);
 	}
 
@@ -54,7 +54,7 @@ void DMA1_Stream2_IRQHandler(void) {
  * 		USART3_TX
  */
 void DMA1_Stream3_IRQHandler(void) {
-	if (i2cHandle.hdmarx->State != HAL_DMA_STATE_READY) {
+	if (i2cHandle.hdmarx->State != HAL_DMA_STATE_READY && i2cHandle.hdmarx->State != HAL_DMA_STATE_RESET) {
 		HAL_DMA_IRQHandler(i2cHandle.hdmarx);
 	}
 
@@ -84,7 +84,7 @@ void DMA1_Stream4_IRQHandler(void) {
  * 		USART2_RX
  */
 void DMA1_Stream5_IRQHandler(void) {
-	if (i2cHandle.hdmarx->State != HAL_DMA_STATE_READY) {
+	if (i2cHandle.hdmarx->State != HAL_DMA_STATE_READY && i2cHandle.hdmarx->State != HAL_DMA_STATE_RESET) {
 		HAL_DMA_IRQHandler(i2cHandle.hdmarx);
 	}
 

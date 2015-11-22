@@ -2,8 +2,8 @@ s = serial('COM9','baudrate',57600,'databits',8,'stopbits',1,'parity','even','fl
 fopen(s);
 
 for k = 1:1
-	str = sprintf('Hello world %d\r', mod(k,10));
-	fprintf(s,str);
+% 	str = sprintf('Hello world %d\r', mod(k,10));
+	fprintf(s,);
 	pause(0.5);
 end
 

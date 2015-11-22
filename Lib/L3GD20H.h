@@ -16,6 +16,7 @@
 #define L3GD20H_H_
 
 #include "I2C.h"
+#include "preFilter.h"
 
 /**
  * Register enumerations for the ST L3GD20H gyro
@@ -430,6 +431,7 @@ typedef struct {
 class L3GD20H {
 private:
 	I2C *i2c;
+	preFilter gx, gy, gz;
 
 	float resolution;
 
@@ -441,12 +443,17 @@ private:
 	uint8_t gyroBuff[6];	// Gyro angular velocity buffer
 #endif
 
-	uint8_t address;
+	TIM_HandleTypeDef TimHandle;
 	uint32_t prevTick;
 	uint32_t dt;
-	TIM_HandleTypeDef TimHandle;
+
+	float xOffset;
+	float yOffset;
+	float zOffset;
+	uint8_t address;
 
 	void enable(L3GD20H_InitStruct init);
+	void calibrate(void);
 
 	int16_t getXRaw(void);		// Roll
 	int16_t getYRaw(void);		// Pitch
@@ -463,6 +470,14 @@ public:
 	float getX(void);		// Roll
 	float getY(void);		// Pitch
 	float getZ(void);		// Yaw
+	float getXFiltered(void);
+	float getYFiltered(void);
+	float getZFiltered(void);
 };
 
 #endif
+
+
+
+
+

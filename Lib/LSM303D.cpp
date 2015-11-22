@@ -17,9 +17,13 @@
 /**
  * @brief Instantiates sensor with default configuration
  */
-LSM303D::LSM303D() {
+LSM303D::LSM303D()
+	: ax(PREFILTER_TAU), ay(PREFILTER_TAU), az(PREFILTER_TAU)
+{
 	// Save the i2c slave address of the sensor
 	address = 0b00111010;
+
+	accXOffset = accYOffset = accZOffset = 0.0f;
 
 	// Initialize the I2C pointer
 	i2c = I2C::Instance(I2C_SCL_PIN, I2C_SDA_PIN);
@@ -44,9 +48,13 @@ LSM303D::LSM303D() {
  * @brief Instantiates sensor with given configuration parameters
  * @param init Sensor configuration parameters
  */
-LSM303D::LSM303D(LSM303D_InitStruct init) {
+LSM303D::LSM303D(LSM303D_InitStruct init)
+	: ax(PREFILTER_TAU), ay(PREFILTER_TAU), az(PREFILTER_TAU)
+{
 	// Save the i2c slave address of the sensor
 	address = 0b00111010;
+
+	accXOffset = accYOffset = accZOffset = 0.0f;
 
 	// Initialize the I2C pointer
 	i2c = I2C::Instance(I2C_SCL_PIN, I2C_SDA_PIN);
@@ -104,6 +112,33 @@ void LSM303D::enable(LSM303D_InitStruct init) {
 	// Set magnetic sensor mode
 	buf = LSM303D_CTRL7_MD(init.md_config);
 	i2c->memWrite(address, (uint8_t)LSM303D_Reg::CTRL7, &buf, 1);
+
+	accCalibrate();
+}
+
+void LSM303D::accCalibrate(void) {
+	uint8_t samples = 32;
+	float ax_offset = 0.0f, ay_offset = 0.0f, az_offset = 0.0f;
+
+	readAcc();	// Initial read so values are correct
+	// Take some readings and accumulate
+	for (int i = 0; i < samples; i++) {
+		readAcc();
+		ax_offset += getAccX();
+		ay_offset += getAccY();
+		az_offset += getAccZ();
+		HAL_Delay(20);
+	}
+
+	// Average the offsets
+	ax_offset = ax_offset / (float)samples;
+	ay_offset = ay_offset / (float)samples;
+	az_offset = (az_offset / (float)samples) + 1.0f;	// Subtract gravity
+
+	// Save the offsets
+	accXOffset = ax_offset;
+	accYOffset = ay_offset;
+	accZOffset = az_offset;
 }
 
 /**
@@ -155,8 +190,14 @@ int16_t LSM303D::getAccXRaw(void) {
  * @return X axis acceleration (g)
  */
 float LSM303D::getAccX() {
-	float retVal = (float)getAccXRaw() * accResolution;
-	return retVal;
+	float x = (float)getAccXRaw() * accResolution - accXOffset;
+
+	return x;
+}
+
+float LSM303D::getAccXFiltered() {
+	float xf = ax.filterSample(getAccX());
+	return xf;
 }
 
 /**
@@ -184,8 +225,14 @@ int16_t LSM303D::getAccYRaw(void) {
  * @return Y axis acceleration (g)
  */
 float LSM303D::getAccY() {
-	float retVal = (float)getAccYRaw() * accResolution;
-	return retVal;
+	float y = (float)getAccYRaw() * accResolution - accYOffset;
+
+	return y;
+}
+
+float LSM303D::getAccYFiltered() {
+	float yf = ay.filterSample(getAccY());
+	return yf;
 }
 
 /**
@@ -213,8 +260,14 @@ int16_t LSM303D::getAccZRaw(void) {
  * @return Z axis acceleration (g)
  */
 float LSM303D::getAccZ() {
-	float retVal = (float)getAccZRaw() * accResolution;
-	return retVal;
+	float z = (float)getAccZRaw() * accResolution - accZOffset;
+
+	return z;
+}
+
+float LSM303D::getAccZFiltered() {
+	float zf = az.filterSample(getAccZ());
+	return zf;
 }
 
 uint8_t LSM303D::readMag(void) {

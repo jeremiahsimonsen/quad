@@ -16,6 +16,7 @@
 #define LSM303D_H_
 
 #include "I2C.h"
+#include "preFilter.h"
 
 enum class LSM303D_Reg {
 	TEMP_OUT_L		= 0x05,
@@ -345,6 +346,7 @@ typedef struct {
 class LSM303D {
 private:
 	I2C *i2c;
+	preFilter ax, ay, az;
 
 	float accResolution;
 	float magResolution;
@@ -365,6 +367,7 @@ private:
 	uint8_t address;
 
 	void enable(LSM303D_InitStruct init);
+	void accCalibrate(void);
 
 	int16_t getAccXRaw(void);
 	int16_t getAccYRaw(void);
@@ -373,6 +376,10 @@ private:
 	int16_t getMagXRaw(void);
 	int16_t getMagYRaw(void);
 	int16_t getMagZRaw(void);
+
+	float accXOffset;
+	float accYOffset;
+	float accZOffset;
 
 public:
 	LSM303D();
@@ -384,6 +391,9 @@ public:
 	float getAccX(void);
 	float getAccY(void);
 	float getAccZ(void);
+	float getAccXFiltered(void);
+	float getAccYFiltered(void);
+	float getAccZFiltered(void);
 
 	uint8_t readMag(void);
 	float getMagX(void);

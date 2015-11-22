@@ -17,8 +17,12 @@
 /**
  * @brief Instantiates an object using default I2C pins and configures the sensor to default
  */
-L3GD20H::L3GD20H(void) {
+L3GD20H::L3GD20H(void)
+	: gx(PREFILTER_TAU), gy(PREFILTER_TAU), gz(PREFILTER_TAU)
+{
 	address = 0b11010110;
+	dt = prevTick = 0;
+	xOffset = yOffset = zOffset = 0.0f;
 
 	i2c = I2C::Instance(I2C_SCL_PIN, I2C_SDA_PIN);
 
@@ -33,8 +37,12 @@ L3GD20H::L3GD20H(void) {
  * @brief Configures the sensor according to the parameters
  * @param init Sensor configuration parameters
  */
-L3GD20H::L3GD20H(L3GD20H_InitStruct init) {
+L3GD20H::L3GD20H(L3GD20H_InitStruct init)
+	: gx(PREFILTER_TAU), gy(PREFILTER_TAU), gz(PREFILTER_TAU)
+{
 	address = 0b11010110;
+	dt = prevTick = 0;
+	xOffset = yOffset = zOffset = 0.0f;
 
 	switch(init.fs_config) {
 	case L3GD_FS_Config::LOW	: resolution = 8.75e-3f;  break;
@@ -69,19 +77,6 @@ void L3GD20H::enable(L3GD20H_InitStruct init) {
 			| L3GD_CTRL4_BDU_MASK);
 	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::CTRL4, &buf, 1);
 
-	// GPIO Initialization for sample time measurement
-	GPIO_InitTypeDef GPIO_InitStruct;
-
-	__HAL_RCC_GPIOA_CLK_ENABLE();
-
-	GPIO_InitStruct.Pin = GPIO_PIN_4;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
-
 	// TIM initialization for alternative sample time measurement
 	TimHandle.Instance = TIM6;
 	TimHandle.Init.Period = 0xFFFF;
@@ -100,6 +95,33 @@ void L3GD20H::enable(L3GD20H_InitStruct init) {
 		// Error
 		while(1);
 	}
+
+	calibrate();
+}
+
+void L3GD20H::calibrate() {
+	uint8_t samples = 32;
+	float gx_offset = 0.0f, gy_offset = 0.0f, gz_offset = 0.0f;
+
+	read();	// Initial read so values are correct
+	// Take some readings and accumulate
+	for (int i = 0; i < samples; i++) {
+		read();
+		gx_offset += getX();
+		gy_offset += getY();
+		gz_offset += getZ();
+		HAL_Delay(20);
+	}
+
+	// Average the offsets
+	gx_offset = gx_offset / (float)samples;
+	gy_offset = gy_offset / (float)samples;
+	gz_offset = gz_offset / (float)samples;
+
+	// Save the offsets
+	xOffset = gx_offset;
+	yOffset = gy_offset;
+	zOffset = gz_offset;
 }
 
 /**
@@ -165,8 +187,14 @@ int16_t L3GD20H::getXRaw(void) {
  * @return Rate of angular rotation about the x axis (roll) in degrees per second (dps)
  */
 float L3GD20H::getX() {
-	float retVal = (float)getXRaw() * resolution;
-	return retVal;
+	float x = (float)getXRaw() * resolution - xOffset;
+
+	return x;
+}
+
+float L3GD20H::getXFiltered() {
+	float xf = gx.filterSample(getX());
+	return xf;
 }
 
 /**
@@ -193,8 +221,14 @@ int16_t L3GD20H::getYRaw(void) {
  * @return Rate of angular rotation about the y axis (pitch) in degrees per second (dps)
  */
 float L3GD20H::getY() {
-	float retVal = (float)getYRaw() * resolution;
-	return retVal;
+	float y = (float)getYRaw() * resolution - yOffset;
+
+	return y;
+}
+
+float L3GD20H::getYFiltered() {
+	float yf = gy.filterSample(getY());
+	return yf;
 }
 
 /**
@@ -221,6 +255,14 @@ int16_t L3GD20H::getZRaw(void) {
  * @return Rate of angular rotation about the z axis (yaw) in degrees per second (dps)
  */
 float L3GD20H::getZ() {
-	float retVal = (float)getZRaw() * resolution;
-	return retVal;
+	float z = (float)getZRaw() * resolution - zOffset;
+
+	return z;
 }
+
+float L3GD20H::getZFiltered() {
+	float zf = gz.filterSample(getZ());
+	return zf;
+}
+
+
