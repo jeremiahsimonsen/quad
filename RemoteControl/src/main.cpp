@@ -42,22 +42,22 @@
 
 int main(int argc, char* argv[])
 {
-  // At this stage the system clock should have already been configured
-  // at high speed.
+	// At this stage the system clock should have already been configured
+	// at high speed.
 
 	init_USART(3, 6, 57600, UART_WORDLENGTH_9B, UART_STOPBITS_1, UART_PARITY_EVEN);
 
 	uint8_t txBuff[] = "Hello world";
-	uint8_t rxBuff[RXBUFFERSIZE];
+	uint8_t rxBuff[15] = {0};
 
-	usart_transmit(txBuff);
-	usart_receive(rxBuff, RXBUFFERSIZE);
+	//	usart_transmit(txBuff);
 
-  // Infinite loop
-  while (1)
-    {
-       // Add your code here.
-    }
+	// Infinite loop
+	while (1)
+	{
+		usart_receive(rxBuff, 14);
+		trace_printf("%s",(char *)rxBuff);
+	}
 }
 
 #pragma GCC diagnostic pop
