@@ -27,8 +27,10 @@ L3GD20H::L3GD20H(void)
 	i2c = I2C::Instance(I2C_SCL_PIN, I2C_SDA_PIN);
 
 	L3GD20H_InitStruct init;
-	init.odr_bw_config = L3GD_ODR_BW_Config::EIGHT;
-	init.fs_config = L3GD_FS_Config::MEDIUM;
+	init.odr_bw_config 	= 	L3GD_ODR_BW_Config::EIGHT;	// 200 Hz ODR, 12.5 Hz BW
+	init.hpm_config 	= 	L3GD_HPM_Config::THREE;		// Normal mode
+	init.hpcf_config 	= 	L3GD_HPCF_Config::FIVE;		// 1 Hz cut-off frequency for 200 Hz ODR
+	init.fs_config 		= 	L3GD_FS_Config::MEDIUM;		// 500 dps full-scale
 	resolution = 17.50e-3f;
 	enable(init);
 }
@@ -72,10 +74,19 @@ void L3GD20H::enable(L3GD20H_InitStruct init) {
 	buf = L3GD_LOW_ODR_Low_ODR(L3GD_ODR_BW_Config_LOW_ODR(init.odr_bw_config));
 	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::LOW_ODR, &buf, 1);
 
+	// Set high-pass filter mode and high-pass filter cutoff frequency
+	buf = (uint8_t)(L3GD_CTRL2_HPM(init.hpm_config)
+					| L3GD_CTRL2_HPCF(init.hpcf_config));
+	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::CTRL2, &buf, 1);
+
 	// Set full scale
-	buf = (uint8_t)(L3GD_CTRL4_FS(init.fs_config)
-			| L3GD_CTRL4_BDU_MASK);
+	buf = (uint8_t)(L3GD_CTRL4_FS(init.fs_config));
+//			| L3GD_CTRL4_BDU_MASK);
 	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::CTRL4, &buf, 1);
+
+	// Enable the high-pass filter
+	buf = (uint8_t)(L3GD_CTRL5_HPen_MASK);
+	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::CTRL5, &buf, 1);
 
 	// TIM initialization for alternative sample time measurement
 	TimHandle.Instance = TIM6;

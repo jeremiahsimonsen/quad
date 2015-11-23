@@ -38,10 +38,15 @@ int main(int argc, char* argv[])
 	// At this stage the system clock should have already been configured
 	// at high speed.
 
-	Motor m1(TimerPin::PC9);
+//	Motor m1(TimerPin::PC8);	// PCB P3
+//	Motor m2(TimerPin::PC6);	// PCB P5
+//	Motor m3(TimerPin::PD14);	// PCB P7
+//	Motor m4(TimerPin::PD12);	// PCB P9
+
+	Motor m1(TimerPin::PC6);
 	Motor m2(TimerPin::PC7);
-	Motor m3(TimerPin::PC6);
-	Motor m4(TimerPin::PC8);
+	Motor m3(TimerPin::PC8);
+	Motor m4(TimerPin::PC9);
 
 	init_USART(3, 6, 57600, UART_WORDLENGTH_9B, UART_STOPBITS_1, UART_PARITY_EVEN);
 

@@ -411,6 +411,27 @@ enum class L3GD_ODR_BW_Config {
 #define L3GD_ODR_BW_Config_DR(x)		(((uint8_t)(((uint8_t)(x))>>2))&0b11)
 #define L3GD_ODR_BW_Config_BW(x)		(((uint8_t)(((uint8_t)(x))))&0b11)
 
+enum class L3GD_HPM_Config {
+	ONE			=	0b00,		// Normal mode (reset reading REFERENCE register)
+	TWO			=	0b01,		// Reference signal for filtering
+	THREE		=	0b10,		// Normal mode
+	FOUR		=	0b11		// Autoreset on interrupt event
+};
+
+enum class L3GD_HPCF_Config {
+	// Cut-off frequency vs ODR	//	12.5	25		50		100		200		400		800
+	ONE 		=	0b0000,		//	 1		 2		 4		  8		 15		 30		 56
+	TWO			=	0b0001,		//	 0.5	 1		 2		  4		  8		 15		 30
+	THREE		= 	0b0010,		//	 0.2	 0.5	 1		  2		  4		  8		 15
+	FOUR		=	0b0011,		//	 0.1	 0.2	 0.5	  1		  2		  4		  8
+	FIVE		=	0b0100,		//	 0.05	 0.1	 0.2	  0.5	  1		  2		  4
+	SIX			=	0b0101,		//	 0.02	 0.05	 0.1	  0.2	  0.5	  1		  2
+	SEVEN		=	0b0110,		//	 0.01	 0.02	 0.05	  0.1	  0.2	  0.5	  1
+	EIGHT		=	0b0111,		//	 0.005	 0.01	 0.02	  0.05	  0.1	  0.2	  0.5
+	NINE		=	0b1000,		//	 0.002	 0.005	 0.01	  0.02	  0.05	  0.1	  0.2
+	TEN			=	0b1001,		//	 0.001	 0.002	 0.005	  0.01	  0.02	  0.05	  0.1
+};
+
 /**
  * Full-scale configurations
  */
@@ -425,6 +446,8 @@ enum class L3GD_FS_Config {
  */
 typedef struct {
 	L3GD_ODR_BW_Config	odr_bw_config;
+	L3GD_HPM_Config		hpm_config;
+	L3GD_HPCF_Config	hpcf_config;
 	L3GD_FS_Config		fs_config;
 } L3GD20H_InitStruct;
 
