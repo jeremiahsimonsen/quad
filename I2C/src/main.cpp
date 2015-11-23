@@ -29,6 +29,10 @@ void lsm_test(void);
 void imu_test(void);
 void lidar_test(void);
 void raw_imu_data(void);
+
+L3GD20H_InitStruct gyroConfig;
+LSM303D_InitStruct accelConfig;
+
 // Sample pragmas to cope with warnings. Please note the related line at
 // the end of this function, used to pop the compiler diagnostics status.
 #pragma GCC diagnostic push
@@ -41,13 +45,29 @@ int main(int argc, char* argv[])
 	// At this stage the system clock should have already been configured
 	// at high speed.
 
+	gyroConfig.odr_bw_config 	= L3GD_ODR_BW_Config::FOUR;		// 100 Hz ODR
+	gyroConfig.hpm_config 		= L3GD_HPM_Config::THREE;		// Normal mode
+	gyroConfig.hpcf_config		= L3GD_HPCF_Config::FOUR;		// 1 Hz cut-off frequency for 100 Hz ODR
+	gyroConfig.fs_config 		= L3GD_FS_Config::MEDIUM;		// ±500 dps full-scale
+
+
+	accelConfig.aodr_config 	= LSM_AODR_Config::SEVEN;		// 100 Hz AODR
+	accelConfig.abw_config 		= LSM_ABW_Config::FOUR;			// 50 Hz anti-alias filter bandwidth
+	accelConfig.afs_config 		= LSM_AFS_Config::FOUR;			// ±4g full-scale
+	accelConfig.modr_config 	= LSM_MODR_Config::SIX;			// 100 Hz MODR
+	accelConfig.mres_config 	= LSM_MRES_Config::HIGH;		// High-res mode
+	accelConfig.mfs_config 		= LSM_MFS_Config::FOUR;			// ± 4 gauss magnetic full-scale
+	accelConfig.md_config 		= LSM_MD_Config::CONTINUOUS;	// Continuous conversion mode
+
+	init_USART(3, 6, 57600, UART_WORDLENGTH_9B, UART_STOPBITS_1, UART_PARITY_EVEN);
+
 //	i2c_lowlevel_test();
 //	lps_test();
 //	l3g_test();
 //	lsm_test();
-//	imu_test();
+	imu_test();
 //	lidar_test();
-	raw_imu_data();
+//	raw_imu_data();
 }
 
 #pragma GCC diagnostic pop
@@ -57,7 +77,6 @@ void i2c_lowlevel_test() {
 		I2C *i2c = I2C::Instance(i2cPin::PB6, i2cPin::PB9);
 
 		uint8_t data1[3] = {0x0};
-		uint8_t data2[3] = {0x0};
 
 		uint8_t on = 0xB4;
 		// Power on and set output data rate to 12.5 Hz
@@ -65,7 +84,6 @@ void i2c_lowlevel_test() {
 
 		while(1) {
 			int16_t temperature;
-			uint8_t x;
 #if USE_DOUBLE_BUFFERING
 			x = i2c->memRead(slave_addr, 0x2B|(1<<7), data1, data2, 2);	// read temperature
 
@@ -150,31 +168,30 @@ void lsm_test() {
 void imu_test() {
 	char str[50];
 	sprintf(str, "USART working.\r\n");
-
-	init_USART(3, 6, 57600, UART_WORDLENGTH_9B, UART_STOPBITS_1, UART_PARITY_EVEN);
 	usart_transmit((uint8_t *)str);
-
-	L3GD20H_InitStruct gyroConfig;
-	gyroConfig.fs_config = L3GD_FS_Config::MEDIUM;
-	gyroConfig.odr_bw_config = L3GD_ODR_BW_Config::NINETEEN;
-
-	LSM303D_InitStruct accelConfig;
-	accelConfig.aodr_config = LSM_AODR_Config::ELEVEN;
-	accelConfig.abw_config = LSM_ABW_Config::FOUR;
-	accelConfig.afs_config = LSM_AFS_Config::FOUR;
-	accelConfig.modr_config = LSM_MODR_Config::SIX;
-	accelConfig.mres_config = LSM_MRES_Config::HIGH;
-	accelConfig.mfs_config = LSM_MFS_Config::FOUR;
-	accelConfig.md_config = LSM_MD_Config::CONTINUOUS;
 
 	IMU imu(gyroConfig, accelConfig);
 	float roll, pitch;
 
+	GPIO_InitTypeDef GPIO_InitStruct;
+
+	__HAL_RCC_GPIOB_CLK_ENABLE();
+
+	GPIO_InitStruct.Pin = GPIO_PIN_5;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
+
 	while (1) {
+		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
+
 		roll = imu.getRoll();
 		pitch = imu.getPitch();
 
-		sprintf(str, "Roll: %f\tPitch: %f\r\n", roll, pitch);
+		sprintf(str, "%f %f\r\n", roll, pitch);
 //		trace_printf("%s", str);
 		usart_transmit((uint8_t *)str);
 
@@ -220,23 +237,8 @@ void raw_imu_data(void) {
 //	Motor m1(TimerPin::PC9);
 //	Motor m2(TimerPin::PC7);
 
-	L3GD20H_InitStruct gyroConfig;
-	gyroConfig.fs_config = L3GD_FS_Config::MEDIUM;
-	gyroConfig.odr_bw_config = L3GD_ODR_BW_Config::NINETEEN;
-
-	LSM303D_InitStruct accelConfig;
-	accelConfig.aodr_config = LSM_AODR_Config::ELEVEN;
-	accelConfig.abw_config = LSM_ABW_Config::FOUR;
-	accelConfig.afs_config = LSM_AFS_Config::FOUR;
-	accelConfig.modr_config = LSM_MODR_Config::SIX;
-	accelConfig.mres_config = LSM_MRES_Config::HIGH;
-	accelConfig.mfs_config = LSM_MFS_Config::FOUR;
-	accelConfig.md_config = LSM_MD_Config::CONTINUOUS;
-
 	L3GD20H l3g(gyroConfig);
 	LSM303D lsm(accelConfig);
-
-	init_USART(3, 6, 57600, UART_WORDLENGTH_9B, UART_STOPBITS_1, UART_PARITY_EVEN);
 
 //	m1.setSpeed(0.5f);
 //	m2.setSpeed(0.5f);
