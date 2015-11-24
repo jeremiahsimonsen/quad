@@ -75,9 +75,9 @@ void L3GD20H::enable(L3GD20H_InitStruct init) {
 	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::LOW_ODR, &buf, 1);
 
 	// Set high-pass filter mode and high-pass filter cutoff frequency
-	buf = (uint8_t)(L3GD_CTRL2_HPM(init.hpm_config)
-					| L3GD_CTRL2_HPCF(init.hpcf_config));
-	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::CTRL2, &buf, 1);
+//	buf = (uint8_t)(L3GD_CTRL2_HPM(init.hpm_config)
+//					| L3GD_CTRL2_HPCF(init.hpcf_config));
+//	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::CTRL2, &buf, 1);
 
 	// Set full scale
 	buf = (uint8_t)(L3GD_CTRL4_FS(init.fs_config));
@@ -85,8 +85,8 @@ void L3GD20H::enable(L3GD20H_InitStruct init) {
 	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::CTRL4, &buf, 1);
 
 	// Enable the high-pass filter
-	buf = (uint8_t)(L3GD_CTRL5_HPen_MASK);
-	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::CTRL5, &buf, 1);
+//	buf = (uint8_t)(L3GD_CTRL5_HPen_MASK);
+//	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::CTRL5, &buf, 1);
 
 	// TIM initialization for alternative sample time measurement
 	TimHandle.Instance = TIM6;

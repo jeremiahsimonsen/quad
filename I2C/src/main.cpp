@@ -45,13 +45,12 @@ int main(int argc, char* argv[])
 	// At this stage the system clock should have already been configured
 	// at high speed.
 
-	gyroConfig.odr_bw_config 	= L3GD_ODR_BW_Config::FOUR;		// 100 Hz ODR
+	gyroConfig.odr_bw_config 	= L3GD_ODR_BW_Config::TWO;		// 25 Hz ODR
 	gyroConfig.hpm_config 		= L3GD_HPM_Config::THREE;		// Normal mode
-	gyroConfig.hpcf_config		= L3GD_HPCF_Config::FOUR;		// 1 Hz cut-off frequency for 100 Hz ODR
+	gyroConfig.hpcf_config		= L3GD_HPCF_Config::TWO;		// 1 Hz cut-off frequency for 100 Hz ODR
 	gyroConfig.fs_config 		= L3GD_FS_Config::MEDIUM;		// ±500 dps full-scale
 
-
-	accelConfig.aodr_config 	= LSM_AODR_Config::SEVEN;		// 100 Hz AODR
+	accelConfig.aodr_config 	= LSM_AODR_Config::THREE;		// 6.25 Hz AODR
 	accelConfig.abw_config 		= LSM_ABW_Config::FOUR;			// 50 Hz anti-alias filter bandwidth
 	accelConfig.afs_config 		= LSM_AFS_Config::FOUR;			// ±4g full-scale
 	accelConfig.modr_config 	= LSM_MODR_Config::SIX;			// 100 Hz MODR

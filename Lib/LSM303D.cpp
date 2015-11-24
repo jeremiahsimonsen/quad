@@ -110,7 +110,8 @@ void LSM303D::enable(LSM303D_InitStruct init) {
 	i2c->memWrite(address, (uint8_t)LSM303D_Reg::CTRL6, &buf, 1);
 
 	// Set magnetic sensor mode
-	buf = LSM303D_CTRL7_MD(init.md_config);
+	buf = (uint8_t)(LSM303D_CTRL7_MD(init.md_config));
+//			| LSM303D_CTRL7_AFDS_MASK);
 	i2c->memWrite(address, (uint8_t)LSM303D_Reg::CTRL7, &buf, 1);
 
 	accCalibrate();

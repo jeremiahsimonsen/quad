@@ -19,7 +19,7 @@
 #include "accelCompFilter.h"
 #include "gyroCompFilter.h"
 
-#define COMPLEMENTARY_TAU (0.5f)
+#define COMPLEMENTARY_TAU (0.8f)
 
 class IMU {
 private:
@@ -29,6 +29,8 @@ private:
 
 	accelCompFilter aFilter_x, aFilter_y;
 	gyroCompFilter gFilter_x, gFilter_y;
+
+	float rate_roll, rate_pitch, angle_roll, angle_pitch;
 
 public:
 	IMU();

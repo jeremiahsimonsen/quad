@@ -1,27 +1,30 @@
+clear all;
 close all;
 
-N = length(ax(:,2));
-
-y_ax = zeros(N,1);
-y_ay = zeros(N,1);
-y_az = zeros(N,1);
-
-y_gx = zeros(N,1);
-y_gy = zeros(N,1);
-y_gz = zeros(N,1);
+% N = length(ax(:,2));
+% 
+% y_ax = zeros(N,1);
+% y_ay = zeros(N,1);
+% y_az = zeros(N,1);
+% 
+% y_gx = zeros(N,1);
+% y_gy = zeros(N,1);
+% y_gz = zeros(N,1);
 
 tau = 15;
-tau2 = 0.9;
+tau2 = 0.8;
 
 %% Transfer functions
-% f = linspace(-.5,.5,1024);	% normalized frequency
-% z = exp(1i*2*pi.*f);
-% Ha = (1 + z.^(-1)) ./ (tau+1 + (1-tau).*z.^(-1));
-% Hg = (tau + tau*z.^(-1)) ./ (tau+1 + (1-tau).*z.^(-1));
-% 
-% figure(1);
-% plot(f, 20*log10(abs(Hg)));
-% ylim([-60 30]);
+f = linspace(-.5,.5,1024);	% normalized frequency
+z = exp(1i*2*pi.*f);
+% Ha = (1 + z.^(-1)) ./ (tau2+1 + (1-tau2).*z.^(-1));
+% Hg = (tau2 + tau2*z.^(-1)) ./ (tau2+1 + (1-tau2).*z.^(-1));
+Hg = (tau2*.02) ./ (1-tau2.*z.^(-1));
+Ha = (1-tau2) ./ (1-tau2.*z.^(-1));
+
+figure(1);
+plot(f, 20*log10(abs(Hg)),f,20*log10(abs(Ha)));
+ylim([-60 30]);
 
 %% Pre-filter the raw accelerometer/gyroscope data
 for n = 1:N
@@ -129,15 +132,15 @@ end
 angle_x = f_ang_x + f_gyro_x;
 angle_y = f_ang_y + f_gyro_y;
 
-figure(8);
-plot(f_ang_x);
-xlabel('Sample number');
-ylabel('X angle (^\circ)');
-
-figure(9);
-plot(f_ang_y);
-xlabel('Sample number');
-ylabel('Y angle (^\circ)');
+% figure(8);
+% plot(f_ang_x);
+% xlabel('Sample number');
+% ylabel('X angle (^\circ)');
+% 
+% figure(9);
+% plot(f_ang_y);
+% xlabel('Sample number');
+% ylabel('Y angle (^\circ)');
 
 
 
