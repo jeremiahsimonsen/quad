@@ -41,6 +41,11 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Lib/PwmTimer.h</locationURI>
 		</link>
 		<link>
+			<name>include/pid.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Lib/pid.h</locationURI>
+		</link>
+		<link>
 			<name>include/stm32f4xx_hal_conf.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/lib/stm32f4xx_hal_conf.h</locationURI>
@@ -69,6 +74,11 @@
 			<name>src/PwmTimer.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Lib/PwmTimer.cpp</locationURI>
+		</link>
+		<link>
+			<name>src/pid.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/Lib/pid.cpp</locationURI>
 		</link>
 		<link>
 			<name>src/stm32f4xx_it.c</name>

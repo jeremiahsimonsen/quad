@@ -50,7 +50,7 @@ void Motor::setSpeed(float s) {
 }
 
 float Motor::getSpeed(void) {
-	return 0.0;
+	return speed;
 }
 
 float Motor::mapSpeedToPulseW(float s) {

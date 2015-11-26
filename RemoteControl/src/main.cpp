@@ -1,10 +1,3 @@
-//
-// This file is part of the GNU ARM Eclipse distribution.
-// Copyright (c) 2014 Liviu Ionescu.
-//
-
-// ----------------------------------------------------------------------------
-
 #include <stdio.h>
 #include <stdlib.h>
 #include "diag/Trace.h"
@@ -14,17 +7,23 @@
 
 #include "uart.h"
 #include "Motor.h"
+#include "IMU.h"
+#include "pid.h"
 
-// ----------------------------------------------------------------------------
-//
-// Standalone STM32F4 empty sample (trace via DEBUG).
-//
-// Trace support is enabled by adding the TRACE macro definition.
-// By default the trace messages are forwarded to the DEBUG output,
-// but can be rerouted to any device or completely suppressed, by
-// changing the definitions required in system/src/diag/trace_impl.c
-// (currently OS_USE_TRACE_ITM, OS_USE_TRACE_SEMIHOSTING_DEBUG/_STDOUT).
-//
+#define TIMEOUT 100
+#define START 255
+
+//	static Motor front(TimerPin::PC8);	// PCB P3
+//	static Motor rear(TimerPin::PC6);	// PCB P5
+//	static Motor left(TimerPin::PD14);	// PCB P7
+//	static Motor right(TimerPin::PD12);	// PCB P9
+
+static Motor front(TimerPin::PC6);
+static Motor rear(TimerPin::PC7);
+static Motor left(TimerPin::PC8);
+static Motor right(TimerPin::PC9);
+
+void descend(float f, float b, float l, float r);
 
 // Sample pragmas to cope with warnings. Please note the related line at
 // the end of this function, used to pop the compiler diagnostics status.
@@ -38,27 +37,19 @@ int main(int argc, char* argv[])
 	// At this stage the system clock should have already been configured
 	// at high speed.
 
-//	Motor m1(TimerPin::PC8);	// PCB P3
-//	Motor m2(TimerPin::PC6);	// PCB P5
-//	Motor m3(TimerPin::PD14);	// PCB P7
-//	Motor m4(TimerPin::PD12);	// PCB P9
-
-	Motor m1(TimerPin::PC6);
-	Motor m2(TimerPin::PC7);
-	Motor m3(TimerPin::PC8);
-	Motor m4(TimerPin::PC9);
-
 	init_USART(3, 6, 57600, UART_WORDLENGTH_9B, UART_STOPBITS_1, UART_PARITY_EVEN);
 
-	uint8_t txBuff[] = "Hello world";
-	uint8_t transferSize = 4;
+	uint8_t transferSize = 6;
 	uint8_t DmaBuff[2*transferSize] = {0};
 	uint8_t readBuff[transferSize] = {0};
 
 	//	usart_transmit(txBuff);
 	usart_receive_begin(DmaBuff, 2*transferSize);
 
-	float s1 = 0.0f, s2 = 0.0f, s3 = 0.0f, s4 = 0.0f;
+	uint8_t rxTimeout = 0;
+	float throttle_cmd, pitch_cmd, roll_cmd, yaw_cmd;
+	float front_s = 0.0f, rear_s = 0.0f, left_s = 0.0f, right_s = 0.0f;
+
 	while (1)
 	{
 		if (usart_read(DmaBuff, readBuff, transferSize) > 0) {
@@ -67,19 +58,59 @@ int main(int argc, char* argv[])
 			sprintf(txBuff, "%d %d %d %d\n", readBuff[0], readBuff[1], readBuff[2], readBuff[3]);
 			usart_transmit((uint8_t *)txBuff);
 
-			s1 = (float)readBuff[0] / 255.0f;
-			s2 = (float)readBuff[1] / 255.0f;
-			s3 = (float)readBuff[2] / 255.0f;
-			s4 = (float)readBuff[3] / 255.0f;
+			if (readBuff[0] != START) {
+				continue;
+			}
 
-			m1.setSpeed(s1);
-			m2.setSpeed(s2);
-			m3.setSpeed(s3);
-			m4.setSpeed(s4);
+			throttle_cmd = (float)readBuff[1] / 255.0f;
+			pitch_cmd 	 = (float)readBuff[2] / 255.0f;
+			roll_cmd 	 = (float)readBuff[3] / 255.0f;
+			yaw_cmd 	 = (float)readBuff[4] / 255.0f;
+
+			front_s = throttle_cmd - pitch_cmd - yaw_cmd;
+			rear_s  = throttle_cmd + pitch_cmd - yaw_cmd;
+			right_s = throttle_cmd - roll_cmd  + yaw_cmd;
+			left_s  = throttle_cmd + roll_cmd  + yaw_cmd;
+
+			front.setSpeed(front_s);
+			rear.setSpeed(rear_s);
+			left.setSpeed(left_s);
+			right.setSpeed(right_s);
+
+			rxTimeout = 0;
+		} else {
+			rxTimeout++;
+			if (rxTimeout >= TIMEOUT) {
+				descend(front_s, rear_s, left_s, right_s);
+			}
 		}
 	}
 }
 
 #pragma GCC diagnostic pop
 
-// ----------------------------------------------------------------------------
+// TODO: Make this feedback controlled based on rangefinder for the final flight controller
+void descend(float f, float b, float l, float r) {
+	char txBuff[] = "Error, no command received. Descending now";
+	usart_transmit((uint8_t *)txBuff);
+
+	while(1) {
+		f -= 0.01f;
+		b -= 0.01f;
+		l -= 0.01f;
+		r -= 0.01f;
+
+		front.setSpeed(f);
+		rear.setSpeed(b);
+		left.setSpeed(l);
+		right.setSpeed(r);
+
+		if (f <= 0.0f && b <= 0.0f && l <= 0.0f && r <= 0.0f) {
+			while(1);
+		}
+
+		HAL_Delay(50);
+	}
+}
+
+
