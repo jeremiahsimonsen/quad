@@ -24,7 +24,7 @@
 #if TAKE_PID
 pid::pid(float kp, float ki, float kd) {
 	k1 = kp + ki + kd;
-	k2 = kp - 2*kd;
+	k2 = -kp - 2*kd;
 	k3 = kd;
 	u1 = e1 = e2 = 0.0f;
 }
@@ -38,7 +38,7 @@ pid::pid(float k1, float k2, float k3) {
 #endif
 
 float pid::calculate(float e) {
-	float u = u1 + k1*e - k2*e1 + k3*e2;
+	float u = u1 + k1*e + k2*e1 + k3*e2;
 
 	u1 = u;
 	e2 = e1;
