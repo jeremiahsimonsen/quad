@@ -19,8 +19,6 @@
 
 #include "pid.h"
 
-#define TAKE_PID 0
-
 #if TAKE_PID
 pid::pid(float kp, float ki, float kd) {
 	k1 = kp + ki + kd;

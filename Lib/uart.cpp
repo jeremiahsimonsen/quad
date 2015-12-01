@@ -893,19 +893,19 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 }
 
 void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart) {
-//	_GET_LOCK_NORETURN(rxLock);
+	_GET_LOCK_NORETURN(rxLock);
 	validRx = 0;
 	dataRead = false;
-//	_UNLOCK(rxLock);
+	_UNLOCK(rxLock);
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 //	UartReady = SET;
-//	_GET_LOCK_NORETURN(rxLock);
+	_GET_LOCK_NORETURN(rxLock);
 	validRx = 1;
 	dataRead = false;
-//	_UNLOCK(rxLock);
+	_UNLOCK(rxLock);
 }
 
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
@@ -1054,9 +1054,9 @@ void usart_receive_begin(uint8_t *s, uint32_t size) {
 }
 
 int8_t usart_read(uint8_t *DmaBuff, uint8_t *readBuff, uint8_t transferSize) {
-	int8_t retVal;
+	int8_t retVal = -1;
 
-//	_GET_LOCK_RETURN(rxLock);
+	_GET_LOCK_RETURN(rxLock);
 
 	if (validRx >= 0 && dataRead == false) {
 		for (int i = 0; i < transferSize; i++) {
@@ -1064,11 +1064,9 @@ int8_t usart_read(uint8_t *DmaBuff, uint8_t *readBuff, uint8_t transferSize) {
 			retVal = i;
 		}
 		dataRead = true;
-	} else {
-		retVal = -1;
 	}
 
-//	_UNLOCK(rxLock);
+	_UNLOCK(rxLock);
 	return retVal;
 }
 

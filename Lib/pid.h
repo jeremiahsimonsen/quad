@@ -20,6 +20,8 @@
 #ifndef PID_H_
 #define PID_H_
 
+#define TAKE_PID 1
+
 class pid {
 private:
 	float k1, k2, k3;

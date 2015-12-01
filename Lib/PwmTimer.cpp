@@ -88,29 +88,44 @@ void PwmTimer::setWidth(float w) {
 
 	channel = TimerChannelToCH[(int)ch];
 
-	// Setup channel-specific settings
-	TIM_OC_InitTypeDef sConfig;
-	sConfig.OCMode = TIM_OCMODE_PWM1;
-	sConfig.Pulse = (uint32_t) ( (float)(TimHandle.Init.Period + 1) * pulseWidth * .001 * frequency - 1 );
-	sConfig.OCPolarity = TIM_OCPOLARITY_HIGH;
-	sConfig.OCNPolarity = TIM_OCPOLARITY_HIGH;
-	sConfig.OCFastMode = TIM_OCFAST_DISABLE;
-	sConfig.OCIdleState = TIM_OCIDLESTATE_RESET;
-	sConfig.OCNIdleState = TIM_OCIDLESTATE_RESET;
+	uint32_t ccr = (uint32_t) ( (float)(TimHandle.Init.Period + 1) * pulseWidth * .001 * frequency - 1);
 
-	// Store configuration settings in peripheral registers
-	// NOTE: Disables PWM output
-	if (HAL_TIM_PWM_ConfigChannel(&TimHandle, &sConfig, channel) != HAL_OK) {
-		// TODO: Error_Handler();
-		while(1);
-	}
-
-	// Start/re-enable the PWM output
-	if (HAL_TIM_PWM_Start(&TimHandle, channel) != HAL_OK) {
-		// TODO: Error_Handler();
-		while(1);
-	}
+	__HAL_TIM_SET_COMPARE(&this->TimHandle, channel, ccr);
 }
+
+//void PwmTimer::setWidth(float w) {
+//	// TODO: Add error checking/clipping for w
+//	pulseWidth = w;
+//	uint32_t channel;
+//
+//	// TODO: Refactor this crappy array mapping shit
+//	uint32_t TimerChannelToCH[32] = {TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_1, TIM_CHANNEL_1, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_1, TIM_CHANNEL_1};
+//
+//	channel = TimerChannelToCH[(int)ch];
+//
+//	// Setup channel-specific settings
+//	TIM_OC_InitTypeDef sConfig;
+//	sConfig.OCMode = TIM_OCMODE_PWM1;
+//	sConfig.Pulse = (uint32_t) ( (float)(TimHandle.Init.Period + 1) * pulseWidth * .001 * frequency - 1 );
+//	sConfig.OCPolarity = TIM_OCPOLARITY_HIGH;
+//	sConfig.OCNPolarity = TIM_OCPOLARITY_HIGH;
+//	sConfig.OCFastMode = TIM_OCFAST_DISABLE;
+//	sConfig.OCIdleState = TIM_OCIDLESTATE_RESET;
+//	sConfig.OCNIdleState = TIM_OCIDLESTATE_RESET;
+//
+//	// Store configuration settings in peripheral registers
+//	// NOTE: Disables PWM output
+//	if (HAL_TIM_PWM_ConfigChannel(&TimHandle, &sConfig, channel) != HAL_OK) {
+//		// TODO: Error_Handler();
+//		while(1);
+//	}
+//
+//	// Start/re-enable the PWM output
+//	if (HAL_TIM_PWM_Start(&TimHandle, channel) != HAL_OK) {
+//		// TODO: Error_Handler();
+//		while(1);
+//	}
+//}
 
 void PwmTimer::initTimer(float f, float w, TimerPin p) {
 	// Arrays for mapping TimerPin p to STM HAL variables
@@ -119,7 +134,7 @@ void PwmTimer::initTimer(float f, float w, TimerPin p) {
 	uint16_t TimerPinToGpioPin[50] = {GPIO_PIN_0, GPIO_PIN_1, GPIO_PIN_2, GPIO_PIN_3, GPIO_PIN_6, GPIO_PIN_7, GPIO_PIN_8, GPIO_PIN_9, GPIO_PIN_10, GPIO_PIN_11,  GPIO_PIN_15, GPIO_PIN_0, GPIO_PIN_1, GPIO_PIN_3, GPIO_PIN_4, GPIO_PIN_5, GPIO_PIN_6, GPIO_PIN_7, GPIO_PIN_8, GPIO_PIN_9, GPIO_PIN_10, GPIO_PIN_11,  GPIO_PIN_14, GPIO_PIN_15, GPIO_PIN_6, GPIO_PIN_7, GPIO_PIN_8, GPIO_PIN_9, GPIO_PIN_12, GPIO_PIN_13, GPIO_PIN_14, GPIO_PIN_15, GPIO_PIN_5, GPIO_PIN_6, GPIO_PIN_9, GPIO_PIN_11, GPIO_PIN_13, GPIO_PIN_14, GPIO_PIN_6, GPIO_PIN_7, GPIO_PIN_8, GPIO_PIN_9, GPIO_PIN_10, GPIO_PIN_11, GPIO_PIN_12, GPIO_PIN_0, GPIO_PIN_2, GPIO_PIN_5, GPIO_PIN_6, GPIO_PIN_7	};
 
 	TIM_TypeDef* TimerChannelToTIM_TD[32] = {TIM1, TIM1, TIM1, TIM1, TIM2, TIM2, TIM2, TIM2, TIM3, TIM3, TIM3, TIM3, TIM4, TIM4, TIM4, TIM4, TIM5, TIM5, TIM5, TIM5, TIM8, TIM8, TIM8, TIM8, TIM9, TIM9, TIM10, TIM11, TIM12, TIM12, TIM13, TIM14};
-//	uint32_t TimerChannelToCH[32] = {TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_1, TIM_CHANNEL_1, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_1, TIM_CHANNEL_1};
+	uint32_t TimerChannelToCH[32] = {TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_1, TIM_CHANNEL_1, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_1, TIM_CHANNEL_1};
 	uint8_t TimerChannelToAF[32] = {GPIO_AF1_TIM1, GPIO_AF1_TIM1, GPIO_AF1_TIM1, GPIO_AF1_TIM1, GPIO_AF1_TIM2, GPIO_AF1_TIM2, GPIO_AF1_TIM2, GPIO_AF1_TIM2, GPIO_AF2_TIM3, GPIO_AF2_TIM3, GPIO_AF2_TIM3, GPIO_AF2_TIM3, GPIO_AF2_TIM4, GPIO_AF2_TIM4, GPIO_AF2_TIM4, GPIO_AF2_TIM4, GPIO_AF2_TIM5, GPIO_AF2_TIM5, GPIO_AF2_TIM5, GPIO_AF2_TIM5, GPIO_AF3_TIM8, GPIO_AF3_TIM8, GPIO_AF3_TIM8, GPIO_AF3_TIM8, GPIO_AF3_TIM9, GPIO_AF3_TIM9, GPIO_AF3_TIM10, GPIO_AF3_TIM11, GPIO_AF9_TIM12, GPIO_AF9_TIM12, GPIO_AF9_TIM13, GPIO_AF9_TIM14};
 
 	// Map to usable variables
@@ -128,7 +143,7 @@ void PwmTimer::initTimer(float f, float w, TimerPin p) {
 	uint16_t GPIO_PIN = TimerPinToGpioPin[(int)p];
 
 	TIM_TypeDef *TIMx = TimerChannelToTIM_TD[(int)ch];
-//	uint32_t channel = TimerChannelToCH[(int)ch];
+	uint32_t channel = TimerChannelToCH[(int)ch];
 	uint32_t AF = TimerChannelToAF[(int)ch];
 
 	// GPIO Initialization
@@ -202,6 +217,29 @@ void PwmTimer::initTimer(float f, float w, TimerPin p) {
 	TimHandle.State = HAL_TIM_STATE_RESET;
 	// NOTE: Calls HAL_TIM_PWM_MspInit()
 	if (HAL_TIM_PWM_Init(&TimHandle) != HAL_OK) {
+		// TODO: Error_Handler();
+		while(1);
+	}
+
+	// Setup channel-specific settings
+	TIM_OC_InitTypeDef sConfig;
+	sConfig.OCMode = TIM_OCMODE_PWM1;
+	sConfig.Pulse = (uint32_t) ( (float)(TimHandle.Init.Period + 1) * 1.0f * .001f * frequency - 1 );
+	sConfig.OCPolarity = TIM_OCPOLARITY_HIGH;
+	sConfig.OCNPolarity = TIM_OCPOLARITY_HIGH;
+	sConfig.OCFastMode = TIM_OCFAST_DISABLE;
+	sConfig.OCIdleState = TIM_OCIDLESTATE_RESET;
+	sConfig.OCNIdleState = TIM_OCIDLESTATE_RESET;
+
+	// Store configuration settings in peripheral registers
+	// NOTE: Disables PWM output
+	if (HAL_TIM_PWM_ConfigChannel(&TimHandle, &sConfig, channel) != HAL_OK) {
+		// TODO: Error_Handler();
+		while(1);
+	}
+
+	// Start/re-enable the PWM output
+	if (HAL_TIM_PWM_Start(&TimHandle, channel) != HAL_OK) {
 		// TODO: Error_Handler();
 		while(1);
 	}

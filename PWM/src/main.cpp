@@ -36,8 +36,6 @@ int main(int argc, char* argv[])
 	// At this stage the system clock should have already been configured
 	// at high speed.
 
-	HAL_Init();
-
 //	PwmTimer pwm1(51.5, TimerPin::PA8);
 //	PwmTimer pwm2(51.5, TimerPin::PA1);
 //	PwmTimer pwm3(51.5, TimerPin::PA6);
@@ -52,6 +50,8 @@ int main(int argc, char* argv[])
 	Motor m(TimerPin::PC9);
 //
 	m.setSpeed(1.0f);
+
+	while(1);
 
 	float fDir = 1.0f;
 	float wDir = 1.0f;

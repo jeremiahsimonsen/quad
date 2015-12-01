@@ -36,6 +36,14 @@ int main(int argc, char* argv[])
 {
 	// At this stage the system clock should have already been configured
 	// at high speed.
+	__HAL_RCC_GPIOE_CLK_ENABLE();
+
+	GPIO_InitTypeDef GPIO_InitStruct;
+	GPIO_InitStruct.Pin 		= GPIO_PIN_5;
+	GPIO_InitStruct.Mode 		= GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull		= GPIO_NOPULL;
+	GPIO_InitStruct.Speed 		= GPIO_SPEED_FAST;
+	HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
 	init_USART(3, 6, 57600, UART_WORDLENGTH_9B, UART_STOPBITS_1, UART_PARITY_EVEN);
 
@@ -55,6 +63,8 @@ int main(int argc, char* argv[])
 	while (1)
 	{
 		if (usart_read(DmaBuff, readBuff, transferSize) > 0) {
+			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, GPIO_PIN_SET);
+
 //			trace_printf("%d %d %d %d\n", readBuff[0], readBuff[1], readBuff[2], readBuff[3]);
 			char txBuff[100];
 			sprintf(txBuff, "Received: %d %d %d %d %d %d\n\r", readBuff[0], readBuff[1], readBuff[2], readBuff[3], readBuff[4], readBuff[5]);
@@ -83,6 +93,8 @@ int main(int argc, char* argv[])
 			sprintf(txBuff2, "Motors: %f %f %f %f\n\r", front_s, rear_s, right_s, left_s);
 			usart_transmit((uint8_t *)txBuff2);
 //
+			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, GPIO_PIN_RESET);
+
 //			rxTimeout = 0;
 		} //else {
 //			rxTimeout++;
@@ -90,6 +102,8 @@ int main(int argc, char* argv[])
 //				descend(front_s, rear_s, left_s, right_s);
 //			}
 //		}
+
+//		HAL_Delay(10);
 	}
 }
 
