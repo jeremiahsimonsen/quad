@@ -138,10 +138,10 @@ void main()
 		u_pitch_cmd = u_pitch / MAX_ANGLE;
 		u_roll_cmd  = u_roll  / MAX_ANGLE;
 
-		front_s = throttle_cmd - u_pitch_cmd - yaw_cmd;
-		rear_s  = throttle_cmd + u_pitch_cmd - yaw_cmd;
-		right_s = throttle_cmd - u_roll_cmd  + yaw_cmd;
-		left_s  = throttle_cmd + u_roll_cmd  + yaw_cmd;
+		front_s = throttle_cmd - u_pitch_cmd;// - yaw_cmd;
+		rear_s  = throttle_cmd + u_pitch_cmd;// - yaw_cmd;
+		right_s = throttle_cmd - u_roll_cmd;//  + yaw_cmd;
+		left_s  = throttle_cmd + u_roll_cmd;//  + yaw_cmd;
 
 		front.setSpeed(front_s);
 		rear.setSpeed(rear_s);

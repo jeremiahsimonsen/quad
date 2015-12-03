@@ -64,19 +64,22 @@ def main():
 	packet = [START, 0, 0, 0, 0, STOP]
 	ids = ['dummy_id', 'r2_analog', pitch_LUT[MODE-1], roll_LUT[MODE-1], yaw_LUT[MODE-1]]
 	
-	ser = serial.Serial('/dev/ttyUSB0', 57600, parity=serial.PARITY_EVEN)
+# 	ser = serial.Serial('/dev/ttyUSB0', 57600, parity=serial.PARITY_EVEN)
 # 	ser = serial.Serial('COM9', 57600, parity=serial.PARITY_EVEN)
 	
-# 	buf = StringIO.StringIO(report)
-# 	for line in buf:
-	for line in sys.stdin:
+	buf = StringIO.StringIO(report)
+	for line in buf:
+# 	for line in sys.stdin:
 		""" New report """
 		if 'Report dump' in line:
-			ser.write(bytearray(packet))
+# 			ser.write(bytearray(packet))
 			print packet
 		for index, val in enumerate(ids):
 			if val in line:
-				packet[index] = int(int(filter(str.isdigit, str.lstrip(line, ' r2'))) / 255.0 * 253.0)
+				if index == 2:
+					packet[index] = int(int(filter(str.isdigit, str.lstrip(line, ' r2'))) / 255.0 * 253.0 * -1.0 + 253.0)
+				else:
+					packet[index] = int(int(filter(str.isdigit, str.lstrip(line, ' r2'))) / 255.0 * 253.0)
 			
 if __name__ == '__main__':
 	main()
