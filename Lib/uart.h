@@ -16,6 +16,10 @@
 
 #include "DMA_IT.h"
 
+#define START 255
+#define STOP  254
+#define TRANSFER_SIZE 6
+
 //extern UART_HandleTypeDef UartHandle;
 
 /**
@@ -32,9 +36,11 @@ void init_USART(int uart_num, int num_args, ...);
 
 void usart_transmit(uint8_t *s);
 
-void usart_receive_begin(uint8_t *s, uint32_t size);
+//void usart_receive_begin(uint8_t *s, uint32_t size);
+void usart_receive_begin(void);
 
-int8_t usart_read(uint8_t *DmaBuff, uint8_t *readBuff, uint8_t transferSize);
+//int8_t usart_read(uint8_t *DmaBuff, uint8_t *readBuff, uint8_t transferSize);
+uint8_t* usart_read(void);
 
 //////////////////////////////////////////////////////////////////////
 //                      Definitions for USART1                      //

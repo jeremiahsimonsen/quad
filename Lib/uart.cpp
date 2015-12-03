@@ -11,6 +11,11 @@ static volatile int8_t validRx = -1;
 static volatile bool dataRead = false;
 static HAL_LockTypeDef rxLock = HAL_UNLOCKED;
 
+static volatile uint8_t DmaBuff[2*TRANSFER_SIZE] = {0};
+static volatile uint8_t readBuffPing[TRANSFER_SIZE] = {0};
+static volatile uint8_t readBuffPong[TRANSFER_SIZE] = {0};
+static volatile bool pingPongBar = true;		// true means ping can be read - write to pong
+
 #define _GET_LOCK_RETURN(__LOCK__)								\
 							do{									\
 								if((__LOCK__) == HAL_LOCKED)	\
@@ -893,19 +898,44 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 }
 
 void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart) {
-	_GET_LOCK_NORETURN(rxLock);
+//	_GET_LOCK_NORETURN(rxLock);
 	validRx = 0;
+//	dataRead = false;
+//	_UNLOCK(rxLock);
+	if (pingPongBar == false) {
+		// Copy first half of DmaBuff to readPing
+		for (int i = 0; i < TRANSFER_SIZE; i++) {
+			readBuffPing[i] = DmaBuff[i];
+		}
+		pingPongBar = true;
+	} else {
+		for (int i = 0; i < TRANSFER_SIZE; i++) {
+			readBuffPong[i] = DmaBuff[i];
+		}
+		pingPongBar = false;
+	}
 	dataRead = false;
-	_UNLOCK(rxLock);
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 //	UartReady = SET;
-	_GET_LOCK_NORETURN(rxLock);
+//	_GET_LOCK_NORETURN(rxLock);
 	validRx = 1;
+//	dataRead = false;
+//	_UNLOCK(rxLock);
+
+	if (pingPongBar == false) {
+		for (int i = 0; i < TRANSFER_SIZE; i++) {
+			readBuffPing[i] = DmaBuff[TRANSFER_SIZE+i];
+		}
+		pingPongBar = true;
+	} else {
+		for (int i = 0; i < TRANSFER_SIZE; i++) {
+			readBuffPong[i] = DmaBuff[TRANSFER_SIZE+i];
+		}
+	}
 	dataRead = false;
-	_UNLOCK(rxLock);
 }
 
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
@@ -1044,31 +1074,78 @@ void usart_transmit(uint8_t *s)
 	}
 }
 
-void usart_receive_begin(uint8_t *s, uint32_t size) {
-//	while (UartReady != SET);
-//	UartReady = RESET;
+//void usart_receive_begin(uint8_t *s, uint32_t size) {
+////	while (UartReady != SET);
+////	UartReady = RESET;
+//
+//	if (HAL_UART_Receive_DMA(&UartHandle, s, size)) {
+//		// TODO: Error_Handler();
+//	}
+//}
 
-	if (HAL_UART_Receive_DMA(&UartHandle, s, size)) {
+void usart_receive_begin() {
+	if (HAL_UART_Receive_DMA(&UartHandle, (uint8_t *)DmaBuff, 2*TRANSFER_SIZE)) {
 		// TODO: Error_Handler();
 	}
 }
 
-int8_t usart_read(uint8_t *DmaBuff, uint8_t *readBuff, uint8_t transferSize) {
-	int8_t retVal = -1;
+//int8_t usart_read(uint8_t *DmaBuff, uint8_t *readBuff, uint8_t transferSize) {
+//	int8_t retVal = -1;
+//
+//	_GET_LOCK_RETURN(rxLock);
+//
+//	if (validRx >= 0 && dataRead == false) {
+//		for (int i = 0; i < transferSize; i++) {
+//			readBuff[i] = DmaBuff[validRx*transferSize + i];
+//			retVal = i;
+//		}
+//		dataRead = true;
+//	}
+//
+//	_UNLOCK(rxLock);
+//	return retVal;
+//}
 
-	_GET_LOCK_RETURN(rxLock);
+//int8_t usart_read(uint8_t *DmaBuff, uint8_t *readBuff, uint8_t transferSize) {
+//	static int8_t prevEnd = -1;
+//	uint8_t start = (prevEnd + 1) % (2*transferSize);
+//	int8_t retVal = -1;
+//	int i;
+//
+//	_GET_LOCK_RETURN(rxLock);
+//	if (dataRead == false) {
+//		while (DmaBuff[start%(2*transferSize)] != START) {
+//			start++;
+//			if (start%(2*transferSize) == prevEnd) {
+//				return retVal;
+//			}
+//		}
+//		retVal = start;
+//
+//
+//		for (i = 0; i < transferSize; i++) {
+//			readBuff[i] = DmaBuff[(start+i)%(2*transferSize)];
+//		}
+//
+//		dataRead = true;
+//	} else {
+//		retVal = -1;
+//	}
+//	_UNLOCK(rxLock);
+//
+//	prevEnd = (start + transferSize - 1) % (2*transferSize);
+//
+//	return retVal;
+//}
 
-	if (validRx >= 0 && dataRead == false) {
-		for (int i = 0; i < transferSize; i++) {
-			readBuff[i] = DmaBuff[validRx*transferSize + i];
-			retVal = i;
-		}
+
+uint8_t* usart_read(void) {
+	if (dataRead == true || validRx < 0) {
+		return NULL;
+	} else {
 		dataRead = true;
+		return pingPongBar == true ? (uint8_t *)readBuffPing : (uint8_t *)readBuffPong;
 	}
-
-	_UNLOCK(rxLock);
-	return retVal;
 }
-
 
 

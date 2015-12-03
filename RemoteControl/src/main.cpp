@@ -11,7 +11,6 @@
 #include "pid.h"
 
 #define TIMEOUT 100000
-#define START 255
 
 //static Motor rear(TimerPin::PC8);	// PCB P3
 //static Motor right(TimerPin::PC6);	// PCB P5
@@ -36,25 +35,27 @@ int main(int argc, char* argv[])
 {
 	// At this stage the system clock should have already been configured
 	// at high speed.
-	__HAL_RCC_GPIOE_CLK_ENABLE();
+	__HAL_RCC_GPIOD_CLK_ENABLE();
 
 	GPIO_InitTypeDef GPIO_InitStruct;
-	GPIO_InitStruct.Pin 		= GPIO_PIN_5;
+	GPIO_InitStruct.Pin 		= GPIO_PIN_12;
 	GPIO_InitStruct.Mode 		= GPIO_MODE_OUTPUT_PP;
 	GPIO_InitStruct.Pull		= GPIO_NOPULL;
 	GPIO_InitStruct.Speed 		= GPIO_SPEED_FAST;
-	HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
 
 	init_USART(3, 6, 57600, UART_WORDLENGTH_9B, UART_STOPBITS_1, UART_PARITY_EVEN);
 
-	uint8_t transferSize = 6;
-	uint8_t DmaBuff[2*transferSize] = {0};
-	uint8_t readBuff[transferSize] = {0};
+//	uint8_t DmaBuff[2*TRANSFER_SIZE] = {0};
+//	uint8_t readBuff[TRANSFER_SIZE] = {0};
+	uint8_t *readBuff = NULL;
 
 	char txBuff[] = "USART working\n\r";
 //	trace_printf("USART working\n");
 	usart_transmit((uint8_t *)txBuff);
-	usart_receive_begin(DmaBuff, 2*transferSize);
+//	usart_receive_begin(DmaBuff, 2*transferSize);
+	usart_receive_begin();
 
 //	uint32_t rxTimeout = 0;
 	float throttle_cmd, pitch_cmd, roll_cmd, yaw_cmd;
@@ -62,22 +63,24 @@ int main(int argc, char* argv[])
 
 	while (1)
 	{
-		if (usart_read(DmaBuff, readBuff, transferSize) > 0) {
-			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, GPIO_PIN_SET);
+//		if (usart_read(DmaBuff, readBuff, transferSize) > 0) {
+		readBuff = usart_read();
+		if (readBuff != NULL) {
+//			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, GPIO_PIN_SET);
 
 //			trace_printf("%d %d %d %d\n", readBuff[0], readBuff[1], readBuff[2], readBuff[3]);
 			char txBuff[100];
 			sprintf(txBuff, "Received: %d %d %d %d %d %d\n\r", readBuff[0], readBuff[1], readBuff[2], readBuff[3], readBuff[4], readBuff[5]);
 			usart_transmit((uint8_t *)txBuff);
 
-//			if (readBuff[0] != START) {
-//				continue;
-//			}
+			if (readBuff[0] != START || readBuff[5] != STOP) {
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
+			}
 
-			throttle_cmd = (float)readBuff[1] / 255.0f;
-			pitch_cmd 	 = ((float)readBuff[2] - 128.0) / 128.0f;
-			roll_cmd 	 = ((float)readBuff[3] - 128.0) / 128.0f;
-			yaw_cmd 	 = ((float)readBuff[4] - 128.0) / 128.0f;
+			throttle_cmd = (float)readBuff[1] / 253.0f;
+			pitch_cmd 	 = ((float)readBuff[2] - 127.0) / 127.0f;
+			roll_cmd 	 = ((float)readBuff[3] - 127.0) / 127.0f;
+			yaw_cmd 	 = ((float)readBuff[4] - 127.0) / 127.0f;
 
 			front_s = throttle_cmd - pitch_cmd - yaw_cmd;
 			rear_s  = throttle_cmd + pitch_cmd - yaw_cmd;
@@ -93,7 +96,7 @@ int main(int argc, char* argv[])
 			sprintf(txBuff2, "Motors: %f %f %f %f\n\r", front_s, rear_s, right_s, left_s);
 			usart_transmit((uint8_t *)txBuff2);
 //
-			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, GPIO_PIN_RESET);
+//			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_5, GPIO_PIN_RESET);
 
 //			rxTimeout = 0;
 		} //else {
