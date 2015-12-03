@@ -81,6 +81,11 @@
 			<locationURI>PARENT-1-PROJECT_LOC/lib/gyroCompFilter.h</locationURI>
 		</link>
 		<link>
+			<name>include/led.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/led.h</locationURI>
+		</link>
+		<link>
 			<name>include/pid.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Lib/pid.h</locationURI>
@@ -169,6 +174,11 @@
 			<name>src/gyroCompFilter.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/lib/gyroCompFilter.cpp</locationURI>
+		</link>
+		<link>
+			<name>src/led.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/led.cpp</locationURI>
 		</link>
 		<link>
 			<name>src/pid.cpp</name>

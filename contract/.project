@@ -105,6 +105,21 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Lib/LidarLite.h</locationURI>
 		</link>
 		<link>
+			<name>include/accelCompFilter.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/accelCompFilter.h</locationURI>
+		</link>
+		<link>
+			<name>include/gyroCompFilter.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/gyroCompFilter.h</locationURI>
+		</link>
+		<link>
+			<name>include/preFilter.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/preFilter.h</locationURI>
+		</link>
+		<link>
 			<name>include/stm32f4xx_hal_conf.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Lib/stm32f4xx_hal_conf.h</locationURI>
@@ -168,6 +183,21 @@
 			<name>src/PwmTimer.cpp</name>
 			<type>1</type>
 			<locationURI>copy_PARENT/Lib/PwmTimer.cpp</locationURI>
+		</link>
+		<link>
+			<name>src/accelCompFilter.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/accelCompFilter.cpp</locationURI>
+		</link>
+		<link>
+			<name>src/gyroCompFilter.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/gyroCompFilter.cpp</locationURI>
+		</link>
+		<link>
+			<name>src/preFilter.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/preFilter.cpp</locationURI>
 		</link>
 		<link>
 			<name>src/stm32f4xx_it.c</name>

@@ -189,7 +189,7 @@ int16_t L3GD20H::getXRaw(void) {
 	}
 #else
 	i2c->readyWait();
-	return (int16_t)(gyroBuff[1]<<8 | gyroBuff[0]);
+	return -(int16_t)(gyroBuff[1]<<8 | gyroBuff[0]);
 #endif
 }
 
@@ -223,7 +223,7 @@ int16_t L3GD20H::getYRaw(void) {
 	}
 #else
 	i2c->readyWait();
-	return (int16_t)(gyroBuff[3]<<8 | gyroBuff[2]);
+	return -(int16_t)(gyroBuff[3]<<8 | gyroBuff[2]);
 #endif
 }
 

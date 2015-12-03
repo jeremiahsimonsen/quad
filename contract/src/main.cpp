@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
 	// At this stage the system clock should have already been configured
 	// at high speed.
 
-	LidarLite lidar;
+//	LidarLite lidar;
 
 //	while(1) {
 //		float dist = lidar.getDistIn();
@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
 	accelConfig.md_config = LSM_MD_Config::CONTINUOUS;
 
 	IMU imu(gyroConfig, accelConfig);
-	Adc vSense(AdcPin::PA2);
+//	Adc vSense(AdcPin::PA2);
 //	Adc iSense(AdcPin::PA3);
 
 	init_USART(3, 6, 57600, UART_WORDLENGTH_9B, UART_STOPBITS_1, UART_PARITY_EVEN);
@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
 
 	float roll, pitch;
 	float height;
-	float v;//, i;
+//	float v;//, i;
 	uint32_t iter = 0;
 	char txBuff[50];
 
@@ -84,11 +84,11 @@ int main(int argc, char* argv[])
 		roll = imu.getRoll();
 		pitch = imu.getPitch();
 
-		height = lidar.getDistIn();
+//		height = lidar.getDistIn();
 
-		uint32_t vRaw = vSense.read();
+//		uint32_t vRaw = vSense.read();
 //		uint32_t iRaw = iSense.read();
-		v = (float)vRaw * 3.0f / 4096.0f / 63.69e-3f;
+//		v = (float)vRaw * 3.0f / 4096.0f / 63.69e-3f;
 //		i = (float)iRaw * 3.0f / 4096.0f / 18.30e-3f;
 
 //		uint32_t adcVal = adc.read();
@@ -107,8 +107,9 @@ int main(int argc, char* argv[])
 		}
 
 		if (iter % 2 == 0) {
+			sprintf(txBuff, "Pitch: %f\tRoll: %f\n\r", pitch, roll);
 //			sprintf(txBuff, "Height: %f\tRoll: %f\tPitch: %f\n\r", height, roll, pitch);
-			sprintf(txBuff, "Height: %f\tRoll: %f\tPitch: %f\tVoltage: %f\n\r", height, roll, pitch, v);
+//			sprintf(txBuff, "Height: %f\tRoll: %f\tPitch: %f\tVoltage: %f\n\r", height, roll, pitch, v);
 //			sprintf(txBuff, "Height: %f\tRoll: %f\tPitch: %f\tVoltage: %f\tCurrent%f\n\r", height, roll, pitch, v, i);
 //			float dt = imu.getDT();
 //			sprintf(txBuff, "DT: %f\n\r", dt);

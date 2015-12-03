@@ -182,7 +182,7 @@ int16_t LSM303D::getAccXRaw(void) {
 	}
 #else
 	i2c->readyWait();
-	return (int16_t)(accBuff[1]<<8 | accBuff[0]);
+	return -(int16_t)(accBuff[1]<<8 | accBuff[0]);
 #endif
 }
 
@@ -217,7 +217,7 @@ int16_t LSM303D::getAccYRaw(void) {
 	}
 #else
 	i2c->readyWait();
-	return (int16_t)(accBuff[3]<<8 | accBuff[2]);
+	return -(int16_t)(accBuff[3]<<8 | accBuff[2]);
 #endif
 }
 

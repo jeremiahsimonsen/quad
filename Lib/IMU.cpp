@@ -62,7 +62,7 @@ float IMU::getPitch(void) {
 #endif
 
 #if 1
-float IMU::getRoll(void) {
+float IMU::getPitch(void) {
 	// Initiate a new read
 	accel.read();
 	gyro.read();
@@ -101,7 +101,7 @@ float IMU::getRoll(void) {
 	return angle_roll;
 }
 
-float IMU::getPitch(void) {
+float IMU::getRoll(void) {
 	// Initiate a new read
 	accel.read();
 	gyro.read();

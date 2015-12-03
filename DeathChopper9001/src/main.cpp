@@ -9,10 +9,10 @@
 #include "Motor.h"
 #include "IMU.h"
 #include "pid.h"
+#include "led.h"
 
 // UART RX parameters
-#define TIMEOUT 100000
-#define START 255
+#define TIMEOUT 2000
 
 // Flight Parameters
 #define MAX_ANGLE 30.0f					// Maximum pitch & roll angle [deg]
@@ -26,46 +26,45 @@
 #define ROLL_KI  0.0f
 #define ROLL_KD  0.0f
 
-//static Motor rear(TimerPin::PC8);	// PCB P3
-//static Motor right(TimerPin::PC6);	// PCB P5
-//static Motor front(TimerPin::PD14);	// PCB P7
-//static Motor left(TimerPin::PD12);	// PCB P9
+//#define DISCOVERY_BOARD
+#define DEATH_CHOPPER
 
+#ifdef DEATH_CHOPPER
+#define BOARD Board::DEATH_CHOPPER_9000
+static Motor left(TimerPin::PC8);	// PCB P3
+static Motor rear(TimerPin::PC6);	// PCB P5
+static Motor front(TimerPin::PD14);	// PCB P7
+static Motor right(TimerPin::PD12);	// PCB P9
+#endif
+#ifdef DISCOVERY_BOARD
+#define BOARD Board::STM32F4_DISCOVERY
 static Motor front(TimerPin::PC6);
 static Motor rear(TimerPin::PC7);
 static Motor left(TimerPin::PC8);
 static Motor right(TimerPin::PC9);
+#endif
+
+static led *leds;
 
 //void descend(float f, float b, float l, float r);
+void abort(void);
 
 void main()
 {
 	// At this stage the system clock should have already been configured
 	// at high speed.
-
-	__HAL_RCC_GPIOD_CLK_ENABLE();
-
-	GPIO_InitTypeDef GPIO_InitStruct;
-	GPIO_InitStruct.Pin 		= GPIO_PIN_12;
-	GPIO_InitStruct.Mode 		= GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull		= GPIO_NOPULL;
-	GPIO_InitStruct.Speed 		= GPIO_SPEED_FAST;
-	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
-	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
+	leds = new led(BOARD);
 
 	init_USART(3, 6, 57600, UART_WORDLENGTH_9B, UART_STOPBITS_1, UART_PARITY_EVEN);
 
-//	uint8_t DmaBuff[2*TRANSFER_SIZE] = {0};
-//	uint8_t readBuff[TRANSFER_SIZE] = {0};
 	uint8_t *readBuff = NULL;
 	uint32_t iter = 0;
 
 	char txBuff[] = "USART working\n\r";
 	usart_transmit((uint8_t *)txBuff);
-//	usart_receive_begin(DmaBuff, 2*transferSize);
 	usart_receive_begin();
 
-//	uint32_t rxTimeout = 0;
+	uint32_t rxTimeout = 0;
 	float throttle_cmd = 0.0f, pitch_cmd = 0.0f, roll_cmd = 0.0f, yaw_cmd = 0.0f;
 	float pitch_y, roll_y;
 	float pitch_e, roll_e;
@@ -93,16 +92,15 @@ void main()
 
 	while (1)
 	{
-//		if (usart_read(DmaBuff, readBuff, transferSize) > 0) {
 		readBuff = usart_read();
 		if (readBuff != NULL) {
-//			trace_printf("%d %d %d %d\n", readBuff[0], readBuff[1], readBuff[2], readBuff[3]);
 			char txBuff[100];
 			sprintf(txBuff, "Received: %d %d %d %d %d %d\n\r", readBuff[0], readBuff[1], readBuff[2], readBuff[3], readBuff[4], readBuff[5]);
 			usart_transmit((uint8_t *)txBuff);
 
 			if (readBuff[0] != START || readBuff[5] != STOP) {
-				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
+				leds->turnOn(LED::RED);
+				abort();
 			}
 
 			throttle_cmd = (float)readBuff[1] / 253.0f;
@@ -113,14 +111,16 @@ void main()
 			char txBuff2[100];
 			sprintf(txBuff2, "Motors: %f %f %f %f\n\r", front_s, rear_s, right_s, left_s);
 			usart_transmit((uint8_t *)txBuff2);
-//
-//			rxTimeout = 0;
-		} //else {
-//			rxTimeout++;
-//			if (rxTimeout >= TIMEOUT) {
+
+			rxTimeout = 0;
+		} else {
+			rxTimeout++;
+			if (rxTimeout >= TIMEOUT) {
 //				descend(front_s, rear_s, left_s, right_s);
-//			}
-//		}
+				leds->turnOn(LED::RED);
+				abort();
+			}
+		}
 
 		// Measure the "output" angles
 		pitch_y = imu.getPitch();
@@ -184,3 +184,10 @@ void main()
 //}
 
 
+void abort() {
+	front.setSpeed(0.0f);
+	rear.setSpeed(0.0f);
+	left.setSpeed(0.0f);
+	right.setSpeed(0.0f);
+	while(1);
+}

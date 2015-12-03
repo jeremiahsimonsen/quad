@@ -57,10 +57,11 @@ roll_LUT 	 = ['right_analog_x', 'right_analog_x', 'left_analog_x', 'left_analog_
 yaw_LUT 	 = ['left_analog_x', 'left_analog_x', 'right_analog_x', 'right_analog_x']
 
 START = 255
-MODE = 3
+STOP  = 254
+MODE  = 3
 
 def main():
-	packet = [START, 0, 0, 0, 0, 0]
+	packet = [START, 0, 0, 0, 0, STOP]
 	ids = ['dummy_id', 'r2_analog', pitch_LUT[MODE-1], roll_LUT[MODE-1], yaw_LUT[MODE-1]]
 	
 	ser = serial.Serial('/dev/ttyUSB0', 57600, parity=serial.PARITY_EVEN)
@@ -75,7 +76,9 @@ def main():
 			print packet
 		for index, val in enumerate(ids):
 			if val in line:
-				packet[index] = int(filter(str.isdigit, str.lstrip(line, ' r2')))
+				packet[index] = int(int(filter(str.isdigit, str.lstrip(line, ' r2'))) / 255.0 * 253.0)
 			
 if __name__ == '__main__':
 	main()
+
+

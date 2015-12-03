@@ -1074,70 +1074,11 @@ void usart_transmit(uint8_t *s)
 	}
 }
 
-//void usart_receive_begin(uint8_t *s, uint32_t size) {
-////	while (UartReady != SET);
-////	UartReady = RESET;
-//
-//	if (HAL_UART_Receive_DMA(&UartHandle, s, size)) {
-//		// TODO: Error_Handler();
-//	}
-//}
-
 void usart_receive_begin() {
 	if (HAL_UART_Receive_DMA(&UartHandle, (uint8_t *)DmaBuff, 2*TRANSFER_SIZE)) {
 		// TODO: Error_Handler();
 	}
 }
-
-//int8_t usart_read(uint8_t *DmaBuff, uint8_t *readBuff, uint8_t transferSize) {
-//	int8_t retVal = -1;
-//
-//	_GET_LOCK_RETURN(rxLock);
-//
-//	if (validRx >= 0 && dataRead == false) {
-//		for (int i = 0; i < transferSize; i++) {
-//			readBuff[i] = DmaBuff[validRx*transferSize + i];
-//			retVal = i;
-//		}
-//		dataRead = true;
-//	}
-//
-//	_UNLOCK(rxLock);
-//	return retVal;
-//}
-
-//int8_t usart_read(uint8_t *DmaBuff, uint8_t *readBuff, uint8_t transferSize) {
-//	static int8_t prevEnd = -1;
-//	uint8_t start = (prevEnd + 1) % (2*transferSize);
-//	int8_t retVal = -1;
-//	int i;
-//
-//	_GET_LOCK_RETURN(rxLock);
-//	if (dataRead == false) {
-//		while (DmaBuff[start%(2*transferSize)] != START) {
-//			start++;
-//			if (start%(2*transferSize) == prevEnd) {
-//				return retVal;
-//			}
-//		}
-//		retVal = start;
-//
-//
-//		for (i = 0; i < transferSize; i++) {
-//			readBuff[i] = DmaBuff[(start+i)%(2*transferSize)];
-//		}
-//
-//		dataRead = true;
-//	} else {
-//		retVal = -1;
-//	}
-//	_UNLOCK(rxLock);
-//
-//	prevEnd = (start + transferSize - 1) % (2*transferSize);
-//
-//	return retVal;
-//}
-
 
 uint8_t* usart_read(void) {
 	if (dataRead == true || validRx < 0) {
