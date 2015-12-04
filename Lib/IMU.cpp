@@ -69,17 +69,17 @@ float IMU::getPitch(void) {
 
 	// Fetch the pre-filtered accelerometer data [g]
 	float ax_f, ay_f, az_f;
-//	ax_f = accel.getAccXFiltered();
-//	ay_f = accel.getAccYFiltered();
-//	az_f = accel.getAccZFiltered();
-	ax_f = accel.getAccX();
-	ay_f = accel.getAccY();
-	az_f = accel.getAccZ();
+	ax_f = accel.getAccXFiltered();
+	ay_f = accel.getAccYFiltered();
+	az_f = accel.getAccZFiltered();
+//	ax_f = accel.getAccX();
+//	ay_f = accel.getAccY();
+//	az_f = accel.getAccZ();
 
 	// Fetch the pre-filtered gyroscope data [deg/s]
 	float gx_f;
-//	gx_f = gyro.getXFiltered();
-	gx_f = gyro.getX();
+	gx_f = gyro.getXFiltered();
+//	gx_f = gyro.getX();
 
 	// Calculate roll angle based on accelerometer data
 	float angle_x;
@@ -108,17 +108,17 @@ float IMU::getRoll(void) {
 
 	// Fetch the pre-filtered accelerometer data [g]
 	float ax_f, ay_f, az_f;
-//	ax_f = accel.getAccXFiltered();
-//	ay_f = accel.getAccYFiltered();
-//	az_f = accel.getAccZFiltered();
-	ax_f = accel.getAccX();
-	ay_f = accel.getAccY();
-	az_f = accel.getAccZ();
+	ax_f = accel.getAccXFiltered();
+	ay_f = accel.getAccYFiltered();
+	az_f = accel.getAccZFiltered();
+//	ax_f = accel.getAccX();
+//	ay_f = accel.getAccY();
+//	az_f = accel.getAccZ();
 
 	// Fetch the pre-filtered gyroscope data [deg/s]
 	float gy_f;
-//	gy_f = gyro.getYFiltered();
-	gy_f = gyro.getY();
+	gy_f = gyro.getYFiltered();
+//	gy_f = gyro.getY();
 
 	// Calculate pitch angle based on accelerometer data
 	float angle_y;

@@ -74,10 +74,10 @@ void main()
 
 	L3GD20H_InitStruct gyroConfig;
 	gyroConfig.fs_config = L3GD_FS_Config::MEDIUM;
-	gyroConfig.odr_bw_config = L3GD_ODR_BW_Config::NINETEEN;
+	gyroConfig.odr_bw_config = L3GD_ODR_BW_Config::FOUR;
 
 	LSM303D_InitStruct accelConfig;
-	accelConfig.aodr_config = LSM_AODR_Config::THREE;
+	accelConfig.aodr_config = LSM_AODR_Config::SEVEN;
 	accelConfig.abw_config = LSM_ABW_Config::ONE;
 	accelConfig.afs_config = LSM_AFS_Config::FOUR;
 	accelConfig.modr_config = LSM_MODR_Config::SIX;
@@ -94,9 +94,9 @@ void main()
 	{
 		readBuff = usart_read();
 		if (readBuff != NULL) {
-			char txBuff[100];
-			sprintf(txBuff, "Received: %d %d %d %d %d %d\n\r", readBuff[0], readBuff[1], readBuff[2], readBuff[3], readBuff[4], readBuff[5]);
-			usart_transmit((uint8_t *)txBuff);
+//			char txBuff[100];
+//			sprintf(txBuff, "Received: %d %d %d %d %d %d\n\r", readBuff[0], readBuff[1], readBuff[2], readBuff[3], readBuff[4], readBuff[5]);
+//			usart_transmit((uint8_t *)txBuff);
 
 			if (readBuff[0] != START || readBuff[5] != STOP) {
 				leds->turnOn(LED::RED);
@@ -108,19 +108,19 @@ void main()
 			roll_cmd 	 = ((float)readBuff[3] - 127.0) / 127.0f * MAX_ANGLE;
 			yaw_cmd 	 = ((float)readBuff[4] - 127.0) / 127.0f * MAX_RATE;
 
-			char txBuff2[100];
-			sprintf(txBuff2, "Motors: %f %f %f %f\n\r", front_s, rear_s, right_s, left_s);
-			usart_transmit((uint8_t *)txBuff2);
+//			char txBuff2[100];
+//			sprintf(txBuff2, "Motors: %f %f %f %f\n\r", front_s, rear_s, right_s, left_s);
+//			usart_transmit((uint8_t *)txBuff2);
 
 			rxTimeout = 0;
-		} else {
-			rxTimeout++;
-			if (rxTimeout >= TIMEOUT) {
-//				descend(front_s, rear_s, left_s, right_s);
-				leds->turnOn(LED::RED);
-				abort();
-			}
-		}
+		} //else {
+//			rxTimeout++;
+//			if (rxTimeout >= TIMEOUT) {
+////				descend(front_s, rear_s, left_s, right_s);
+//				leds->turnOn(LED::RED);
+//				abort();
+//			}
+//		}
 
 		// Measure the "output" angles
 		pitch_y = imu.getPitch();
@@ -148,9 +148,10 @@ void main()
 		left.setSpeed(left_s);
 		right.setSpeed(right_s);
 
-		if (iter % 200 == 0) {
+		if (iter % 100 == 0) {
 			char txBuff2[100];
-			sprintf(txBuff2, "Motors: %f %f %f %f\n\r", front_s, rear_s, right_s, left_s);
+			sprintf(txBuff2, "Pitch: %f\tRoll: %f\n\r", pitch_y, roll_y);
+//			sprintf(txBuff2, "Motors: %f %f %f %f\n\r", front_s, rear_s, right_s, left_s);
 			usart_transmit((uint8_t *)txBuff2);
 		}
 
