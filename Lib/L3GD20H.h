@@ -17,6 +17,7 @@
 
 #include "I2C.h"
 #include "preFilter.h"
+#include "preFilter2.h"
 
 /**
  * Register enumerations for the ST L3GD20H gyro
@@ -454,7 +455,7 @@ typedef struct {
 class L3GD20H {
 private:
 	I2C *i2c;
-	preFilter gx, gy, gz;
+	preFilter2 gx, gy, gz;
 
 	float resolution;
 

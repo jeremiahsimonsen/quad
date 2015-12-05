@@ -18,8 +18,10 @@
 #include "LSM303D.h"
 #include "accelCompFilter.h"
 #include "gyroCompFilter.h"
+#include "accelCompFilter2.h"
+#include "gyroCompFilter2.h"
 
-#define COMPLEMENTARY_TAU (0.95f)
+#define COMPLEMENTARY_TAU (0.98f)
 
 class IMU {
 private:
@@ -27,8 +29,8 @@ private:
 	L3GD20H gyro;
 	LSM303D accel;
 
-	accelCompFilter aFilter_x, aFilter_y;
-	gyroCompFilter gFilter_x, gFilter_y;
+	accelCompFilter2 aFilter_x, aFilter_y;
+	gyroCompFilter2 gFilter_x, gFilter_y;
 
 	float rate_roll, rate_pitch, angle_roll, angle_pitch;
 

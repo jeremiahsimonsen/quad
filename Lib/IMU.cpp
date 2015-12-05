@@ -16,17 +16,17 @@
 #define PI (3.1415927f)
 
 IMU::IMU()
-	: barometer(), gyro(), accel()//,
-//	  aFilter_x(COMPLEMENTARY_TAU), aFilter_y(COMPLEMENTARY_TAU),
-//	  gFilter_x(COMPLEMENTARY_TAU), gFilter_y(COMPLEMENTARY_TAU)
+	: barometer(), gyro(), accel(),
+	  aFilter_x(COMPLEMENTARY_TAU), aFilter_y(COMPLEMENTARY_TAU),
+	  gFilter_x(COMPLEMENTARY_TAU), gFilter_y(COMPLEMENTARY_TAU)
 {
 	rate_roll = rate_pitch = angle_roll = angle_pitch = 0.0f;
 }
 
 IMU::IMU(L3GD20H_InitStruct gyroConfig, LSM303D_InitStruct accelConfig)
-	: barometer(), gyro(gyroConfig), accel(accelConfig)//,
-//	  aFilter_x(COMPLEMENTARY_TAU), aFilter_y(COMPLEMENTARY_TAU),
-//	  gFilter_x(COMPLEMENTARY_TAU), gFilter_y(COMPLEMENTARY_TAU)
+	: barometer(), gyro(gyroConfig), accel(accelConfig),
+	  aFilter_x(COMPLEMENTARY_TAU), aFilter_y(COMPLEMENTARY_TAU),
+	  gFilter_x(COMPLEMENTARY_TAU), gFilter_y(COMPLEMENTARY_TAU)
 {
 	rate_roll = rate_pitch = angle_roll = angle_pitch = 0.0f;
 }
@@ -85,20 +85,21 @@ float IMU::getPitch(void) {
 	float angle_x;
 	angle_x = atan2f(ax_f, sqrtf(ay_f*ay_f + az_f*az_f)) * 180.0f / PI;
 
-	angle_roll = COMPLEMENTARY_TAU * (angle_roll + gx_f * gyro.getDT()) + (1.0f - COMPLEMENTARY_TAU) * (angle_x);
+//	angle_pitch = COMPLEMENTARY_TAU * (angle_pitch + gx_f * gyro.getDT()) + (1.0f - COMPLEMENTARY_TAU) * (angle_x);
 
 	// Complementary filter the accelerometer calculated angle
-//	float angle_x_f;
-//	angle_x_f = aFilter_x.filterSample(angle_x);
+	float angle_x_f;
+	angle_x_f = aFilter_x.filterSample(angle_x);
 
 	// Complementary filter the gyroscope data
-//	float gyro_x_f;
-//	gyro_x_f = gFilter_x.filterSample(gx_f);
+	float gyro_x_f;
+	gyro_x_f = gFilter_x.filterSample(gx_f);
 
 	// Sum the two
-//	float roll = angle_x_f + gyro_x_f;
+	float pitch = angle_x_f + gyro_x_f;
 
-	return angle_roll;
+	return pitch;
+//	return angle_pitch;
 }
 
 float IMU::getRoll(void) {
@@ -124,20 +125,21 @@ float IMU::getRoll(void) {
 	float angle_y;
 	angle_y = atan2f(ay_f, sqrtf(ax_f*ax_f + az_f*az_f)) * 180.0f / PI;
 
-	angle_pitch = COMPLEMENTARY_TAU * (angle_pitch + gy_f * gyro.getDT()) + (1.0f-COMPLEMENTARY_TAU)*angle_y;
+	angle_roll = COMPLEMENTARY_TAU * (angle_roll + gy_f * gyro.getDT()) + (1.0f-COMPLEMENTARY_TAU)*angle_y;
 
 	// Complementary filter the accelerometer calculated angle
-//	float angle_y_f;
-//	angle_y_f = aFilter_y.filterSample(angle_y);
+	float angle_y_f;
+	angle_y_f = aFilter_y.filterSample(angle_y);
 
 	// Complementary filter the gyroscope data
-//	float gyro_y_f;
-//	gyro_y_f = gFilter_y.filterSample(gy_f);
+	float gyro_y_f;
+	gyro_y_f = gFilter_y.filterSample(gy_f);
 
 	// Sum the two
-//	float pitch = angle_y_f + gyro_y_f;
+	float roll = angle_y_f + gyro_y_f;
 
-	return angle_pitch;
+	return roll;
+//	return angle_roll;
 }
 #endif
 

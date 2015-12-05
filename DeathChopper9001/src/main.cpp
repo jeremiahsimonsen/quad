@@ -29,6 +29,8 @@
 //#define DISCOVERY_BOARD
 #define DEATH_CHOPPER
 
+#define RX_TIMEOUT_ENABLE
+
 #ifdef DEATH_CHOPPER
 #define BOARD Board::DEATH_CHOPPER_9000
 static Motor left(TimerPin::PC8);	// PCB P3
@@ -74,10 +76,10 @@ void main()
 
 	L3GD20H_InitStruct gyroConfig;
 	gyroConfig.fs_config = L3GD_FS_Config::MEDIUM;
-	gyroConfig.odr_bw_config = L3GD_ODR_BW_Config::FOUR;
+	gyroConfig.odr_bw_config = L3GD_ODR_BW_Config::THREE;
 
 	LSM303D_InitStruct accelConfig;
-	accelConfig.aodr_config = LSM_AODR_Config::SEVEN;
+	accelConfig.aodr_config = LSM_AODR_Config::SIX;
 	accelConfig.abw_config = LSM_ABW_Config::ONE;
 	accelConfig.afs_config = LSM_AFS_Config::FOUR;
 	accelConfig.modr_config = LSM_MODR_Config::SIX;
@@ -113,14 +115,17 @@ void main()
 //			usart_transmit((uint8_t *)txBuff2);
 
 			rxTimeout = 0;
-		} //else {
-//			rxTimeout++;
-//			if (rxTimeout >= TIMEOUT) {
-////				descend(front_s, rear_s, left_s, right_s);
-//				leds->turnOn(LED::RED);
-//				abort();
-//			}
-//		}
+		}
+#ifdef RX_TIMEOUT_ENABLE
+		else {
+			rxTimeout++;
+			if (rxTimeout >= TIMEOUT) {
+//				descend(front_s, rear_s, left_s, right_s);
+				leds->turnOn(LED::RED);
+				abort();
+			}
+		}
+#endif
 
 		// Measure the "output" angles
 		pitch_y = imu.getPitch();

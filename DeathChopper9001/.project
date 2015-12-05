@@ -76,9 +76,19 @@
 			<locationURI>PARENT-1-PROJECT_LOC/lib/accelCompFilter.h</locationURI>
 		</link>
 		<link>
+			<name>include/accelCompFilter2.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/accelCompFilter2.h</locationURI>
+		</link>
+		<link>
 			<name>include/gyroCompFilter.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/lib/gyroCompFilter.h</locationURI>
+		</link>
+		<link>
+			<name>include/gyroCompFilter2.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/gyroCompFilter2.h</locationURI>
 		</link>
 		<link>
 			<name>include/led.h</name>
@@ -94,6 +104,11 @@
 			<name>include/preFilter.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/lib/preFilter.h</locationURI>
+		</link>
+		<link>
+			<name>include/preFilter2.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/preFilter2.h</locationURI>
 		</link>
 		<link>
 			<name>include/stm32f4xx_hal_conf.h</name>
@@ -171,9 +186,19 @@
 			<locationURI>PARENT-1-PROJECT_LOC/lib/accelCompFilter.cpp</locationURI>
 		</link>
 		<link>
+			<name>src/accelCompFilter2.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/accelCompFilter2.cpp</locationURI>
+		</link>
+		<link>
 			<name>src/gyroCompFilter.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/lib/gyroCompFilter.cpp</locationURI>
+		</link>
+		<link>
+			<name>src/gyroCompFilter2.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/gyroCompFilter2.cpp</locationURI>
 		</link>
 		<link>
 			<name>src/led.cpp</name>
@@ -189,6 +214,11 @@
 			<name>src/preFilter.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/lib/preFilter.cpp</locationURI>
+		</link>
+		<link>
+			<name>src/preFilter2.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/preFilter2.cpp</locationURI>
 		</link>
 		<link>
 			<name>src/stm32f4xx_it.c</name>

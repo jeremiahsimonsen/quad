@@ -20,7 +20,7 @@
 #ifndef PREFILTER_H_
 #define PREFILTER_H_
 
-#define PREFILTER_TAU (1000.0f)
+#define PREFILTER_TAU (3000.0f)
 
 class preFilter {
 private:
