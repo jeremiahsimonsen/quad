@@ -90,6 +90,7 @@ void LSM303D::enable(LSM303D_InitStruct init) {
 
 	// Set Accelerometer output data rate; Enable 3 axis acc operation
 	buf = LSM303D_CTRL1_AODR(init.aodr_config)
+			| LSM303D_CTRL1_BDU_MASK
 			| LSM303D_CTRL1_AXEN_MASK
 			| LSM303D_CTRL1_AYEN_MASK
 			| LSM303D_CTRL1_AZEN_MASK;

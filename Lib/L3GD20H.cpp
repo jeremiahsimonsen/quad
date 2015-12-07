@@ -80,8 +80,8 @@ void L3GD20H::enable(L3GD20H_InitStruct init) {
 //	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::CTRL2, &buf, 1);
 
 	// Set full scale
-	buf = (uint8_t)(L3GD_CTRL4_FS(init.fs_config));
-//			| L3GD_CTRL4_BDU_MASK);
+	buf = (uint8_t)(L3GD_CTRL4_FS(init.fs_config)//);
+			| L3GD_CTRL4_BDU_MASK);
 	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::CTRL4, &buf, 1);
 
 	// Enable the high-pass filter

@@ -12,15 +12,15 @@
 
 #define TIMEOUT 100000
 
-//static Motor rear(TimerPin::PC8);	// PCB P3
-//static Motor right(TimerPin::PC6);	// PCB P5
-//static Motor front(TimerPin::PD14);	// PCB P7
-//static Motor left(TimerPin::PD12);	// PCB P9
+static Motor rear(TimerPin::PC8);	// PCB P3
+static Motor right(TimerPin::PC6);	// PCB P5
+static Motor front(TimerPin::PD14);	// PCB P7
+static Motor left(TimerPin::PD12);	// PCB P9
 
-static Motor front(TimerPin::PC6);
-static Motor rear(TimerPin::PC7);
-static Motor left(TimerPin::PC8);
-static Motor right(TimerPin::PC9);
+//static Motor front(TimerPin::PC6);
+//static Motor rear(TimerPin::PC7);
+//static Motor left(TimerPin::PC8);
+//static Motor right(TimerPin::PC9);
 
 //void descend(float f, float b, float l, float r);
 
@@ -82,10 +82,10 @@ int main(int argc, char* argv[])
 			roll_cmd 	 = ((float)readBuff[3] - 127.0) / 127.0f;
 			yaw_cmd 	 = ((float)readBuff[4] - 127.0) / 127.0f;
 
-			front_s = throttle_cmd - pitch_cmd - yaw_cmd;
-			rear_s  = throttle_cmd + pitch_cmd - yaw_cmd;
-			right_s = throttle_cmd - roll_cmd  + yaw_cmd;
-			left_s  = throttle_cmd + roll_cmd  + yaw_cmd;
+			front_s = throttle_cmd;// - pitch_cmd - yaw_cmd;
+			rear_s  = throttle_cmd;// + pitch_cmd - yaw_cmd;
+			right_s = throttle_cmd;// - roll_cmd  + yaw_cmd;
+			left_s  = throttle_cmd;// + roll_cmd  + yaw_cmd;
 
 			front.setSpeed(front_s);
 			rear.setSpeed(rear_s);
