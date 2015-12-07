@@ -111,6 +111,16 @@
 			<locationURI>PARENT-1-PROJECT_LOC/lib/preFilter2.h</locationURI>
 		</link>
 		<link>
+			<name>include/preFilter3.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/preFilter3.h</locationURI>
+		</link>
+		<link>
+			<name>include/preFilterFIR.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/preFilterFIR.h</locationURI>
+		</link>
+		<link>
 			<name>include/stm32f4xx_hal_conf.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/lib/stm32f4xx_hal_conf.h</locationURI>
@@ -219,6 +229,16 @@
 			<name>src/preFilter2.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/lib/preFilter2.cpp</locationURI>
+		</link>
+		<link>
+			<name>src/preFilter3.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/preFilter3.cpp</locationURI>
+		</link>
+		<link>
+			<name>src/preFilterFIR.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/preFilterFIR.cpp</locationURI>
 		</link>
 		<link>
 			<name>src/stm32f4xx_it.c</name>

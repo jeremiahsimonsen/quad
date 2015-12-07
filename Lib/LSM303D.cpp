@@ -18,7 +18,8 @@
  * @brief Instantiates sensor with default configuration
  */
 LSM303D::LSM303D()
-	: ax(PREFILTER_TAU), ay(PREFILTER_TAU), az(PREFILTER_TAU)
+//	: ax(PREFILTER_TAU), ay(PREFILTER_TAU), az(PREFILTER_TAU)
+	: ax(), ay(), az()
 {
 	// Save the i2c slave address of the sensor
 	address = 0b00111010;
@@ -49,7 +50,8 @@ LSM303D::LSM303D()
  * @param init Sensor configuration parameters
  */
 LSM303D::LSM303D(LSM303D_InitStruct init)
-	: ax(PREFILTER_TAU), ay(PREFILTER_TAU), az(PREFILTER_TAU)
+//	: ax(PREFILTER_TAU), ay(PREFILTER_TAU), az(PREFILTER_TAU)
+	: ax(), ay(), az()
 {
 	// Save the i2c slave address of the sensor
 	address = 0b00111010;
@@ -111,9 +113,19 @@ void LSM303D::enable(LSM303D_InitStruct init) {
 	i2c->memWrite(address, (uint8_t)LSM303D_Reg::CTRL6, &buf, 1);
 
 	// Set magnetic sensor mode
-	buf = (uint8_t)(LSM303D_CTRL7_MD(init.md_config));
-//			| LSM303D_CTRL7_AFDS_MASK);
+	buf = (uint8_t)(LSM303D_CTRL7_MD(init.md_config)//);
+			| LSM303D_CTRL7_AFDS_MASK);
 	i2c->memWrite(address, (uint8_t)LSM303D_Reg::CTRL7, &buf, 1);
+
+	// Initialize PA5 for externally measuring sampling frequency
+	__HAL_RCC_GPIOA_CLK_ENABLE();
+
+	GPIO_InitTypeDef GPIO_InitStruct;
+	GPIO_InitStruct.Pin 	= GPIO_PIN_5;
+	GPIO_InitStruct.Mode 	= GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull	= GPIO_NOPULL;
+	GPIO_InitStruct.Speed 	= GPIO_SPEED_FAST;
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 	accCalibrate();
 }
@@ -147,6 +159,7 @@ void LSM303D::accCalibrate(void) {
  * @brief Initiates a read of the accelerometer and magnetometer
  */
 void LSM303D::read(void) {
+	HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
 	readAcc();
 	readMag();
 }
@@ -198,7 +211,8 @@ float LSM303D::getAccX() {
 }
 
 float LSM303D::getAccXFiltered() {
-	float xf = ax.filterSample(getAccX());
+	float32_t x = getAccX();
+	float xf = ax.filterSample(&x);
 	return xf;
 }
 
@@ -233,7 +247,8 @@ float LSM303D::getAccY() {
 }
 
 float LSM303D::getAccYFiltered() {
-	float yf = ay.filterSample(getAccY());
+	float32_t y = getAccY();
+	float yf = ay.filterSample(&y);
 	return yf;
 }
 
@@ -268,7 +283,8 @@ float LSM303D::getAccZ() {
 }
 
 float LSM303D::getAccZFiltered() {
-	float zf = az.filterSample(getAccZ());
+	float32_t z = getAccZ();
+	float zf = az.filterSample(&z);
 	return zf;
 }
 

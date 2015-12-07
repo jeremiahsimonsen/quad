@@ -21,7 +21,7 @@
 #include "accelCompFilter2.h"
 #include "gyroCompFilter2.h"
 
-#define COMPLEMENTARY_TAU (0.98f)
+#define COMPLEMENTARY_TAU (0.2f)
 
 class IMU {
 private:

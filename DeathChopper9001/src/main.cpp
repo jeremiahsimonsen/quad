@@ -94,6 +94,7 @@ void main()
 
 	while (1)
 	{
+		leds->toggle(LED::BLUE);
 		readBuff = usart_read();
 		if (readBuff != NULL) {
 //			char txBuff[100];
@@ -153,7 +154,7 @@ void main()
 		left.setSpeed(left_s);
 		right.setSpeed(right_s);
 
-		if (iter % 100 == 0) {
+		if (iter % 10 == 0) {
 			char txBuff2[100];
 			sprintf(txBuff2, "%f\t%f\n\r", pitch_y, roll_y);
 //			sprintf(txBuff2, "Motors: %f %f %f %f\n\r", front_s, rear_s, right_s, left_s);
@@ -161,6 +162,7 @@ void main()
 		}
 
 		iter++;
+//		HAL_Delay(10);
 	}
 }
 

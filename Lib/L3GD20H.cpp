@@ -18,7 +18,8 @@
  * @brief Instantiates an object using default I2C pins and configures the sensor to default
  */
 L3GD20H::L3GD20H(void)
-	: gx(PREFILTER_TAU), gy(PREFILTER_TAU), gz(PREFILTER_TAU)
+//	: gx(PREFILTER_TAU), gy(PREFILTER_TAU), gz(PREFILTER_TAU)		// complementary
+	: gx(), gy(), gz()												// IIR or FIR
 {
 	address = 0b11010110;
 	dt = prevTick = 0;
@@ -40,7 +41,8 @@ L3GD20H::L3GD20H(void)
  * @param init Sensor configuration parameters
  */
 L3GD20H::L3GD20H(L3GD20H_InitStruct init)
-	: gx(PREFILTER_TAU), gy(PREFILTER_TAU), gz(PREFILTER_TAU)
+//	: gx(PREFILTER_TAU), gy(PREFILTER_TAU), gz(PREFILTER_TAU)		// complementary
+	: gx(), gy(), gz()												// IIR or FIR
 {
 	address = 0b11010110;
 	dt = prevTick = 0;
@@ -85,8 +87,18 @@ void L3GD20H::enable(L3GD20H_InitStruct init) {
 	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::CTRL4, &buf, 1);
 
 	// Enable the high-pass filter
-//	buf = (uint8_t)(L3GD_CTRL5_HPen_MASK);
-//	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::CTRL5, &buf, 1);
+	buf = (uint8_t)(L3GD_CTRL5_HPen_MASK);
+	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::CTRL5, &buf, 1);
+
+	// Initialize PA4 for externally measuring sampling frequency
+	__HAL_RCC_GPIOA_CLK_ENABLE();
+
+	GPIO_InitTypeDef GPIO_InitStruct;
+	GPIO_InitStruct.Pin 	= GPIO_PIN_4;
+	GPIO_InitStruct.Mode 	= GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull	= GPIO_NOPULL;
+	GPIO_InitStruct.Speed 	= GPIO_SPEED_FAST;
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 	// TIM initialization for alternative sample time measurement
 	TimHandle.Instance = TIM6;
@@ -204,7 +216,8 @@ float L3GD20H::getX() {
 }
 
 float L3GD20H::getXFiltered() {
-	float xf = gx.filterSample(getX());
+	float32_t x = getX();
+	float xf = gx.filterSample(&x);
 	return xf;
 }
 
@@ -238,7 +251,8 @@ float L3GD20H::getY() {
 }
 
 float L3GD20H::getYFiltered() {
-	float yf = gy.filterSample(getY());
+	float32_t y = getY();
+	float yf = gy.filterSample(&y);
 	return yf;
 }
 
@@ -272,7 +286,8 @@ float L3GD20H::getZ() {
 }
 
 float L3GD20H::getZFiltered() {
-	float zf = gz.filterSample(getZ());
+	float32_t z = getZ();
+	float zf = gz.filterSample(&z);
 	return zf;
 }
 

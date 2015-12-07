@@ -60,10 +60,10 @@ s = '';
 for n=1:length(b(:,1))
 	% If this is not the last section / set of coefficients
 	if n ~= length(b(:,1))
-		s = strcat(s, sprintf('{%g, %g, %g},\n',b(n,1),b(n,2),b(n,3)));
+		s = strcat(s, sprintf('{%.12g, %.12g, %.12g},\n',b(n,1),b(n,2),b(n,3)));
 	% If it is the last one
 	else
-		s = strcat(s, sprintf('{%g, %g, %g}};\n',b(n,1),b(n,2),b(n,3)));
+		s = strcat(s, sprintf('{%.12g, %.12g, %.12g}};\n',b(n,1),b(n,2),b(n,3)));
 	end
 end
 % Add start of the a_coef 2d array to output string
@@ -74,14 +74,14 @@ s = strcat(s, sprintf('\nfloat %s_a_coef[%d][3] = {', ...
 for n=1:length(a(:,1))
 	% If this is not the last section
 	if n ~= length(a(:,1))
-		s = strcat(s, sprintf('{%g, %g, %g},\n',a(n,1),a(n,2),a(n,3)));
+		s = strcat(s, sprintf('{%.12g, %.12g, %.12g},\n',a(n,1),a(n,2),a(n,3)));
 	% If it is the last one
 	else
-		s = strcat(s, sprintf('{%g, %g, %g}};\n',a(n,1),a(n,2),a(n,3)));
+		s = strcat(s, sprintf('{%.12g, %.12g, %.12g}};\n',a(n,1),a(n,2),a(n,3)));
 	end
 end
 % Add the gain factor, g, to the output string
-s = strcat(s, sprintf('\nfloat %s_g = %g;\n',filename(1:7),g));
+s = strcat(s, sprintf('\nfloat %s_g = %.12g;\n',filename(1:7),g));
 
 % Add the number of biquad stages
 s = strcat(s, sprintf('\nint %s_num_stages = %d;\n',filename(1:7),length(b(:,1))));
