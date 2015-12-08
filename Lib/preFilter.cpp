@@ -31,9 +31,10 @@ preFilter::preFilter(float t) {
 	tau = t;
 }
 
-float preFilter::filterSample(float x) {
-	float y = ( x + x_prev - y_prev*(1-tau) ) / (tau + 1);
-	x_prev = x;
+float preFilter::filterSample(float *x) {
+	float xn = *x;
+	float y = ( xn + x_prev - y_prev*(1-tau) ) / (tau + 1);
+	x_prev = xn;
 	y_prev = y;
 
 	return y;

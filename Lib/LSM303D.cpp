@@ -18,9 +18,11 @@
  * @brief Instantiates sensor with default configuration
  */
 LSM303D::LSM303D()
-//	: ax(PREFILTER_TAU), ay(PREFILTER_TAU), az(PREFILTER_TAU)
-	: ax(), ay(), az()
+	: ax(PREFILTER_TAU), ay(PREFILTER_TAU), az(PREFILTER_TAU)
+//	: ax(), ay(), az()
 {
+	log = logger::instance();
+
 	// Save the i2c slave address of the sensor
 	address = 0b00111010;
 
@@ -50,9 +52,11 @@ LSM303D::LSM303D()
  * @param init Sensor configuration parameters
  */
 LSM303D::LSM303D(LSM303D_InitStruct init)
-//	: ax(PREFILTER_TAU), ay(PREFILTER_TAU), az(PREFILTER_TAU)
-	: ax(), ay(), az()
+	: ax(PREFILTER_TAU), ay(PREFILTER_TAU), az(PREFILTER_TAU)
+//	: ax(), ay(), az()
 {
+	log = logger::instance();
+
 	// Save the i2c slave address of the sensor
 	address = 0b00111010;
 
@@ -113,8 +117,8 @@ void LSM303D::enable(LSM303D_InitStruct init) {
 	i2c->memWrite(address, (uint8_t)LSM303D_Reg::CTRL6, &buf, 1);
 
 	// Set magnetic sensor mode
-	buf = (uint8_t)(LSM303D_CTRL7_MD(init.md_config)//);
-			| LSM303D_CTRL7_AFDS_MASK);
+	buf = (uint8_t)(LSM303D_CTRL7_MD(init.md_config));
+//			| LSM303D_CTRL7_AFDS_MASK);
 	i2c->memWrite(address, (uint8_t)LSM303D_Reg::CTRL7, &buf, 1);
 
 	// Initialize PA5 for externally measuring sampling frequency
@@ -206,13 +210,22 @@ int16_t LSM303D::getAccXRaw(void) {
  */
 float LSM303D::getAccX() {
 	float x = (float)getAccXRaw() * accResolution - accXOffset;
-
+#ifdef LOG_RAW
+	char buff[100];
+	sprintf(buff, "Ax %f\n\r", x);
+	log->log(buff);
+#endif
 	return x;
 }
 
 float LSM303D::getAccXFiltered() {
 	float32_t x = getAccX();
 	float xf = ax.filterSample(&x);
+#ifdef LOG_PREFILTERED
+	char buff[100];
+	sprintf(buff, "Axf %f\n\r", xf);
+	log->log(buff);
+#endif
 	return xf;
 }
 
@@ -242,13 +255,22 @@ int16_t LSM303D::getAccYRaw(void) {
  */
 float LSM303D::getAccY() {
 	float y = (float)getAccYRaw() * accResolution - accYOffset;
-
+#ifdef LOG_RAW
+	char buff[100];
+	sprintf(buff, "Ay %f\n\r", y);
+	log->log(buff);
+#endif
 	return y;
 }
 
 float LSM303D::getAccYFiltered() {
 	float32_t y = getAccY();
 	float yf = ay.filterSample(&y);
+#ifdef LOG_PREFILTERED
+	char buff[100];
+	sprintf(buff, "Ayf %f\n\r", yf);
+	log->log(buff);
+#endif
 	return yf;
 }
 
@@ -278,13 +300,22 @@ int16_t LSM303D::getAccZRaw(void) {
  */
 float LSM303D::getAccZ() {
 	float z = (float)getAccZRaw() * accResolution - accZOffset;
-
+#ifdef LOG_RAW
+	char buff[100];
+	sprintf(buff, "Az %f\n\r", z);
+	log->log(buff);
+#endif
 	return z;
 }
 
 float LSM303D::getAccZFiltered() {
 	float32_t z = getAccZ();
 	float zf = az.filterSample(&z);
+#ifdef LOG_PREFILTERED
+	char buff[100];
+	sprintf(buff, "Azf %f\n\r", zf);
+	log->log(buff);
+#endif
 	return zf;
 }
 

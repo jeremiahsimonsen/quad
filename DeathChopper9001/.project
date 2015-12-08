@@ -96,6 +96,11 @@
 			<locationURI>PARENT-1-PROJECT_LOC/lib/led.h</locationURI>
 		</link>
 		<link>
+			<name>include/logger.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/logger.h</locationURI>
+		</link>
+		<link>
 			<name>include/pid.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Lib/pid.h</locationURI>
@@ -116,9 +121,19 @@
 			<locationURI>PARENT-1-PROJECT_LOC/lib/preFilter3.h</locationURI>
 		</link>
 		<link>
+			<name>include/preFilterAcc.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/preFilterAcc.h</locationURI>
+		</link>
+		<link>
 			<name>include/preFilterFIR.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/lib/preFilterFIR.h</locationURI>
+		</link>
+		<link>
+			<name>include/preFilterGyro.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/preFilterGyro.h</locationURI>
 		</link>
 		<link>
 			<name>include/stm32f4xx_hal_conf.h</name>
@@ -216,6 +231,11 @@
 			<locationURI>PARENT-1-PROJECT_LOC/lib/led.cpp</locationURI>
 		</link>
 		<link>
+			<name>src/logger.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/logger.cpp</locationURI>
+		</link>
+		<link>
 			<name>src/pid.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Lib/pid.cpp</locationURI>
@@ -236,9 +256,19 @@
 			<locationURI>PARENT-1-PROJECT_LOC/lib/preFilter3.cpp</locationURI>
 		</link>
 		<link>
+			<name>src/preFilterAcc.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/preFilterAcc.cpp</locationURI>
+		</link>
+		<link>
 			<name>src/preFilterFIR.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/lib/preFilterFIR.cpp</locationURI>
+		</link>
+		<link>
+			<name>src/preFilterGyro.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/preFilterGyro.cpp</locationURI>
 		</link>
 		<link>
 			<name>src/stm32f4xx_it.c</name>

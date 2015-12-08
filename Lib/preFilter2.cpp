@@ -26,11 +26,12 @@ preFilter2::preFilter2(float t) {
 	tau = t;
 }
 
-float preFilter2::filterSample(float x) {
-	float y = ( (2*tau+1)*x + 2*x1 + (-2*tau+1)*x2 - (-2*tau*tau+2)*y1 - (tau*tau-2*tau+1)*y2 ) / (tau*tau + 2*tau + 1);
+float preFilter2::filterSample(float *x) {
+	float xn = *x;
+	float y = ( (2*tau+1)*xn + 2*x1 + (-2*tau+1)*x2 - (-2*tau*tau+2)*y1 - (tau*tau-2*tau+1)*y2 ) / (tau*tau + 2*tau + 1);
 
 	x2 = x1;
-	x1 = x;
+	x1 = xn;
 	y2 = y1;
 	y1 = y;
 

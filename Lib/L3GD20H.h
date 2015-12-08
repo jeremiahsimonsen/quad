@@ -16,10 +16,13 @@
 #define L3GD20H_H_
 
 #include "I2C.h"
+#include "logger.h"
+
 #include "preFilter.h"
 #include "preFilter2.h"
 #include "preFilter3.h"
 #include "preFilterFIR.h"
+#include "preFilterGyro.h"
 
 /**
  * Register enumerations for the ST L3GD20H gyro
@@ -457,7 +460,9 @@ typedef struct {
 class L3GD20H {
 private:
 	I2C *i2c;
-	preFilter3 gx, gy, gz;
+	preFilter2 gx, gy, gz;
+
+	logger *log;
 
 	float resolution;
 

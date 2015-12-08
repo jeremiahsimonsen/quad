@@ -20,7 +20,7 @@
 #ifndef PREFILTER_H_
 #define PREFILTER_H_
 
-#define PREFILTER_TAU (3000.0f)
+#define PREFILTER_TAU (2000.0f)
 
 class preFilter {
 private:
@@ -32,7 +32,7 @@ public:
 	preFilter();
 	preFilter(float tau);
 
-	float filterSample(float x);
+	float filterSample(float *x);
 };
 
 #endif

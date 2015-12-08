@@ -16,10 +16,13 @@
 #define LSM303D_H_
 
 #include "I2C.h"
+#include "logger.h"
+
 #include "preFilter.h"
 #include "preFilter2.h"
 #include "preFilter3.h"
 #include "preFilterFIR.h"
+#include "preFilterAcc.h"
 
 enum class LSM303D_Reg {
 	TEMP_OUT_L		= 0x05,
@@ -349,7 +352,9 @@ typedef struct {
 class LSM303D {
 private:
 	I2C *i2c;
-	preFilter3 ax, ay, az;
+	preFilter2 ax, ay, az;
+
+	logger *log;
 
 	float accResolution;
 	float magResolution;

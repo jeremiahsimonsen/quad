@@ -13,6 +13,8 @@
 #ifndef IMU_H_
 #define IMU_H_
 
+#include "logger.h"
+
 #include "LPS25H.h"
 #include "L3GD20H.h"
 #include "LSM303D.h"
@@ -21,13 +23,15 @@
 #include "accelCompFilter2.h"
 #include "gyroCompFilter2.h"
 
-#define COMPLEMENTARY_TAU (0.2f)
+#define COMPLEMENTARY_TAU (0.5f)
 
 class IMU {
 private:
 	LPS25H  barometer;
 	L3GD20H gyro;
 	LSM303D accel;
+
+	logger *log;
 
 	accelCompFilter2 aFilter_x, aFilter_y;
 	gyroCompFilter2 gFilter_x, gFilter_y;
@@ -42,6 +46,8 @@ public:
 
 	float getRoll(void);
 	float getPitch(void);
+
+	void getRollPitch(float *roll, float*pitch);
 };
 
 #endif

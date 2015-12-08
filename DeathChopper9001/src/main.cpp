@@ -26,10 +26,10 @@
 #define ROLL_KI  0.0f
 #define ROLL_KD  0.0f
 
-#define DISCOVERY_BOARD
-//#define DEATH_CHOPPER
+//#define DISCOVERY_BOARD
+#define DEATH_CHOPPER
 
-//#define RX_TIMEOUT_ENABLE
+#define RX_TIMEOUT_ENABLE
 
 #ifdef DEATH_CHOPPER
 #define BOARD Board::DEATH_CHOPPER_9000
@@ -76,10 +76,12 @@ void main()
 
 	L3GD20H_InitStruct gyroConfig;
 	gyroConfig.fs_config = L3GD_FS_Config::MEDIUM;
-	gyroConfig.odr_bw_config = L3GD_ODR_BW_Config::TWO;
+	gyroConfig.hpcf_config = L3GD_HPCF_Config::FOUR;
+	gyroConfig.hpm_config = L3GD_HPM_Config::THREE;
+	gyroConfig.odr_bw_config = L3GD_ODR_BW_Config::THREE;
 
 	LSM303D_InitStruct accelConfig;
-	accelConfig.aodr_config = LSM_AODR_Config::FIVE;
+	accelConfig.aodr_config = LSM_AODR_Config::SIX;
 	accelConfig.abw_config = LSM_ABW_Config::ONE;
 	accelConfig.afs_config = LSM_AFS_Config::FOUR;
 	accelConfig.modr_config = LSM_MODR_Config::SIX;
@@ -129,8 +131,9 @@ void main()
 #endif
 
 		// Measure the "output" angles
-		pitch_y = imu.getPitch();
-		roll_y  = imu.getRoll();
+//		pitch_y = imu.getPitch();
+//		roll_y  = imu.getRoll();
+		imu.getRollPitch(&roll_y, &pitch_y);
 
 		// Calculate the errors
 		pitch_e = pitch_cmd - pitch_y;
@@ -162,7 +165,7 @@ void main()
 		}
 
 		iter++;
-//		HAL_Delay(10);
+		HAL_Delay(10);
 	}
 }
 

@@ -18,9 +18,11 @@
  * @brief Instantiates an object using default I2C pins and configures the sensor to default
  */
 L3GD20H::L3GD20H(void)
-//	: gx(PREFILTER_TAU), gy(PREFILTER_TAU), gz(PREFILTER_TAU)		// complementary
-	: gx(), gy(), gz()												// IIR or FIR
+	: gx(PREFILTER_TAU), gy(PREFILTER_TAU), gz(PREFILTER_TAU)		// complementary
+//	: gx(), gy(), gz()												// IIR or FIR
 {
+	log = logger::instance();
+
 	address = 0b11010110;
 	dt = prevTick = 0;
 	xOffset = yOffset = zOffset = 0.0f;
@@ -41,9 +43,11 @@ L3GD20H::L3GD20H(void)
  * @param init Sensor configuration parameters
  */
 L3GD20H::L3GD20H(L3GD20H_InitStruct init)
-//	: gx(PREFILTER_TAU), gy(PREFILTER_TAU), gz(PREFILTER_TAU)		// complementary
-	: gx(), gy(), gz()												// IIR or FIR
+	: gx(PREFILTER_TAU), gy(PREFILTER_TAU), gz(PREFILTER_TAU)		// complementary
+//	: gx(), gy(), gz()												// IIR or FIR
 {
+	log = logger::instance();
+
 	address = 0b11010110;
 	dt = prevTick = 0;
 	xOffset = yOffset = zOffset = 0.0f;
@@ -77,9 +81,9 @@ void L3GD20H::enable(L3GD20H_InitStruct init) {
 	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::LOW_ODR, &buf, 1);
 
 	// Set high-pass filter mode and high-pass filter cutoff frequency
-//	buf = (uint8_t)(L3GD_CTRL2_HPM(init.hpm_config)
-//					| L3GD_CTRL2_HPCF(init.hpcf_config));
-//	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::CTRL2, &buf, 1);
+	buf = (uint8_t)(L3GD_CTRL2_HPM(init.hpm_config)
+					| L3GD_CTRL2_HPCF(init.hpcf_config));
+	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::CTRL2, &buf, 1);
 
 	// Set full scale
 	buf = (uint8_t)(L3GD_CTRL4_FS(init.fs_config)//);
@@ -211,13 +215,22 @@ int16_t L3GD20H::getXRaw(void) {
  */
 float L3GD20H::getX() {
 	float x = (float)getXRaw() * resolution - xOffset;
-
+#ifdef LOG_RAW
+	char buff[100];
+	sprintf(buff, "Gx %f\n\r", x);
+	log->log(buff);
+#endif
 	return x;
 }
 
 float L3GD20H::getXFiltered() {
 	float32_t x = getX();
 	float xf = gx.filterSample(&x);
+#ifdef LOG_PREFILTERED
+	char buff[100];
+	sprintf(buff, "Gxf %f\n\r", xf);
+	log->log(buff);
+#endif
 	return xf;
 }
 
@@ -246,13 +259,22 @@ int16_t L3GD20H::getYRaw(void) {
  */
 float L3GD20H::getY() {
 	float y = (float)getYRaw() * resolution - yOffset;
-
+#ifdef LOG_RAW
+	char buff[100];
+	sprintf(buff, "Gy %f\n\r", y);
+	log->log(buff);
+#endif
 	return y;
 }
 
 float L3GD20H::getYFiltered() {
 	float32_t y = getY();
 	float yf = gy.filterSample(&y);
+#ifdef LOG_PREFILTERED
+	char buff[100];
+	sprintf(buff, "Gyf %f\n\r", yf);
+	log->log(buff);
+#endif
 	return yf;
 }
 
@@ -281,13 +303,22 @@ int16_t L3GD20H::getZRaw(void) {
  */
 float L3GD20H::getZ() {
 	float z = (float)getZRaw() * resolution - zOffset;
-
+#ifdef LOG_RAW
+	char buff[100];
+	sprintf(buff, "Gz %f\n\r", z);
+	log->log(buff);
+#endif
 	return z;
 }
 
 float L3GD20H::getZFiltered() {
 	float32_t z = getZ();
 	float zf = gz.filterSample(&z);
+#ifdef LOG_PREFILTERED
+	char buff[100];
+	sprintf(buff, "Gzf %f\n\r", zf);
+	log->log(buff);
+#endif
 	return zf;
 }
 

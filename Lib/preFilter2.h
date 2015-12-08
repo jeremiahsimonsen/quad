@@ -32,7 +32,7 @@ private:
 public:
 	preFilter2(float tau);
 
-	float filterSample(float x);
+	float filterSample(float *x);
 };
 
 #endif
