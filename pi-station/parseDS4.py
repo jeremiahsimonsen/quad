@@ -64,7 +64,7 @@ STICK_ZERO = 127
 DEADBAND = 10
 
 def main():
-	packet = [START, 0, 0, 0, 0, STOP]
+	packet = [START, 0, STICK_ZERO, STICK_ZERO, STICK_ZERO, STOP]
 	ids = ['dummy_id', 'r2_analog', pitch_LUT[MODE-1], roll_LUT[MODE-1], yaw_LUT[MODE-1]]
 	
 	ser = serial.Serial('/dev/ttyUSB0', 57600, parity=serial.PARITY_EVEN)
@@ -89,6 +89,12 @@ def main():
 					packet[index] = int(int(filter(str.isdigit, str.lstrip(line, ' r2'))) / 255.0 * 253.0 * -1.0 + 253.0)
 				else:
 					packet[index] = int(int(filter(str.isdigit, str.lstrip(line, ' r2'))) / 255.0 * 253.0)
+					
+		if 'button_cross' in line:
+			if 'True' in line:
+				packet = [0, 0, STICK_ZERO, STICK_ZERO, STICK_ZERO, 0]
+				ser.write(bytearray(packet))
+				exit()
 			
 if __name__ == '__main__':
 	main()

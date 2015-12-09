@@ -16,7 +16,7 @@
 #define TIMEOUT 500
 
 // Flight Parameters
-#define MAX_ANGLE 30.0f					// Maximum pitch & roll angle [deg]
+#define MAX_ANGLE 10.0f					// Maximum pitch & roll angle [deg]
 #define MAX_RATE  180.0f				// Maximum yaw rate [deg/s]
 
 #define PITCH_KP 0.5f
@@ -163,12 +163,12 @@ void main()
 		left.setSpeed(left_s);
 		right.setSpeed(right_s);
 
-//		if (iter % 10 == 0) {
+		if (iter % 10 == 0) {
 			char txBuff2[100];
 			sprintf(txBuff2, "%f\t%f\n\r", pitch_y, roll_y);
 //			sprintf(txBuff2, "Motors: %f %f %f %f\n\r", front_s, rear_s, right_s, left_s);
 			usart_transmit((uint8_t *)txBuff2);
-//		}
+		}
 
 		iter++;
 		HAL_Delay(LOOP_DELAY);
