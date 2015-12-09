@@ -8,12 +8,12 @@ t = [1:length(gyro_x)] * DT;
 % Unfiltered
 N = 8192;
 Hf = fftshift(fft(gyro_y,N));
-f = linspace(-0.5,0.5,N);
+f = linspace(-0.5,0.5,N)*50;
 figure(1);
 plot(f,20*log10(abs(Hf)));
 
 % Filter the data
-y = filter(Hd,gyro_y);
-
-figure(2);
-plot(t,gyro_y,t,y);
+% y = filter(Hd,gyro_y);
+% 
+% figure(2);
+% plot(t,gyro_y,t,y);

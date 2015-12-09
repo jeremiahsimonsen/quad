@@ -95,14 +95,14 @@ void L3GD20H::enable(L3GD20H_InitStruct init) {
 	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::CTRL5, &buf, 1);
 
 	// Initialize PA4 for externally measuring sampling frequency
-	__HAL_RCC_GPIOA_CLK_ENABLE();
-
-	GPIO_InitTypeDef GPIO_InitStruct;
-	GPIO_InitStruct.Pin 	= GPIO_PIN_4;
-	GPIO_InitStruct.Mode 	= GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull	= GPIO_NOPULL;
-	GPIO_InitStruct.Speed 	= GPIO_SPEED_FAST;
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+//	__HAL_RCC_GPIOA_CLK_ENABLE();
+//
+//	GPIO_InitTypeDef GPIO_InitStruct;
+//	GPIO_InitStruct.Pin 	= GPIO_PIN_4;
+//	GPIO_InitStruct.Mode 	= GPIO_MODE_OUTPUT_PP;
+//	GPIO_InitStruct.Pull	= GPIO_NOPULL;
+//	GPIO_InitStruct.Speed 	= GPIO_SPEED_FAST;
+//	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 	// TIM initialization for alternative sample time measurement
 	TimHandle.Instance = TIM6;
@@ -175,7 +175,7 @@ int8_t L3GD20H::read(void) {
 	buffIndicator = i2c->memRead(address, ( (uint8_t)L3GD20H_Reg::OUT_X_L | (1<<7) ), gyroBuff1, gyroBuff2, 6);
 	return buffIndicator;
 #else
-	HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_4);
+//	HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_4);
 
 	uint32_t tmp = __HAL_TIM_GetCounter(&TimHandle);
 

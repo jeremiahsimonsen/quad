@@ -60,19 +60,28 @@ START = 255
 STOP  = 254
 MODE  = 3
 
+STICK_ZERO = 127
+DEADBAND = 10
+
 def main():
 	packet = [START, 0, 0, 0, 0, STOP]
 	ids = ['dummy_id', 'r2_analog', pitch_LUT[MODE-1], roll_LUT[MODE-1], yaw_LUT[MODE-1]]
 	
- 	ser = serial.Serial('/dev/ttyUSB0', 57600, parity=serial.PARITY_EVEN)
+	ser = serial.Serial('/dev/ttyUSB0', 57600, parity=serial.PARITY_EVEN)
 # 	ser = serial.Serial('COM9', 57600, parity=serial.PARITY_EVEN)
 	
-#	buf = StringIO.StringIO(report)
-#	for line in buf:
- 	for line in sys.stdin:
+# 	buf = StringIO.StringIO(report)
+# 	for line in buf:
+	for line in sys.stdin:
 		""" New report """
 		if 'Report dump' in line:
- 			ser.write(bytearray(packet))
+			if abs(packet[2] - STICK_ZERO) < DEADBAND:
+				packet[2] = STICK_ZERO
+			if abs(packet[3] - STICK_ZERO) < DEADBAND:
+				packet[3] = STICK_ZERO
+			if abs(packet[4] - STICK_ZERO) < DEADBAND:
+				packet[4] = STICK_ZERO
+			ser.write(bytearray(packet))
 			print packet
 		for index, val in enumerate(ids):
 			if val in line:

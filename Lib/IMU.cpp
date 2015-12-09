@@ -13,7 +13,7 @@
 #include "IMU.h"
 #include <math.h>
 
-//#define PI (3.1415927f)
+#define USE_PREFILTERED
 
 IMU::IMU()
 	: barometer(), gyro(), accel(),
@@ -163,16 +163,28 @@ void IMU::getRollPitch(float *roll, float*pitch) {
 	accel.read();
 	gyro.read();
 
-	// Fetch the pre-filtered accelerometer data [g]
+
 	float ax_f, ay_f, az_f;
+	float gx_f, gy_f;
+#ifdef USE_PREFILTERED
+	// Fetch the pre-filtered accelerometer data [g]
 	ax_f = accel.getAccXFiltered();
 	ay_f = accel.getAccYFiltered();
 	az_f = accel.getAccZFiltered();
 
 	// Fetch the pre-filtered gyroscope data [deg/s]
-	float gx_f, gy_f;
 	gx_f = gyro.getXFiltered();
 	gy_f = gyro.getYFiltered();
+#else
+	// Fetch the unfiltered accelerometer data [g]
+	ax_f = accel.getAccX();
+	ay_f = accel.getAccY();
+	az_f = accel.getAccZ();
+
+	// Fetch the unfiltered gyroscope data [deg/s]
+	gx_f = gyro.getX();
+	gy_f = gyro.getY();
+#endif
 
 	// Calculate pitch & roll angles based on accelerometer data
 	float angle_x, angle_y;
@@ -185,18 +197,18 @@ void IMU::getRollPitch(float *roll, float*pitch) {
 	log->log(buff1);
 #endif
 
-//	*pitch = COMPLEMENTARY_TAU * (angle_pitch + gx_f * gyro.getDT()) + (1.0f - COMPLEMENTARY_TAU) * (angle_x);
-//	*roll  = COMPLEMENTARY_TAU * (angle_roll + gy_f * gyro.getDT()) + (1.0f-COMPLEMENTARY_TAU)*angle_y;
+	angle_pitch = COMPLEMENTARY_TAU * (angle_pitch + gx_f * gyro.getDT()) + (1.0f - COMPLEMENTARY_TAU) * (angle_x);
+	angle_roll  = COMPLEMENTARY_TAU * (angle_roll + gy_f * gyro.getDT()) + (1.0f-COMPLEMENTARY_TAU)*angle_y;
 
 	// Complementary filter the accelerometer calculated angle
-	float angle_x_f, angle_y_f;
-	angle_x_f = aFilter_x.filterSample(angle_x);
-	angle_y_f = aFilter_y.filterSample(angle_y);
+//	float angle_x_f, angle_y_f;
+//	angle_x_f = aFilter_x.filterSample(angle_x);
+//	angle_y_f = aFilter_y.filterSample(angle_y);
 
 	// Complementary filter the gyroscope data
-	float gyro_x_f, gyro_y_f;
-	gyro_x_f = gFilter_x.filterSample(gx_f);
-	gyro_y_f = gFilter_y.filterSample(gy_f);
+//	float gyro_x_f, gyro_y_f;
+//	gyro_x_f = gFilter_x.filterSample(gx_f);
+//	gyro_y_f = gFilter_y.filterSample(gy_f);
 
 #ifdef LOG_COMP_FILTERED
 	char buff2[100];
@@ -205,8 +217,10 @@ void IMU::getRollPitch(float *roll, float*pitch) {
 #endif
 
 	// Sum the two
-	*pitch = angle_x_f + gyro_x_f;
-	*roll  = angle_y_f + gyro_y_f;
+//	*pitch = angle_x_f + gyro_x_f;
+//	*roll  = angle_y_f + gyro_y_f;
+	*pitch = angle_pitch;
+	*roll  = angle_roll;
 
 #ifdef LOG_OUTPUT
 	char buff3[100];

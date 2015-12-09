@@ -122,14 +122,14 @@ void LSM303D::enable(LSM303D_InitStruct init) {
 	i2c->memWrite(address, (uint8_t)LSM303D_Reg::CTRL7, &buf, 1);
 
 	// Initialize PA5 for externally measuring sampling frequency
-	__HAL_RCC_GPIOA_CLK_ENABLE();
-
-	GPIO_InitTypeDef GPIO_InitStruct;
-	GPIO_InitStruct.Pin 	= GPIO_PIN_5;
-	GPIO_InitStruct.Mode 	= GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull	= GPIO_NOPULL;
-	GPIO_InitStruct.Speed 	= GPIO_SPEED_FAST;
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+//	__HAL_RCC_GPIOA_CLK_ENABLE();
+//
+//	GPIO_InitTypeDef GPIO_InitStruct;
+//	GPIO_InitStruct.Pin 	= GPIO_PIN_5;
+//	GPIO_InitStruct.Mode 	= GPIO_MODE_OUTPUT_PP;
+//	GPIO_InitStruct.Pull	= GPIO_NOPULL;
+//	GPIO_InitStruct.Speed 	= GPIO_SPEED_FAST;
+//	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 	accCalibrate();
 }
@@ -163,7 +163,7 @@ void LSM303D::accCalibrate(void) {
  * @brief Initiates a read of the accelerometer and magnetometer
  */
 void LSM303D::read(void) {
-	HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+//	HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
 	readAcc();
 	readMag();
 }

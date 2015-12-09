@@ -1,3 +1,5 @@
+close all;
+
 acc_x = ax(4:end,8);
 acc_y = ay(4:end,8);
 acc_z = az(4:end,8);
@@ -11,7 +13,7 @@ f = linspace(-0.5, 0.5, N)*50;
 figure(1);
 plot(f,20*log10(abs(Hf)));
 
-y = filter(Hd, acc_x);
+y = filter(ans, acc_x);
 
 figure(2);
 plot(t,acc_x,t,y);

@@ -9,20 +9,21 @@
 #include "Motor.h"
 #include "IMU.h"
 #include "pid.h"
+#include "pid2.h"
 #include "led.h"
 
 // UART RX parameters
-#define TIMEOUT 2000
+#define TIMEOUT 500
 
 // Flight Parameters
 #define MAX_ANGLE 30.0f					// Maximum pitch & roll angle [deg]
 #define MAX_RATE  180.0f				// Maximum yaw rate [deg/s]
 
-#define PITCH_KP 0.1f
+#define PITCH_KP 0.5f
 #define PITCH_KI 0.0f
 #define PITCH_KD 0.0f
 
-#define ROLL_KP  0.1f
+#define ROLL_KP  0.5f
 #define ROLL_KI  0.0f
 #define ROLL_KD  0.0f
 
@@ -30,6 +31,8 @@
 #define DEATH_CHOPPER
 
 #define RX_TIMEOUT_ENABLE
+
+#define LOOP_DELAY 10	// Main loop delay in ms
 
 #ifdef DEATH_CHOPPER
 #define BOARD Board::DEATH_CHOPPER_9000
@@ -67,6 +70,7 @@ void main()
 	usart_receive_begin();
 
 	uint32_t rxTimeout = 0;
+//#warning "Throttle set to full"
 	float throttle_cmd = 0.0f, pitch_cmd = 0.0f, roll_cmd = 0.0f, yaw_cmd = 0.0f;
 	float pitch_y, roll_y;
 	float pitch_e, roll_e;
@@ -76,13 +80,13 @@ void main()
 
 	L3GD20H_InitStruct gyroConfig;
 	gyroConfig.fs_config = L3GD_FS_Config::MEDIUM;
-	gyroConfig.hpcf_config = L3GD_HPCF_Config::FOUR;
+	gyroConfig.hpcf_config = L3GD_HPCF_Config::THREE;
 	gyroConfig.hpm_config = L3GD_HPM_Config::THREE;
-	gyroConfig.odr_bw_config = L3GD_ODR_BW_Config::THREE;
+	gyroConfig.odr_bw_config = L3GD_ODR_BW_Config::EIGHT;
 
 	LSM303D_InitStruct accelConfig;
 	accelConfig.aodr_config = LSM_AODR_Config::SIX;
-	accelConfig.abw_config = LSM_ABW_Config::ONE;
+	accelConfig.abw_config = LSM_ABW_Config::FOUR;
 	accelConfig.afs_config = LSM_AFS_Config::FOUR;
 	accelConfig.modr_config = LSM_MODR_Config::SIX;
 	accelConfig.mres_config = LSM_MRES_Config::HIGH;
@@ -91,8 +95,8 @@ void main()
 
 	IMU imu(gyroConfig, accelConfig);
 
-	pid pitch_pid(PITCH_KP, PITCH_KI, PITCH_KD);
-	pid roll_pid(ROLL_KP, ROLL_KI, ROLL_KD);
+	pid2 pitch_pid(PITCH_KP, PITCH_KI, PITCH_KD);
+	pid2 roll_pid(ROLL_KP, ROLL_KI, ROLL_KD);
 
 	while (1)
 	{
@@ -140,8 +144,10 @@ void main()
 		roll_e  = roll_cmd  - roll_y;
 
 		// Calculate PID control outputs
-		u_pitch = pitch_pid.calculate(pitch_e);
-		u_roll  = roll_pid.calculate(roll_e);
+//		u_pitch = pitch_pid.calculate(pitch_e);
+//		u_roll  = roll_pid.calculate(roll_e);
+		u_pitch = pitch_pid.calculate(pitch_e, LOOP_DELAY);
+		u_roll  = roll_pid.calculate(roll_e, LOOP_DELAY);
 
 		// Convert to motor commands
 		u_pitch_cmd = u_pitch / MAX_ANGLE;
@@ -157,15 +163,15 @@ void main()
 		left.setSpeed(left_s);
 		right.setSpeed(right_s);
 
-		if (iter % 10 == 0) {
+//		if (iter % 10 == 0) {
 			char txBuff2[100];
 			sprintf(txBuff2, "%f\t%f\n\r", pitch_y, roll_y);
 //			sprintf(txBuff2, "Motors: %f %f %f %f\n\r", front_s, rear_s, right_s, left_s);
 			usart_transmit((uint8_t *)txBuff2);
-		}
+//		}
 
 		iter++;
-		HAL_Delay(10);
+		HAL_Delay(LOOP_DELAY);
 	}
 }
 

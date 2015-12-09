@@ -81,6 +81,11 @@
 			<locationURI>PARENT-1-PROJECT_LOC/lib/accelCompFilter2.h</locationURI>
 		</link>
 		<link>
+			<name>include/dac.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/dac.h</locationURI>
+		</link>
+		<link>
 			<name>include/gyroCompFilter.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/lib/gyroCompFilter.h</locationURI>
@@ -104,6 +109,11 @@
 			<name>include/pid.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Lib/pid.h</locationURI>
+		</link>
+		<link>
+			<name>include/pid2.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/pid2.h</locationURI>
 		</link>
 		<link>
 			<name>include/preFilter.h</name>
@@ -216,6 +226,11 @@
 			<locationURI>PARENT-1-PROJECT_LOC/lib/accelCompFilter2.cpp</locationURI>
 		</link>
 		<link>
+			<name>src/dac.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/dac.cpp</locationURI>
+		</link>
+		<link>
 			<name>src/gyroCompFilter.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/lib/gyroCompFilter.cpp</locationURI>
@@ -239,6 +254,11 @@
 			<name>src/pid.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Lib/pid.cpp</locationURI>
+		</link>
+		<link>
+			<name>src/pid2.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/pid2.cpp</locationURI>
 		</link>
 		<link>
 			<name>src/preFilter.cpp</name>
