@@ -31,6 +31,8 @@
 #define FULL_SPEED_WIDTH 2.0f
 #define ZERO_SPEED_WIDTH 1.0f
 
+#define MAX_SPEED 0.7f
+
 class Motor {
 private:
 	PwmTimer *pwm;	///< PwmTimer object to handle hardware-specifics

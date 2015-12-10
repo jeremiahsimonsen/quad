@@ -20,7 +20,8 @@
 #ifndef PID2_H_
 #define PID2_H_
 
-#define INTEGRAL_SATURATION 0.5f
+#define INTEGRAL_SATURATION 5.0f
+#define ERROR_DEADBAND 1.0f
 
 class pid2 {
 private:

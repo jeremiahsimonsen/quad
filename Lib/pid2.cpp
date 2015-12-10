@@ -28,6 +28,10 @@ pid2::pid2(float p, float i, float d) {
 }
 
 float pid2::calculate(float e, float dt) {
+	if (e > -ERROR_DEADBAND && e < ERROR_DEADBAND) {
+		e = 0.0f;
+	}
+
 	integral += e * dt;
 	if (integral > INTEGRAL_SATURATION) integral = INTEGRAL_SATURATION;
 	if (integral < -INTEGRAL_SATURATION) integral = -INTEGRAL_SATURATION;

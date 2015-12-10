@@ -127,16 +127,16 @@ void L3GD20H::enable(L3GD20H_InitStruct init) {
 }
 
 void L3GD20H::calibrate() {
-	uint8_t samples = 32;
+	uint8_t samples = 128;
 	float gx_offset = 0.0f, gy_offset = 0.0f, gz_offset = 0.0f;
 
 	read();	// Initial read so values are correct
 	// Take some readings and accumulate
 	for (int i = 0; i < samples; i++) {
 		read();
-		gx_offset += getX();
-		gy_offset += getY();
-		gz_offset += getZ();
+		gx_offset += getXFiltered();
+		gy_offset += getYFiltered();
+		gz_offset += getZFiltered();
 		HAL_Delay(20);
 	}
 

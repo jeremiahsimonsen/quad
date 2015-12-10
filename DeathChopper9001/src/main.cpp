@@ -13,26 +13,28 @@
 #include "led.h"
 
 // UART RX parameters
-#define TIMEOUT 500
+#define LOOP_DELAY 10	// Main loop delay in ms
+#define TIMEOUT ((int)2.0f / ((float)LOOP_DELAY / (float)1000))
 
 // Flight Parameters
-#define MAX_ANGLE 10.0f					// Maximum pitch & roll angle [deg]
+#define MAX_ANGLE 6.0f					// Maximum pitch & roll angle [deg]
 #define MAX_RATE  180.0f				// Maximum yaw rate [deg/s]
+#define V_MIN 0.2f
 
-#define PITCH_KP 0.5f
+#define PITCH_KP 6.0f
 #define PITCH_KI 0.0f
 #define PITCH_KD 0.0f
 
-#define ROLL_KP  0.5f
+#define ROLL_KP  6.0f
 #define ROLL_KI  0.0f
 #define ROLL_KD  0.0f
+
+#define PID_SCALE 55.0f
 
 //#define DISCOVERY_BOARD
 #define DEATH_CHOPPER
 
 #define RX_TIMEOUT_ENABLE
-
-#define LOOP_DELAY 10	// Main loop delay in ms
 
 #ifdef DEATH_CHOPPER
 #define BOARD Board::DEATH_CHOPPER_9000
@@ -50,6 +52,14 @@ static Motor right(TimerPin::PC9);
 #endif
 
 static led *leds;
+
+static bool enableMotors = false;
+
+void EXTILine0_Config(void);
+extern "C" {
+	void EXTI0_IRQHandler(void);
+	void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
+}
 
 //void descend(float f, float b, float l, float r);
 void abort(void);
@@ -112,7 +122,7 @@ void main()
 				abort();
 			}
 
-			throttle_cmd = (float)readBuff[1] / 253.0f;
+			throttle_cmd = (float)readBuff[1] / (253.0f / MAX_SPEED);
 			pitch_cmd 	 = ((float)readBuff[2] - 127.0) / 127.0f * MAX_ANGLE;
 			roll_cmd 	 = ((float)readBuff[3] - 127.0) / 127.0f * MAX_ANGLE;
 			yaw_cmd 	 = ((float)readBuff[4] - 127.0) / 127.0f * MAX_RATE;
@@ -150,18 +160,29 @@ void main()
 		u_roll  = roll_pid.calculate(roll_e, LOOP_DELAY);
 
 		// Convert to motor commands
-		u_pitch_cmd = u_pitch / MAX_ANGLE;
-		u_roll_cmd  = u_roll  / MAX_ANGLE;
+		u_pitch_cmd = u_pitch / PID_SCALE;
+		u_roll_cmd  = u_roll  / PID_SCALE;
 
-		front_s = throttle_cmd - u_pitch_cmd;// - yaw_cmd;
-		rear_s  = throttle_cmd + u_pitch_cmd;// - yaw_cmd;
-		right_s = throttle_cmd - u_roll_cmd;//  + yaw_cmd;
-		left_s  = throttle_cmd + u_roll_cmd;//  + yaw_cmd;
+//		if (throttle_cmd >= V_MIN) {
+			front_s = throttle_cmd - u_pitch_cmd;// - yaw_cmd;
+			rear_s  = throttle_cmd + u_pitch_cmd;// - yaw_cmd;
+			right_s = throttle_cmd - u_roll_cmd;//  + yaw_cmd;
+			left_s  = throttle_cmd + u_roll_cmd;//  + yaw_cmd;
+//		} else {
+//			front_s = rear_s = right_s = left_s = 0.0f;
+//		}
 
-		front.setSpeed(front_s);
-		rear.setSpeed(rear_s);
-		left.setSpeed(left_s);
-		right.setSpeed(right_s);
+//		if (enableMotors == false) {
+//			front.setSpeed(0.0f);
+//			rear.setSpeed(0.0f);
+//			left.setSpeed(0.0f);
+//			right.setSpeed(0.0f);
+//		} else {
+			front.setSpeed(front_s);
+			rear.setSpeed(rear_s);
+			left.setSpeed(left_s);
+			right.setSpeed(right_s);
+//		}
 
 		if (iter % 10 == 0) {
 			char txBuff2[100];
@@ -207,4 +228,29 @@ void abort() {
 	left.setSpeed(0.0f);
 	right.setSpeed(0.0f);
 	while(1);
+}
+
+void EXTILine0_Config(void) {
+	GPIO_InitTypeDef GPIO_InitStruct;
+
+	__HAL_RCC_GPIOA_CLK_ENABLE();
+
+	GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Pin = GPIO_PIN_0;
+	GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+	HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+}
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+	if (GPIO_Pin == KEY_BUTTON_PIN) {
+		enableMotors = enableMotors == true? false : true;
+	}
+}
+
+void EXTI0_IRQHandler(void) {
+	HAL_GPIO_EXTI_IRQHandler(KEY_BUTTON_PIN);
 }

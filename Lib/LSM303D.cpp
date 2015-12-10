@@ -135,16 +135,16 @@ void LSM303D::enable(LSM303D_InitStruct init) {
 }
 
 void LSM303D::accCalibrate(void) {
-	uint8_t samples = 32;
+	uint8_t samples = 128;
 	float ax_offset = 0.0f, ay_offset = 0.0f, az_offset = 0.0f;
 
 	readAcc();	// Initial read so values are correct
 	// Take some readings and accumulate
 	for (int i = 0; i < samples; i++) {
 		readAcc();
-		ax_offset += getAccX();
-		ay_offset += getAccY();
-		az_offset += getAccZ();
+		ax_offset += getAccXFiltered();
+		ay_offset += getAccYFiltered();
+		az_offset += getAccZFiltered();
 		HAL_Delay(20);
 	}
 

@@ -41,7 +41,7 @@ void Motor::setSpeed(float s) {
 
 	// Only allow speeds between 0.0 and 1.0
 	if (s < 0.0) speed = 0.0;
-	else if (s > 1.0) speed = 1.0;
+	else if (s > MAX_SPEED) speed = MAX_SPEED;
 	else speed = s;
 
 	// Convert speed to pulse width and configure TIM for new width
