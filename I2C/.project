@@ -70,9 +70,19 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>include/Adc.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/Adc.h</locationURI>
+		</link>
+		<link>
 			<name>include/DMA_IT.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Lib/DMA_IT.h</locationURI>
+		</link>
+		<link>
+			<name>include/HCSR04.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/HCSR04.h</locationURI>
 		</link>
 		<link>
 			<name>include/I2C.h</name>
@@ -105,9 +115,29 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Lib/LidarLite.h</locationURI>
 		</link>
 		<link>
+			<name>include/Motor.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/Motor.h</locationURI>
+		</link>
+		<link>
+			<name>include/PwmTimer.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/PwmTimer.h</locationURI>
+		</link>
+		<link>
 			<name>include/accelCompFilter.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/lib/accelCompFilter.h</locationURI>
+		</link>
+		<link>
+			<name>include/accelCompFilter2.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/accelCompFilter2.h</locationURI>
+		</link>
+		<link>
+			<name>include/dac.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/dac.h</locationURI>
 		</link>
 		<link>
 			<name>include/gyroCompFilter.h</name>
@@ -115,9 +145,59 @@
 			<locationURI>PARENT-1-PROJECT_LOC/lib/gyroCompFilter.h</locationURI>
 		</link>
 		<link>
+			<name>include/gyroCompFilter2.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/gyroCompFilter2.h</locationURI>
+		</link>
+		<link>
+			<name>include/led.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/led.h</locationURI>
+		</link>
+		<link>
+			<name>include/logger.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/logger.h</locationURI>
+		</link>
+		<link>
+			<name>include/pid.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/pid.h</locationURI>
+		</link>
+		<link>
+			<name>include/pid2.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/pid2.h</locationURI>
+		</link>
+		<link>
 			<name>include/preFilter.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/lib/preFilter.h</locationURI>
+		</link>
+		<link>
+			<name>include/preFilter2.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/preFilter2.h</locationURI>
+		</link>
+		<link>
+			<name>include/preFilter3.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/preFilter3.h</locationURI>
+		</link>
+		<link>
+			<name>include/preFilterAcc.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/preFilterAcc.h</locationURI>
+		</link>
+		<link>
+			<name>include/preFilterFIR.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/preFilterFIR.h</locationURI>
+		</link>
+		<link>
+			<name>include/preFilterGyro.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/preFilterGyro.h</locationURI>
 		</link>
 		<link>
 			<name>include/stm32f4xx_hal_conf.h</name>
@@ -135,9 +215,19 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Lib/uart.h</locationURI>
 		</link>
 		<link>
+			<name>src/Adc.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/Adc.cpp</locationURI>
+		</link>
+		<link>
 			<name>src/DMA_IT.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Lib/DMA_IT.c</locationURI>
+		</link>
+		<link>
+			<name>src/HCSR04.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/HCSR04.cpp</locationURI>
 		</link>
 		<link>
 			<name>src/I2C.cpp</name>
@@ -185,14 +275,74 @@
 			<locationURI>PARENT-1-PROJECT_LOC/lib/accelCompFilter.cpp</locationURI>
 		</link>
 		<link>
+			<name>src/accelCompFilter2.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/accelCompFilter2.cpp</locationURI>
+		</link>
+		<link>
+			<name>src/dac.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/dac.cpp</locationURI>
+		</link>
+		<link>
 			<name>src/gyroCompFilter.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/lib/gyroCompFilter.cpp</locationURI>
 		</link>
 		<link>
+			<name>src/gyroCompFilter2.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/gyroCompFilter2.cpp</locationURI>
+		</link>
+		<link>
+			<name>src/led.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/led.cpp</locationURI>
+		</link>
+		<link>
+			<name>src/logger.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/logger.cpp</locationURI>
+		</link>
+		<link>
+			<name>src/pid.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/pid.cpp</locationURI>
+		</link>
+		<link>
+			<name>src/pid2.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/pid2.cpp</locationURI>
+		</link>
+		<link>
 			<name>src/preFilter.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/lib/preFilter.cpp</locationURI>
+		</link>
+		<link>
+			<name>src/preFilter2.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/preFilter2.cpp</locationURI>
+		</link>
+		<link>
+			<name>src/preFilter3.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/preFilter3.cpp</locationURI>
+		</link>
+		<link>
+			<name>src/preFilterAcc.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/preFilterAcc.cpp</locationURI>
+		</link>
+		<link>
+			<name>src/preFilterFIR.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/preFilterFIR.cpp</locationURI>
+		</link>
+		<link>
+			<name>src/preFilterGyro.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/preFilterGyro.cpp</locationURI>
 		</link>
 		<link>
 			<name>src/stm32f4xx_it.c</name>

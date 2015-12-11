@@ -3,7 +3,8 @@
 #include "L3GD20H.h"
 #include "LSM303D.h"
 #include "IMU.h"
-#include "LidarLite.h"
+//#include "LidarLite.h"
+#include "HCSR04.h"
 #include "uart.h"
 #include "Motor.h"
 
@@ -27,7 +28,8 @@ void lps_test(void);
 void l3g_test(void);
 void lsm_test(void);
 void imu_test(void);
-void lidar_test(void);
+//void lidar_test(void);
+void hcsr04_test(void);
 void raw_imu_data(void);
 
 L3GD20H_InitStruct gyroConfig;
@@ -64,8 +66,9 @@ int main(int argc, char* argv[])
 //	lps_test();
 //	l3g_test();
 //	lsm_test();
-	imu_test();
+//	imu_test();
 //	lidar_test();
+	hcsr04_test();
 //	raw_imu_data();
 }
 
@@ -198,37 +201,50 @@ void imu_test() {
 	}
 }
 
-void lidar_test() {
-	LidarLite lidar;
-//	int x =0;
+//void lidar_test() {
+//	LidarLite lidar;
+////	int x =0;
+//	float dist;
+//
+//	// i2c implementation
+////	while(1) {
+////		retVal = lidar.startMeasure();
+////		if (retVal < 0) {
+////			trace_printf("Failed to start measurement\n");
+////		}
+////		do {
+////			retVal = lidar.read();
+////		} while (retVal < 0);
+////
+////		x++;
+////		if(retVal < 0) {
+////			trace_printf("error sending read");
+////		}
+////
+////		dist = lidar.getDistRaw();
+////		trace_printf("%d\t%d\n", dist,x);
+////		HAL_Delay(100);
+////	}
+//
+//	while (1) {
+//		dist = lidar.getDistIn();
+//		char str[50];
+//		sprintf(str, "%f",dist);
+////		trace_printf("%\n",dist);
+//		trace_printf("%s\n",str);
+//	}
+//}
+
+void hcsr04_test(void) {
+	HCSR04 rangefinder;
 	float dist;
 
-	// i2c implementation
-//	while(1) {
-//		retVal = lidar.startMeasure();
-//		if (retVal < 0) {
-//			trace_printf("Failed to start measurement\n");
-//		}
-//		do {
-//			retVal = lidar.read();
-//		} while (retVal < 0);
-//
-//		x++;
-//		if(retVal < 0) {
-//			trace_printf("error sending read");
-//		}
-//
-//		dist = lidar.getDistRaw();
-//		trace_printf("%d\t%d\n", dist,x);
-//		HAL_Delay(100);
-//	}
-
 	while (1) {
-		dist = lidar.getDistIn();
+		dist = rangefinder.getDistIn();
 		char str[50];
-		sprintf(str, "%f",dist);
-//		trace_printf("%\n",dist);
-		trace_printf("%s\n",str);
+		sprintf(str, "%f\n\r", dist);
+		usart_transmit((uint8_t *)str);
+		HAL_Delay(50);
 	}
 }
 
