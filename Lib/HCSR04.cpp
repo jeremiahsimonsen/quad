@@ -1,5 +1,5 @@
 /**
- * @file HCSR04.cpp
+ * @file
  *
  * @brief Class for interacting with the HC-SR04 ultrasonic rangefinder
  *
@@ -10,15 +10,28 @@
  *
  */
 
+/** @addtogroup Sensors
+ *  @{
+ */
+
+/** @defgroup HCSR04 HC-SR04 Ultrasonic Rangefinder
+ *  @{
+ */
 
 #include "HCSR04.h"
+#include "DeathChopper9000.h"
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 void HAL_TIM_IC_MspInit(TIM_HandleTypeDef *htim);
 void TIM2_IRQHandler(void);
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim);
-};
+#ifdef __cplusplus
+}
+#endif
 
+// Number of samples to average
 #define NUM_SAMPLES 15
 
 static TIM_HandleTypeDef Tim2Handle;
@@ -26,6 +39,7 @@ static TIM_IC_InitTypeDef sConfig;
 static volatile uint32_t pWidthBuff[NUM_SAMPLES];
 static HAL_LockTypeDef pWidthLock = HAL_UNLOCKED;
 
+// Locking Macros
 #define _GET_LOCK_RETURN(__LOCK__)                                           \
 							do{                                        \
 								if((__LOCK__) == HAL_LOCKED)   \
@@ -53,6 +67,16 @@ static HAL_LockTypeDef pWidthLock = HAL_UNLOCKED;
 								(__LOCK__) = HAL_UNLOCKED;				\
 							} while (0)
 
+/** @addtogroup HCSR04_Class Class for reading from the HC-SR04
+ *  @{
+ */
+
+/**
+ * @brief Create an HCSR04 object
+ *
+ * This initializes the GPIO pins, configures TIM2_CH1/2 for input capture,
+ * and starts PWM on pin PC9. Samples are automatically taken via interrupt.
+ */
 HCSR04::HCSR04() {
 	// TIM configuration settings
 	Tim2Handle.Instance = TIM2;
@@ -84,19 +108,6 @@ HCSR04::HCSR04() {
 		// TODO: Error
 	}
 
-	// Old from LIDAR Lite, may need to make PB5 an input so it doesn't affect anything on PCB
-//	GPIO_InitTypeDef GPIO_InitStruct;
-//
-//	__HAL_RCC_GPIOB_CLK_ENABLE();
-//
-//	GPIO_InitStruct.Pin = GPIO_PIN_5;
-//	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-//	GPIO_InitStruct.Pull = GPIO_NOPULL;
-//	GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
-//	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-//
-//	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);		// Pull low for continuous
-
 	// Start input capture with interrupts
 	if (HAL_TIM_IC_Start_IT(&Tim2Handle, TIM_CHANNEL_1) != HAL_OK) {
 		// Error
@@ -111,6 +122,10 @@ HCSR04::HCSR04() {
 	trigger.setWidth(0.011f);
 }
 
+/**
+ * @brief Calculate raw pulse width
+ * @return The average pulse width in TIM counts
+ */
 float HCSR04::getDistRaw() {
 	// Locking since interrupt changes pWidthBuff
 	_GET_LOCK_RETURN(pWidthLock);
@@ -131,18 +146,44 @@ float HCSR04::getDistRaw() {
 	return dist;
 }
 
+/**
+ * @brief Calculate the measured distance
+ * @return The distance calculated from the average pulse width over NUM_SAMPLES
+ */
 float HCSR04::getDistIn() {
+	// Distance = (high time) * (velocity) / 2
 	float dist = getDistRaw() / 84e6f * 340 / 2 * 39.37f;
+
 	return dist;
 }
 
-// Input Capture using TIM2CH1 and TIM2CH2 on PB3
+/** @} Close HCSR04_Class group */
+
+#ifdef USE_ULTRASONIC
+
+/** @addtogroup HCSR04_Functions HAL and ISRs
+ *  @{
+ */
+
+// Silence some warnings
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
+/**
+ * @brief MCU-specific initialization for input capture
+ *
+ * Sets up input capture on TIM2_CH1 and TIM2_CH2 on PB3
+ *
+ * @param htim
+ */
 void HAL_TIM_IC_MspInit(TIM_HandleTypeDef *htim) {
 	GPIO_InitTypeDef GPIO_InitStruct;
 
+	// Enable the TIM2 and GPIOB clocks
 	__HAL_RCC_TIM2_CLK_ENABLE();
 	__HAL_RCC_GPIOB_CLK_ENABLE();
 
+	// Configure the GPIO for input capture
 	GPIO_InitStruct.Pin = GPIO_PIN_3;
 	GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
 	GPIO_InitStruct.Pull = GPIO_PULLUP;
@@ -150,22 +191,36 @@ void HAL_TIM_IC_MspInit(TIM_HandleTypeDef *htim) {
 	GPIO_InitStruct.Alternate = GPIO_AF1_TIM2;
 	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
+	// Enable interrupts
 	HAL_NVIC_SetPriority(TIM2_IRQn, 3, 1);
 	HAL_NVIC_EnableIRQ(TIM2_IRQn);
 }
 
+#pragma GCC diagnostic pop
+
+/**
+ * @brief Timer2 interrupt service routine
+ *
+ * Resets flags and handles errors
+ */
 void TIM2_IRQHandler() {
 	HAL_TIM_IRQHandler(&Tim2Handle);
 }
 
+/**
+ * @brief Input Capture Edge Detection callback
+ * @param htim Pointer to Tim2Handle
+ */
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 	static uint32_t cntValBuff[4];
 	static uint8_t cntValBuffIndex = 0;
 	static uint8_t pWidthBuffIndex = 0;
 
-	// If falling edge
+	/* If falling edge; Only need to calculate new width on falling because we are
+	 * concerned with positive width and both rise and fall values are latched */
 	if (htim->Instance == TIM2 && htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2)
 	{
+		// Locking
 		_GET_LOCK_NORETURN(pWidthLock);
 
 		// Read and store the CCR values
@@ -195,9 +250,15 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 		if (pWidthBuffIndex == NUM_SAMPLES)
 			pWidthBuffIndex = 0;
 
+		// Unlocking
 		_UNLOCK(pWidthLock);
 	}
 }
 
+/** @} Close HCSR04_Functions group */
 
+#endif
+
+/** @} Close HCSR04 group */
+/** @} Close Sensors Group */
 

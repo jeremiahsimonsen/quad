@@ -1,5 +1,5 @@
 /**
- * @file I2C.cpp
+ * @file
  *
  * @brief Low level i2c class and code for interfacing with HAL
  *
@@ -19,6 +19,15 @@
  *
  */
 
+/** @addtogroup Peripherals
+ *  @{
+ */
+
+/** @defgroup I2C I2C Communication
+ *  @brief Module for communication via I2C - required for interfacing with sensors.
+ *  @{
+ */
+
 #include "I2C.h"
 #include "DMA_IT.h"
 #include "stm32f4xx_hal.h"
@@ -32,7 +41,6 @@
 I2C* I2C::i2cInstance = NULL;
 
 // Global variables needed by interrupts
-//I2C_HandleTypeDef i2cHandle;
 static DMA_HandleTypeDef hdma_tx;
 static DMA_HandleTypeDef hdma_rx;
 
@@ -55,7 +63,9 @@ void I2C2_MspDeInit(void);
 void I2C3_MspDeInit(void);
 
 // Callbacks and ISRs
+#ifdef __cplusplus
 extern "C" {
+#endif
 void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c);
 void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c);
 void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c);
@@ -66,19 +76,17 @@ void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c);
 
 void I2C1_ER_IRQHandler(void);
 
-//void I2C1_DMA_RX_IRQHandler(void);
-//void I2C1_DMA_TX_IRQHandler(void);
-//
-//void I2C2_DMA_RX_IRQHandler(void);
-//void I2C2_DMA_TX_IRQHandler(void);
-//
-//void I2C3_DMA_RX_IRQHandler(void);
-//void I2C3_DMA_TX_IRQHandler(void);
-};
+#ifdef __cplusplus
+}
+#endif
 
-///////////////////////////////////////////////////////////////////////
-//                      Initialization Routines                      //
-///////////////////////////////////////////////////////////////////////
+/** @addtogroup I2C_Functions Functions
+ *  @{
+ */
+
+/** @addtogroup I2C_Functions_Init Initialization Routines
+ *  @{
+ */
 
 /**
  * @brief Function to initialize I2C on a given set of pins
@@ -161,10 +169,6 @@ void initI2C(int scl, int sda) {
 	HAL_NVIC_EnableIRQ(I2C1_ER_IRQn);
 }
 
-void I2C1_ER_IRQHandler() {
-	HAL_I2C_ER_IRQHandler(&i2cHandle);
-}
-
 /**
  * @brief Module-specific initialization; called by HAL_I2C_Init()
  * @param hi2c I2C_HandleTypeDef * i2c configuration
@@ -223,11 +227,7 @@ void I2C1_MspInit(I2C_HandleTypeDef *hi2c) {
 	hdma_rx.Init.MemInc              = DMA_MINC_ENABLE;
 	hdma_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
 	hdma_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
-#if USE_DOUBLE_BUFFERING
-	hdma_rx.Init.Mode                = DMA_CIRCULAR;
-#else
 	hdma_rx.Init.Mode				 = DMA_NORMAL;
-#endif
 	hdma_rx.Init.Priority            = DMA_PRIORITY_HIGH;
 	hdma_rx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
 	hdma_rx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
@@ -287,11 +287,7 @@ void I2C2_MspInit(I2C_HandleTypeDef *hi2c) {
 	hdma_rx.Init.MemInc              = DMA_MINC_ENABLE;
 	hdma_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
 	hdma_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
-#if USE_DOUBLE_BUFFERING
-	hdma_rx.Init.Mode                = DMA_CIRCULAR;
-#else
 	hdma_rx.Init.Mode				 = DMA_NORMAL;
-#endif
 	hdma_rx.Init.Priority            = DMA_PRIORITY_HIGH;
 	hdma_rx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
 	hdma_rx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
@@ -351,11 +347,7 @@ void I2C3_MspInit(I2C_HandleTypeDef *hi2c) {
 	hdma_rx.Init.MemInc              = DMA_MINC_ENABLE;
 	hdma_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
 	hdma_rx.Init.MemDataAlignment    = DMA_MDATAALIGN_BYTE;
-#if USE_DOUBLE_BUFFERING
-	hdma_rx.Init.Mode                = DMA_CIRCULAR;
-#else
 	hdma_rx.Init.Mode				 = DMA_NORMAL;
-#endif
 	hdma_rx.Init.Priority            = DMA_PRIORITY_HIGH;
 	hdma_rx.Init.FIFOMode            = DMA_FIFOMODE_DISABLE;
 	hdma_rx.Init.FIFOThreshold       = DMA_FIFO_THRESHOLD_FULL;
@@ -376,9 +368,11 @@ void I2C3_MspInit(I2C_HandleTypeDef *hi2c) {
 	HAL_NVIC_EnableIRQ(I2C3_DMA_RX_IRQn);
 }
 
-///////////////////////////////////////////////////////////////////////
-//                     DeInitialization Routines                     //
-///////////////////////////////////////////////////////////////////////
+/** @} Close I2C_Functions_Init group */
+
+/** @addtogroup I2C_Functions_DeInit De-Initialization Routines
+ *  @{
+ */
 
 /**
  * @brief Function to de-initialize I2C on a given set of pins
@@ -485,9 +479,12 @@ void I2C3_MspDeInit() {
 	HAL_NVIC_DisableIRQ(I2C3_DMA_RX_IRQn);
 }
 
-////////////////////////////////////////////////////////////////////////
-//                         Callback functions                         //
-////////////////////////////////////////////////////////////////////////
+/** @} Close I2C_Functions_DeInit group */
+
+/** @addtogroup I2C_Functions_Callbacks Interrupt Callbacks
+ *  @{
+ */
+
 // Silence some warnings
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -549,52 +546,62 @@ void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c) {
 }
 #pragma GCC diagnostic pop
 
-// TODO: Refactor these ISRs
-///////////////////////////////////////////////////////////////////////
-//                               ISRs                                //
-///////////////////////////////////////////////////////////////////////
-#if 0
-void I2C1_DMA_RX_IRQHandler(void) {
-	HAL_DMA_IRQHandler(i2cHandle.hdmarx);
+/** @} Close I2C_Functions_Callbacks group */
+
+/** @addtogroup I2C_Functions_ISRs Interrupt Service Routines
+ *  @{
+ */
+
+void I2C1_ER_IRQHandler() {
+	HAL_I2C_ER_IRQHandler(&i2cHandle);
 }
 
-void I2C1_DMA_TX_IRQHandler(void) {
-	HAL_DMA_IRQHandler(i2cHandle.hdmatx);
-}
+/** @} Close I2C_Functions_ISRs group */
 
-void I2C2_DMA_RX_IRQHandler(void) {
-	HAL_DMA_IRQHandler(i2cHandle.hdmarx);
-}
+/** @addtogroup I2C_Functions_Helpers Helper functions
+ *  @{
+ */
 
-void I2C2_DMA_TX_IRQHandler(void) {
-	HAL_DMA_IRQHandler(i2cHandle.hdmatx);
-}
-
-void I2C3_DMA_RX_IRQHandler(void) {
-	HAL_DMA_IRQHandler(i2cHandle.hdmarx);
-}
-
-void I2C3_DMA_TX_IRQHandler(void) {
-	HAL_DMA_IRQHandler(i2cHandle.hdmatx);
-}
-#endif
-
+/**
+ * @brief Helper function to determine if an i2cPin is a clock pin
+ * @param p Pin to check
+ * @return True if p is an i2c clock pin, false otherwise
+ */
 bool isSclPin(i2cPin p) {
+	// Array corresponding to the i2cPin enum class
 	bool map[14] = {true, true, false, true, false, true, false, false, false, true, true, false, true, false};
 
 	return map[(int)p];
 }
 
+/**
+ * @brief Helper function to determine if an i2cPin is a data pin
+ * @param p Pin to check
+ * @return True if p is an i2c data pin, false otherwise
+ */
 bool isSdaPin(i2cPin p) {
+	// Array corresponding to the i2cPin enum class
 	bool map[14] = {false, false, true, false, true, false, true, true, true, false, false, true, false, true};
 
 	return map[(int)p];
 }
 
+/** @} Close I2C_Functions_Helpers group */
+
+/** @defgroup I2C_Class I2C class
+ *  @brief Low-level i2c abstraction
+ *  @{
+ */
+
+/** @defgroup I2C_Class_Constructors Constructors
+ *  @brief Functions to obtain an I2C instance
+ *  @{
+ */
+
 /**
- * @brief This function is called to create an instance of the class
- * @param cl i2cPin to be used for the clock
- * @param da i2cPin to be used for the data
+ * @brief This function is called to create/get an instance of the class
+ * @param cl i2cPin to be used for the clock if the instance has not been created
+ * @param da i2cPin to be used for the data if the instance has not been created
  * @return Pointer to a I2C instance
  */
 I2C* I2C::Instance(i2cPin cl, i2cPin da) {
@@ -624,7 +631,6 @@ I2C::I2C(i2cPin cl, i2cPin da) {
 	if (!isSclPin(cl) || !isSdaPin(da)) {
 		// TODO: Do some error handling
 	}
-	// TODO: Also check if scl and sda are on the same I2Cx
 
 	// Initialize member variables
 	scl = cl;
@@ -633,6 +639,13 @@ I2C::I2C(i2cPin cl, i2cPin da) {
 	// Initialize the i2c peripheral
 	initI2C((int)scl, (int)sda);
 }
+
+/** @} Close I2C_Class_Constructors group */
+
+/** @defgroup I2C_Class_IO I/O Methods
+ *  @brief Methods to perform reads & writes
+ *  @{
+ */
 
 /**
  * @brief Member function to perform generic i2c writes as master
@@ -654,7 +667,6 @@ int8_t I2C::write(uint16_t devAddr, uint8_t *pData, uint16_t size) {
 }
 
 
-// TODO: Use double buffering
 /**
  * @brief Member function to perform generic i2c reads as master
  * @param devAddr i2c slave address of the device to read from (left-justified)
@@ -663,7 +675,10 @@ int8_t I2C::write(uint16_t devAddr, uint8_t *pData, uint16_t size) {
  * @return 0 on success, -1 on error
  */
 int8_t I2C::read(uint16_t devAddr, uint8_t *pData, uint16_t size) {
+	// Must wait until the I2C peripheral is ready, i.e., for any previous transfers to finish
 	while (HAL_I2C_GetState(&i2cHandle) != HAL_I2C_STATE_READY);
+
+	// Initiate a read
 	if (HAL_I2C_Master_Receive_DMA(&i2cHandle, devAddr, pData, size) != HAL_OK) {
 		return -1;
 	}
@@ -680,7 +695,10 @@ int8_t I2C::read(uint16_t devAddr, uint8_t *pData, uint16_t size) {
  * @return 0 on success, -1 on error
  */
 int8_t I2C::memWrite(uint16_t devAddr, uint16_t memAddr, uint8_t *pData, uint16_t size) {
+	// Must wait until the I2C peripheral is ready, i.e., for any previous transfers to finish
 	while (HAL_I2C_GetState(&i2cHandle) != HAL_I2C_STATE_READY);
+
+	// Initiate a memory write
 	if (HAL_I2C_Mem_Write_DMA(&i2cHandle, devAddr, memAddr, I2C_MEMADD_SIZE_8BIT, pData, size) != HAL_OK) {
 		return -1;
 	}
@@ -688,36 +706,6 @@ int8_t I2C::memWrite(uint16_t devAddr, uint16_t memAddr, uint8_t *pData, uint16_
 	return 0;
 }
 
-#if USE_DOUBLE_BUFFERING
-/**
- * @brief Member function to read a register from an i2c slave device (Using DMA double buffering)
- * @param devAddr i2c slave address of the device to read from (left-justified)
- * @param memAddr Address of the device register to read
- * @param pData1  Pointer to data ping-pong buffer 1
- * @param pData2  Pointer to data ping-pong buffer 2
- * @param size    Number of bytes to be read
- * @return		  1 if pData1 contains the valid data
- * 				  2 if pData2 contains the valid data
- * 				  -1 if HAL_Error returned
- */
-int8_t I2C::memRead(uint16_t devAddr, uint16_t memAddr, uint8_t *pData1, uint8_t *pData2, uint16_t size) {
-	// Must wait until the I2C peripheral is ready, i.e., for any previous transfers to finish
-	while(HAL_I2C_GetState(&i2cHandle) != HAL_I2C_STATE_READY);
-
-	// Initiate a memory read
-	// HAL_I2C_Mem_Read_DMA_Hacked utilizes DMA Double Buffering
-	if (HAL_I2C_Mem_Read_DMA_Hacked(&i2cHandle, devAddr, memAddr, I2C_MEMADD_SIZE_8BIT, pData1, pData2, size) != HAL_OK) {
-		return -1;
-	}
-
-	// If current target (CT) is 0, then DMA is writing to pData1
-	if ( (i2cHandle.hdmarx->Instance->CR & DMA_SxCR_CT) == 0) {
-		return 2;
-	} else { //if ( (i2cHandle.hdmarx->Instance->CR & DMA_SxCR_CT) == 1) {
-		return 1;
-	}
-}
-#else
 /**
  * @brief Member function to read a register from an i2c slave device
  * @param devAddr i2c slave address of the device to read from (left-justified)
@@ -738,7 +726,8 @@ int8_t I2C::memRead(uint16_t devAddr, uint16_t memAddr, uint8_t *pData1, uint16_
 
 	return 0;
 }
-#endif
+
+/** @} Close I2C_Class_IO group */
 
 /**
  * @brief Function to block until the peripheral is ready
@@ -747,3 +736,8 @@ void I2C::readyWait(void) {
 	// Must wait until the I2C peripheral is ready, i.e., for any previous transfers to finish
 	while(HAL_I2C_GetState(&i2cHandle) != HAL_I2C_STATE_READY);
 }
+
+/** @} Close I2C_Class group */
+
+/** @} Close I2C group */
+/** @} Close Peripherals Group */

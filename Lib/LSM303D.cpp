@@ -1,5 +1,5 @@
 /**
- * @file LSM303D.cpp
+ * @file
  *
  * @brief Class for interfacing with the ST LSM303D 3-axis accelerometer and magnetometer
  *
@@ -12,6 +12,18 @@
  *
  */
 
+/** @addtogroup Sensors
+ *  @{
+ */
+
+/** @addtogroup IMU
+ *  @{
+ */
+
+/** @addtogroup LSM303D
+ *  @{
+ */
+
 #include "LSM303D.h"
 
 /**
@@ -21,11 +33,13 @@ LSM303D::LSM303D()
 	: ax(PREFILTER_TAU), ay(PREFILTER_TAU), az(PREFILTER_TAU)
 //	: ax(), ay(), az()
 {
+	// Get a pointer to the logger
 	log = logger::instance();
 
 	// Save the i2c slave address of the sensor
 	address = 0b00111010;
 
+	// Initialize members
 	accXOffset = accYOffset = accZOffset = 0.0f;
 
 	// Initialize the I2C pointer
@@ -55,11 +69,13 @@ LSM303D::LSM303D(LSM303D_InitStruct init)
 	: ax(PREFILTER_TAU), ay(PREFILTER_TAU), az(PREFILTER_TAU)
 //	: ax(), ay(), az()
 {
+	// Get a pointer to the logger
 	log = logger::instance();
 
 	// Save the i2c slave address of the sensor
 	address = 0b00111010;
 
+	// Initialize members
 	accXOffset = accYOffset = accZOffset = 0.0f;
 
 	// Initialize the I2C pointer
@@ -131,9 +147,16 @@ void LSM303D::enable(LSM303D_InitStruct init) {
 //	GPIO_InitStruct.Speed 	= GPIO_SPEED_FAST;
 //	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+	// Calibrate the sensor to eliminate offset error
 	accCalibrate();
 }
 
+/**
+ * @brief Basic calibration to eliminate offset errors
+ *
+ * Initializes the offset members so offset error can be reduced/eliminated.
+ * The sensor must remain stationary during calibration.
+ */
 void LSM303D::accCalibrate(void) {
 	uint8_t samples = 128;
 	float ax_offset = 0.0f, ay_offset = 0.0f, az_offset = 0.0f;
@@ -171,37 +194,24 @@ void LSM303D::read(void) {
 /**
  * @brief  Initiates a read of the accelerometer data registers
  * @return  The return value of I2C::memRead()
- * 			DOUBLE BUFFERING: 1 or 2 means which buffer is readable, -1 means HAL_ERROR
- * 			ELSE: 0 on success, -1 on HAL_ERROR
+ * 			0 on success, -1 on HAL_ERROR
  * 			Updates data in accBuff
  */
 uint8_t LSM303D::readAcc(void) {
-#if USE_DOUBLE_BUFFERING
-	accBuffIndicator = i2c->memRead(address, ( (uint8_t)LSM303D_Reg::OUT_X_L_A | (1<<7) ), accBuff1, accBuff2, 6);
-	return accBuffIndicator;
-#else
+	// Read from the accelerometer registers
 	return i2c->memRead(address, ( (uint8_t)LSM303D_Reg::OUT_X_L_A | (1<<7) ), accBuff, 6);
-#endif
 }
 
 /**
- * @brief  Function to get the acceleration on the x axis
+ * @brief  Function to get the raw acceleration on the x axis
  * @return Raw x axis acceleration (register values)
  */
 int16_t LSM303D::getAccXRaw(void) {
-#if USE_DOUBLE_BUFFERING
-	if (accBuffIndicator == 1) {
-		return (accBuff1[1]<<8 | accBuff1[0]);
-	}
-	else if (accBuffIndicator == 2) {
-		return accBuff2[1]<<8 | accBuff2[0];
-	} else {
-		return 0;
-	}
-#else
+	// Wait for the measurement to be ready
 	i2c->readyWait();
+
+	// Return the raw X acceleration
 	return -(int16_t)(accBuff[1]<<8 | accBuff[0]);
-#endif
 }
 
 /**
@@ -218,6 +228,10 @@ float LSM303D::getAccX() {
 	return x;
 }
 
+/**
+ * @brief  Function to get the filtered acceleration in the x direction
+ * @return Filtered X acceleration (g)
+ */
 float LSM303D::getAccXFiltered() {
 	float32_t x = getAccX();
 	float xf = ax.filterSample(&x);
@@ -230,23 +244,15 @@ float LSM303D::getAccXFiltered() {
 }
 
 /**
- * @brief  Function to get the acceleration on the y axis
+ * @brief  Function to get the raw acceleration on the y axis
  * @return Raw y axis acceleration (register values)
  */
 int16_t LSM303D::getAccYRaw(void) {
-#if USE_DOUBLE_BUFFERING
-	if (accBuffIndicator == 1) {
-		return (accBuff1[3]<<8 | accBuff1[2]);
-	}
-	else if (accBuffIndicator == 2) {
-		return accBuff2[3]<<8 | accBuff2[2];
-	} else {
-		return 0;
-	}
-#else
+	// Wait for the measurement to be ready
 	i2c->readyWait();
+
+	// Return the raw Y acceleration
 	return -(int16_t)(accBuff[3]<<8 | accBuff[2]);
-#endif
 }
 
 /**
@@ -263,6 +269,10 @@ float LSM303D::getAccY() {
 	return y;
 }
 
+/**
+ * @brief  Function to get the filtered acceleration on the y axis
+ * @return Filtered Y accleration (g)
+ */
 float LSM303D::getAccYFiltered() {
 	float32_t y = getAccY();
 	float yf = ay.filterSample(&y);
@@ -275,23 +285,15 @@ float LSM303D::getAccYFiltered() {
 }
 
 /**
- * @brief  Function to get the acceleration on the z axis
+ * @brief  Function to get the raw acceleration on the z axis
  * @return Raw z axis acceleration (register values)
  */
 int16_t LSM303D::getAccZRaw(void) {
-#if USE_DOUBLE_BUFFERING
-	if (accBuffIndicator == 1) {
-		return accBuff1[5]<<8 | accBuff1[4];
-	}
-	else if (accBuffIndicator == 2) {
-		return accBuff2[5]<<8 | accBuff2[4];
-	} else {
-		return 0;
-	}
-#else
+	// Wait for the measurement to be ready
 	i2c->readyWait();
+
+	// Return the raw Z acceleration
 	return (int16_t)(accBuff[5]<<8 | accBuff[4]);
-#endif
 }
 
 /**
@@ -308,6 +310,10 @@ float LSM303D::getAccZ() {
 	return z;
 }
 
+/**
+ * @brief  Function to get the filtered acceleration on the z-axis
+ * @return Filtered Z acceleration (g)
+ */
 float LSM303D::getAccZFiltered() {
 	float32_t z = getAccZ();
 	float zf = az.filterSample(&z);
@@ -319,13 +325,15 @@ float LSM303D::getAccZFiltered() {
 	return zf;
 }
 
+/**
+ * @brief  Initiates a read of all 3 magnetometer axes
+ * @return The return value of I2C::memRead()
+ * 			0 on success, -1 on HAL_ERROR
+ * 			Updates data in magBuff
+ */
 uint8_t LSM303D::readMag(void) {
-#if USE_DOUBLE_BUFFERING
-	magBuffIndicator = i2c->memRead(address, ( (uint8_t)LSM303D_Reg::OUT_X_L_M | (1<<7) ), magBuff1, magBuff2, 6);
-	return magBuffIndicator;
-#else
 	return i2c->memRead(address, ( (uint8_t)LSM303D_Reg::OUT_X_L_M | (1<<7) ), magBuff, 6);
-#endif
+
 }
 
 /**
@@ -333,19 +341,11 @@ uint8_t LSM303D::readMag(void) {
  * @return Raw x axis magnetic field (register values)
  */
 int16_t LSM303D::getMagXRaw(void) {
-#if USE_DOUBLE_BUFFERING
-	if (magBuffIndicator == 1) {
-		return magBuff1[1]<<8 | magBuff1[0];
-	}
-	else if (magBuffIndicator == 2) {
-		return magBuff2[1]<<8 | magBuff2[0];
-	} else {
-		return 0;
-	}
-#else
+	// Wait for the measurement to be ready
 	i2c->readyWait();
+
+	// Return the raw x magnetic reading
 	return (int16_t)(magBuff[1]<<8 | magBuff[0]);
-#endif
 }
 
 /**
@@ -362,19 +362,11 @@ float LSM303D::getMagX() {
  * @return Raw y axis magnetic field (register values)
  */
 int16_t LSM303D::getMagYRaw(void) {
-#if USE_DOUBLE_BUFFERING
-	if (magBuffIndicator == 1) {
-		return magBuff1[3]<<8 | magBuff1[2];
-	}
-	else if (magBuffIndicator == 2) {
-		return magBuff2[3]<<8 | magBuff2[2];
-	} else {
-		return 0;
-	}
-#else
+	// Wait for the measurement to be ready
 	i2c->readyWait();
+
+	// Return the raw y magnetic reading
 	return (int16_t)(magBuff[3]<<8 | magBuff[2]);
-#endif
 }
 
 /**
@@ -391,19 +383,11 @@ float LSM303D::getMagY() {
  * @return Raw z axis magnetic field (register values)
  */
 int16_t LSM303D::getMagZRaw(void) {
-#if USE_DOUBLE_BUFFERING
-	if (magBuffIndicator == 1) {
-		return magBuff1[5]<<8 | magBuff1[4];
-	}
-	else if (magBuffIndicator == 2) {
-		return magBuff2[5]<<8 | magBuff2[4];
-	} else {
-		return 0;
-	}
-#else
+	// Wait for the measurement to be ready
 	i2c->readyWait();
+
+	// Return the raw z magnetic reading
 	return (int16_t)(magBuff[5]<<8 | magBuff[4]);
-#endif
 }
 
 /**
@@ -415,4 +399,6 @@ float LSM303D::getMagZ() {
 	return retVal;
 }
 
-
+/** @} Close LSM303D group */
+/** @} Close IMU group */
+/** @} Close Sensors Group */

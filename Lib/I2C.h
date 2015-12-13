@@ -1,12 +1,21 @@
 /**
- * @file I2C.h
+ * @file
  *
  * @brief Low level i2c class
  *
  * @author Jeremiah Simonsen
+ * @author Jasmine Despres
  *
  * @date Sep 27, 2015
  *
+ */
+
+/** @addtogroup Peripherals
+ *  @{
+ */
+
+/** @addtogroup I2C
+ *  @{
  */
 
 #ifndef I2C_H_
@@ -14,12 +23,15 @@
 
 #include "stm32f4xx_hal.h"
 #include "stm32f4_discovery.h"
-//#include "I2C_Msp.h"
 
-#define USE_DOUBLE_BUFFERING 0
+/** @addtogroup I2C_Defines Definitions
+ *  @{
+ */
 
-//BEGIN: I2C_MSP.h
-#if 1
+/** @addtogroup I2C_Defines_I2C1 I2C1 Defines
+ *  @{
+ */
+
 /*
  * Definitions for I2C1
  */
@@ -32,6 +44,12 @@
 #define I2C1_DMA_RX_IRQn                DMA1_Stream5_IRQn
 #define I2C1_DMA_TX_IRQHandler          DMA1_Stream6_IRQHandler
 #define I2C1_DMA_RX_IRQHandler          DMA1_Stream5_IRQHandler
+
+/** @} Close I2C_Defines_I2C1 group */
+
+/** @addtogroup I2C_Defines_I2C2 I2C2 Defines
+ *  @{
+ */
 
 /*
  * Definitions for I2C2
@@ -46,6 +64,12 @@
 #define I2C2_DMA_TX_IRQHandler          DMA1_Stream7_IRQHandler
 #define I2C2_DMA_RX_IRQHandler          DMA1_Stream3_IRQHandler
 
+/** @} Close I2C_Defines_I2C2 group */
+
+/** @addtogroup I2C_Defines_I2C3 I2C3 Defines
+ *  @{
+ */
+
 /*
  * Definitions for I2C3
  */
@@ -59,15 +83,14 @@
 #define I2C3_DMA_TX_IRQHandler          DMA1_Stream4_IRQHandler
 #define I2C3_DMA_RX_IRQHandler          DMA1_Stream2_IRQHandler
 
-void initI2C(int scl, int sda);
-void deInitI2C(int scl, int sda);
+/** @} Close I2C_Defines_I2C3 group */
 
-//extern "C"{
-//	extern I2C_HandleTypeDef i2cHandle;
-//};
-#endif
-//END: I2C_MSP
+//void initI2C(int scl, int sda);
+//void deInitI2C(int scl, int sda);
 
+/**
+ * @brief GPIO pins with i2c functionality
+ */
 enum class i2cPin {
 	PA8 = 0,// I2C3_SCL
 	PB6,	// I2C1_SCL
@@ -85,20 +108,36 @@ enum class i2cPin {
 	PH8,	// I2C3_SDA
 };
 
+// TODO: Move to config
 #define I2C_SCL_PIN (i2cPin::PB6)
 #define I2C_SDA_PIN (i2cPin::PB9)
 
+/**
+ * @brief Class for low-level i2c operations
+ *
+ * This class is responsible for low-level i2c reads and writes. It uses a
+ * singleton design pattern so that it is impossible to create more than one
+ * instance. This is because i2c transfers are done via DMA. DMA completion
+ * ISRs require the i2cHandle to be global.
+ *
+ * To use the class, an I2C* must be fetched using I2C::Instance(). Reads and
+ * writes (general and memory) can then be freely performed using the member
+ * functions. If the i2c hardware peripheral is busy performing an I/O operation,
+ * it will block until it is available to perform the next operation.
+ */
 class I2C {
 private:
 	// Constructors are private so it can't be called from outside code
+
 	I2C();
 	I2C(i2cPin cl, i2cPin da);
 	I2C(I2C const&);
 	I2C& operator=(I2C const&);
 
-	i2cPin scl, sda;
+	i2cPin scl;					///< i2c clock GPIO pin
+	i2cPin sda;					///< i2c data GPIO pin
 
-	static I2C *i2cInstance;
+	static I2C *i2cInstance;	///< Pointer to the singleton instance
 
 public:
 	static I2C* Instance(i2cPin cl, i2cPin da);
@@ -108,14 +147,13 @@ public:
 
 	int8_t memWrite(uint16_t devAddr, uint16_t memAddr, uint8_t *pData, uint16_t size);
 
-#if USE_DOUBLE_BUFFERING
-	int8_t memRead(uint16_t devAddr, uint16_t memAddr, uint8_t *pData1, uint8_t *pData2, uint16_t size);
-#else
 	int8_t memRead(uint16_t devAddr, uint16_t memAddr, uint8_t *pData1, uint16_t size);
-#endif
 
 	void readyWait(void);
 };
 
 
 #endif
+
+/** @} Close I2C group */
+/** @} Close Peripherals Group */

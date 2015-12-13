@@ -9,6 +9,15 @@
  *
  */
 
+/** @addtogroup Peripherals
+ *  @{
+ */
+
+/** @defgroup Adc ADC (Analog to Digital Converter)
+ *  @brief Module for reading from the ADC
+ *  @{
+ */
+
 #include "Adc.h"
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_hal_adc.h"
@@ -19,42 +28,41 @@
 
 static ADC_HandleTypeDef AdcHandle;
 
+/** @defgroup Adc_Class Adc class
+ *  @brief ADC abstraction for reading analog values
+ *  @{
+ */
+
+/** @defgroup Adc_Class_Constructors Constructors/Initialization
+ *  @brief Functions to obtain an Adc object
+ *  @{
+ */
+
+/**
+ * @brief Default constructor to initialize ADC for reading pin PA2
+ */
 Adc::Adc() {
 	pin = AdcPin::PA2;
 
+	// Initialize the ADC
 	initAdc(pin);
 }
 
+/**
+ * @brief Constructor to initialize the ADC for reading from specified pin
+ * @param p
+ */
 Adc::Adc(AdcPin p) {
 	pin = p;
 
+	// Initialize the ADC
 	initAdc(pin);
 }
 
-uint32_t Adc::read() {
-	uint32_t retval;
-
-	// Start the conversion
-	if (HAL_ADC_Start(&AdcHandle) != HAL_OK) {
-		// TODO: Error_Handler();
-		while(1);
-	}
-
-	// Wait for end of conversion
-	if (HAL_ADC_PollForConversion(&AdcHandle, 1000) != HAL_OK) {
-		// TODO: Error_Handler();
-		while(1);
-	}
-
-	// Get the conversion value
-	retval = HAL_ADC_GetValue(&AdcHandle);
-
-	// Stop the ADC
-	HAL_ADC_Stop(&AdcHandle);
-
-	return retval;
-}
-
+/**
+ * @brief Initialize hardware so ADC can read from pin p
+ * @param p GPIO pin to read from
+ */
 void Adc::initAdc(AdcPin p) {
 	GPIO_InitTypeDef GPIO_InitStruct;
 
@@ -103,6 +111,48 @@ void Adc::initAdc(AdcPin p) {
 	}
 }
 
+/** @} Close Adc_Class_Constructors group */
+
+/** @addtogroup Adc_Class_IO I/O
+ *  @{
+ */
+
+/**
+ * @brief Perform a conversion and read from the ADC data register
+ * @return Raw sample value
+ */
+uint32_t Adc::read() {
+	uint32_t retval;
+
+	// Start the conversion
+	if (HAL_ADC_Start(&AdcHandle) != HAL_OK) {
+		// TODO: Error_Handler();
+		while(1);
+	}
+
+	// Wait for end of conversion
+	if (HAL_ADC_PollForConversion(&AdcHandle, 1000) != HAL_OK) {
+		// TODO: Error_Handler();
+		while(1);
+	}
+
+	// Get the conversion value
+	retval = HAL_ADC_GetValue(&AdcHandle);
+
+	// Stop the ADC
+	HAL_ADC_Stop(&AdcHandle);
+
+	return retval;
+}
+
+/** @} Close Adc_Class_IO group */
+
+/** @} Close Adc_Class group */
+
+/** @addtogroup Adc_Functions Functions
+ *  @{
+ */
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 void HAL_ADC_MspInit(ADC_HandleTypeDef *hadc) {
@@ -114,3 +164,8 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef *hadc) {
 	// GPIO configured in initAdc()
 }
 #pragma GCC diagnostic pop
+
+/** @} Close Adc_Functions group */
+
+/** @} Close Adc group */
+/** @} Close Peripherals Group */

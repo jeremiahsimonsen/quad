@@ -1,5 +1,5 @@
 /**
- * @file IMU.cpp
+ * @file
  *
  * @brief Class for interacting with the inertial measurement unit
  *
@@ -10,62 +10,64 @@
  *
  */
 
+/** @addtogroup Sensors
+ *  @{
+ */
+
+/** @addtogroup IMU
+ *  @{
+ */
+
 #include "IMU.h"
 #include <math.h>
 
+// Define for whether or not pre-filtered sensor data should be used for calculations
 #define USE_PREFILTERED
 
+/**
+ * @brief Create an IMU object with default sensor configurations
+ *
+ * Initializes each of the sensors and the required filters
+ */
 IMU::IMU()
 	: barometer(), gyro(), accel(),
 	  aFilter_x(COMPLEMENTARY_TAU), aFilter_y(COMPLEMENTARY_TAU),
 	  gFilter_x(COMPLEMENTARY_TAU), gFilter_y(COMPLEMENTARY_TAU)
 {
+	// Initialize members
 	rate_roll = rate_pitch = angle_roll = angle_pitch = 0.0f;
 	log = logger::instance();
 }
 
+/**
+ * @brief Create an IMU object with a given sensor configuration
+ * @param gyroConfig  Configuration options for the gyro
+ * @param accelConfig Configuration options for the accelerometer/magnetometer
+ */
 IMU::IMU(L3GD20H_InitStruct gyroConfig, LSM303D_InitStruct accelConfig)
 	: barometer(), gyro(gyroConfig), accel(accelConfig),
 	  aFilter_x(COMPLEMENTARY_TAU), aFilter_y(COMPLEMENTARY_TAU),
 	  gFilter_x(COMPLEMENTARY_TAU), gFilter_y(COMPLEMENTARY_TAU)
 {
+	// Initialize members
 	rate_roll = rate_pitch = angle_roll = angle_pitch = 0.0f;
 	log = logger::instance();
 }
 
+/**
+ * @brief  Sample rate measurement
+ * @return The sample time
+ */
 float IMU::getDT(void) {
 	return gyro.getDT();
 }
 
-#if 0 // 4pcb code
-float IMU::getRoll(void) {
-	// Initiate a new read
-	accel.read();
-	gyro.read();
-
-	rate_roll = gyro.getX();
-	angle_roll = COMPLEMENTARY_TAU * (angle_roll + rate_roll * gyro.getDT());
-	angle_roll += (1.0f - COMPLEMENTARY_TAU) * (accel.getAccX());
-
-	return angle_roll;
-}
-
+/**
+ * @brief  Calculate the pitch angle
+ * @return The pitch angle [deg]
+ */
 float IMU::getPitch(void) {
-	// Initiate a new read
-	accel.read();
-	gyro.read();
-
-	rate_pitch = gyro.getY();
-	angle_pitch = COMPLEMENTARY_TAU * (angle_pitch + rate_pitch * gyro.getDT());
-	angle_pitch += (1.0f - COMPLEMENTARY_TAU) * (accel.getAccY());
-
-	return angle_pitch;
-}
-#endif
-
-#if 1
-float IMU::getPitch(void) {
-	// Initiate a new read
+	// Initiate new reads
 	accel.read();
 	gyro.read();
 
@@ -74,17 +76,13 @@ float IMU::getPitch(void) {
 	ax_f = accel.getAccXFiltered();
 	ay_f = accel.getAccYFiltered();
 	az_f = accel.getAccZFiltered();
-//	ax_f = accel.getAccX();
-//	ay_f = accel.getAccY();
-//	az_f = accel.getAccZ();
 
 	// Fetch the pre-filtered gyroscope data [deg/s]
 	float gx_f;
 	gx_f = gyro.getXFiltered();
 	gyro.getYFiltered();
-//	gx_f = gyro.getX();
 
-	// Calculate roll angle based on accelerometer data
+	// Calculate pitch angle based on accelerometer data
 	float angle_x;
 	angle_x = atan2f(ax_f, sqrtf(ay_f*ay_f + az_f*az_f)) * 180.0f / PI;
 
@@ -94,6 +92,7 @@ float IMU::getPitch(void) {
 	log->log(buff);
 #endif
 
+	// Alternate implementation
 //	angle_pitch = COMPLEMENTARY_TAU * (angle_pitch + gx_f * gyro.getDT()) + (1.0f - COMPLEMENTARY_TAU) * (angle_x);
 
 	// Complementary filter the accelerometer calculated angle
@@ -111,8 +110,12 @@ float IMU::getPitch(void) {
 //	return angle_pitch;
 }
 
+/**
+ * @brief  Calculate the roll angle
+ * @return The roll angle [deg]
+ */
 float IMU::getRoll(void) {
-	// Initiate a new read
+	// Initiate new reads
 	accel.read();
 	gyro.read();
 
@@ -121,15 +124,11 @@ float IMU::getRoll(void) {
 	ax_f = accel.getAccXFiltered();
 	ay_f = accel.getAccYFiltered();
 	az_f = accel.getAccZFiltered();
-//	ax_f = accel.getAccX();
-//	ay_f = accel.getAccY();
-//	az_f = accel.getAccZ();
 
 	// Fetch the pre-filtered gyroscope data [deg/s]
 	float gy_f;
 	gyro.getXFiltered();
 	gy_f = gyro.getYFiltered();
-//	gy_f = gyro.getY();
 
 	// Calculate pitch angle based on accelerometer data
 	float angle_y;
@@ -141,6 +140,7 @@ float IMU::getRoll(void) {
 	log->log(buff);
 #endif
 
+	// Alternate implementation
 //	angle_roll = COMPLEMENTARY_TAU * (angle_roll + gy_f * gyro.getDT()) + (1.0f-COMPLEMENTARY_TAU)*angle_y;
 
 	// Complementary filter the accelerometer calculated angle
@@ -158,11 +158,15 @@ float IMU::getRoll(void) {
 //	return angle_roll;
 }
 
+/**
+ * @brief Calculate the roll and pitch simultaneously
+ * @param roll  [out] The roll angle [deg]
+ * @param pitch [out] The pitch angle [deg]
+ */
 void IMU::getRollPitch(float *roll, float*pitch) {
-	// Initiate a new read
+	// Initiate new reads
 	accel.read();
 	gyro.read();
-
 
 	float ax_f, ay_f, az_f;
 	float gx_f, gy_f;
@@ -229,7 +233,6 @@ void IMU::getRollPitch(float *roll, float*pitch) {
 #endif
 }
 
-#endif
-
-
+/** @} Close IMU group */
+/** @} Close Peripherals Group */
 

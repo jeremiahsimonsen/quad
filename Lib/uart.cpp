@@ -1,21 +1,43 @@
+/**
+ * @file
+ *
+ * @brief	Definitions for UART communication
+ *
+ * @author 	Jeremiah Simonsen
+ * @author  Jasmine Despres
+ *
+ * @date 	Jul 13, 2015
+ * 
+ */
+
+/** @addtogroup Peripherals
+ *  @{
+ */
+
+/** @defgroup UART UART Communication
+ *  @brief Module for communication via UART - required for remote control using XBees.
+ *  @{
+ */
+
 #include "uart.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
-//UART_HandleTypeDef UartHandle;
 static __IO ITStatus UartReady = RESET;
 static DMA_HandleTypeDef hdma_tx;
 static DMA_HandleTypeDef hdma_rx;
 static volatile int8_t validRx = -1;
 static volatile bool dataRead = false;
-static HAL_LockTypeDef rxLock = HAL_UNLOCKED;
 
 static volatile uint8_t DmaBuff[2*TRANSFER_SIZE] = {0};
 static volatile uint8_t readBuffPing[TRANSFER_SIZE] = {0};
 static volatile uint8_t readBuffPong[TRANSFER_SIZE] = {0};
 static volatile bool pingPongBar = true;		// true means ping can be read - write to pong
 
+/*
+ * Locking Macros
+ */
 #define _GET_LOCK_RETURN(__LOCK__)								\
 							do{									\
 								if((__LOCK__) == HAL_LOCKED)	\
@@ -43,9 +65,9 @@ static volatile bool pingPongBar = true;		// true means ping can be read - write
 								(__LOCK__) = HAL_UNLOCKED;		\
 							} while (0)
 
-///////////////////////////////////////////////////////////////////////
-//                     Function Pre-Declarations                     //
-///////////////////////////////////////////////////////////////////////
+/*
+ * Function Pre-Declarations
+ */
 void HAL_UART_MspInit(UART_HandleTypeDef *huart);
 void USART1MspInit(void);
 void USART2MspInit(void);
@@ -70,52 +92,31 @@ void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart);
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle);
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *UartHandle);
 
-//void USART1_TX_DMA_IRQHandler(void);
-//void USART1_RX_DMA_IRQHandler(void);
 void USART1_IRQHandler(void);
 
-//void USART2_TX_DMA_IRQHandler(void);
-//void USART2_RX_DMA_IRQHandler(void);
 void USART2_IRQHandler(void);
 
-//void USART3_TX_DMA_IRQHandler(void);
-//void USART3_RX_DMA_IRQHandler(void);
 void USART3_IRQHandler(void);
 
-//void UART4_TX_DMA_IRQHandler(void);
-//void UART4_RX_DMA_IRQHandler(void);
 void UART4_IRQHandler(void);
 
-//void UART5_TX_DMA_IRQHandler(void);
-//void UART5_RX_DMA_IRQHandler(void);
 void UART5_IRQHandler(void);
 
-//void USART6_TX_DMA_IRQHandler(void);
-//void USART6_RX_DMA_IRQHandler(void);
 void USART6_IRQHandler(void);
 #ifdef __cplusplus
 }
 #endif
 
-///////////////////////////////////////////////////////////////////////
-//                      Initialization Routines                      //
-///////////////////////////////////////////////////////////////////////
-
-/**
-* @brief Initializes the U(S)ART port specified by @uart_num
-* @details Initializes the U(S)ART port specified by @uart_num to settings
-* 		 specified by optional arguments. 
-* 		 Usage is:
-* 		 	init_USART(uart_num, num_args[, baud_rate[, wordlength[, stop_bits[, parity[, hw_flow_ctrl[, mode[, oversampling]]]]]]])
-* 
-* @param uart_num 		Number of the U(S)ART port to initialize
-* @param num_args 		Number of arguments to the function
-*/
+/*
+ * U(S)ART initialization wrapper function
+ */
 void init_USART(int uart_num, int num_args, ...)
 {
+	// Required for variadic functions
 	va_list ap;
 	va_start(ap, num_args);
 
+	// Select the desired U(S)ART port according to the number
 	switch (uart_num) {
 		case 1: UartHandle.Instance = USART1; break;
 		case 2: UartHandle.Instance = USART2; break;
@@ -175,7 +176,7 @@ void init_USART(int uart_num, int num_args, ...)
 		default: break;
 	}
 
-	va_end(ap);
+	va_end(ap);		// Required for variadics
 
 	// Note that HAL_UART_Init() calls HAL_UART_MspInit() (MPU-specific initialization)
 	if(HAL_UART_Init(&UartHandle) != HAL_OK)
@@ -184,10 +185,58 @@ void init_USART(int uart_num, int num_args, ...)
 		while(1);
 	}
 
+	// The UART peripheral is now ready to transmit
 	UartReady = SET;
 }
 
 /*
+ * Send a string over UART
+ */
+void usart_transmit(uint8_t *s)
+{
+	uint16_t len;
+
+	while (UartReady != SET);
+	UartReady = RESET;
+
+	len = strlen((char *)s);
+
+	if (HAL_UART_Transmit_DMA(&UartHandle, s, len) != HAL_OK)
+	{
+		// TODO: Error Handler();
+	}
+}
+
+/*
+ * Start DMAs for UART RX
+ */
+void usart_receive_begin() {
+	if (HAL_UART_Receive_DMA(&UartHandle, (uint8_t *)DmaBuff, 2*TRANSFER_SIZE)) {
+		// TODO: Error_Handler();
+	}
+}
+
+/*
+ * Read the buffer of data from UART RX
+ */
+uint8_t* usart_read(void) {
+	if (dataRead == true || validRx < 0) {
+		return NULL;
+	} else {
+		dataRead = true;
+		return pingPongBar == true ? (uint8_t *)readBuffPing : (uint8_t *)readBuffPong;
+	}
+}
+
+/*
+ * Initialization Functions
+ */
+
+/** @addtogroup UART_Initialization UART Initialization
+ *  @{
+ */
+
+/**
  * @brief UART MSP Initialization 
  *        This function configures the hardware resources used: 
  *           - Peripheral's clock enable
@@ -718,9 +767,15 @@ void USART6MspInit()
 	HAL_NVIC_EnableIRQ(USART6_IRQn);
 }
 
-///////////////////////////////////////////////////////////////////////
-//                     DeInitialization Routines                     //
-///////////////////////////////////////////////////////////////////////
+/** @} Close UART_Initialization group */
+
+/*
+ * De-Initialization Routines
+ */
+
+/** @addtogroup UART_DeInitialization UART De-Initialization
+ *  @{
+ */
 
 /**
  * @brief UART MSP De-Initialization 
@@ -733,6 +788,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
 {
 	uint32_t inst = (uint32_t)huart->Instance;
 
+	// Call the appropriate helper function based on the port being de-initialized
 	switch (inst) {
 		case (uint32_t)USART1: 	USART1MspDeInit();
 					 	 	 	break;
@@ -750,7 +806,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
 	}
 }
 
-//                      DeInitialization Helpers                     //
+//                      De-Initialization Helpers                     //
 
 /**
  * @brief Helper function. MspDeInit routine for USART1
@@ -884,39 +940,78 @@ void USART6MspDeInit()
 	HAL_NVIC_DisableIRQ(USART6_RX_DMA_IRQn);
 }
 
-////////////////////////////////////////////////////////////////////////
-//                         Callback functions                         //
-////////////////////////////////////////////////////////////////////////
+/** @} Close UART_DeInitialization group */
 
+/*
+ * Callback functions
+ */
+
+/** @addtogroup UART_Callbacks Interrupt Callbacks
+ *  @{
+ */
+
+// Pragmas to silence compiler warnings for these functions
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
+/**
+ * @brief UART TX Complete callback
+ *
+ * This function is called from within the appropriate DMAx_Streamy_IRQHandler()
+ * when the DMA transfer is complete - i.e., when all the bytes in s have been
+ * sent after usart_transmit() is caled.
+ *
+ * @param huart Pointer to UartHandle
+ */
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
 	UartReady = SET;
-//	BSP_LED_On(LED6);
 }
 
+/**
+ * @brief UART RX Half Complete callback
+ *
+ * This function is called from within the appropriate DMAx_Streamy_IRQHandler()
+ * when the DMA transfer is half complete - i.e., when a single "remote control"
+ * buffer has been received.
+ *
+ * @param huart Pointer to UartHandle
+ */
 void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart) {
 //	_GET_LOCK_NORETURN(rxLock);
 	validRx = 0;
-//	dataRead = false;
 //	_UNLOCK(rxLock);
+
+	// False means Pong can be read, so write to Ping
 	if (pingPongBar == false) {
 		// Copy first half of DmaBuff to readPing
 		for (int i = 0; i < TRANSFER_SIZE; i++) {
 			readBuffPing[i] = DmaBuff[i];
 		}
+		// Switch buffers
 		pingPongBar = true;
-	} else {
+	} else {	// True means Ping can be read, so write to Pong
+		// Copy first half of DmaBuff to readPong
 		for (int i = 0; i < TRANSFER_SIZE; i++) {
 			readBuffPong[i] = DmaBuff[i];
 		}
+		// Switch buffers
 		pingPongBar = false;
 	}
+
+	// Have new data that hasn't been read
 	dataRead = false;
 }
 
+/**
+ * @brief UART RX Complete Callback
+ *
+ * This function is caled from within the appropriate DMAx_Streamy_IRQHandler()
+ * when the DMA transfer is complete - i.e., when a second "remote control"
+ * buffer has been received.
+ *
+ * @param huart Pointer to UartHandle
+ */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 //	UartReady = SET;
@@ -925,19 +1020,33 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 //	dataRead = false;
 //	_UNLOCK(rxLock);
 
+	// False means Pong can be read, so write to Ping
 	if (pingPongBar == false) {
+		// Copy the second half of DmaBuff to readPing
 		for (int i = 0; i < TRANSFER_SIZE; i++) {
 			readBuffPing[i] = DmaBuff[TRANSFER_SIZE+i];
 		}
 		pingPongBar = true;
-	} else {
+	} else {	// True means Ping can be read, so write to Pong
+		// Copy the second half of DmaBuff to readPong
 		for (int i = 0; i < TRANSFER_SIZE; i++) {
 			readBuffPong[i] = DmaBuff[TRANSFER_SIZE+i];
 		}
+		// Switch buffers
+		pingPongBar = false;
 	}
+
+	// Have new data that hasn't been read
 	dataRead = false;
 }
 
+/**
+ * @brief UART Error callback
+ *
+ * This function is called when the UART detects an error
+ *
+ * @param huart Pointer to UartHandle
+ */
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 {
 	// TODO: Change to Error_Handler() after refactoring to error.h
@@ -950,143 +1059,77 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 
 #pragma GCC diagnostic pop
 
-///////////////////////////////////////////////////////////////////////
-//                               ISRs                                //
-///////////////////////////////////////////////////////////////////////
+/** @} Close UART_Callbacks group */
 
-#if 0
-void USART1_TX_DMA_IRQHandler(void)
-{
-	HAL_DMA_IRQHandler(UartHandle.hdmatx);
-}
+/*
+ * ISRs
+ */
 
-void USART1_RX_DMA_IRQHandler(void)
-{
-	HAL_DMA_IRQHandler(UartHandle.hdmarx);
-}
-#endif
+/** @addtogroup UART_ISRs UART Interrupt Service Routines
+ *  @{
+ */
 
+/**
+ * @brief USART1 Interrupt Service Routine
+ *
+ * Resets interrupt flags and handles errors
+ */
 void USART1_IRQHandler(void)
 {
 	HAL_UART_IRQHandler(&UartHandle);
 }
 
-#if 0
-void USART2_TX_DMA_IRQHandler(void)
-{
-	HAL_DMA_IRQHandler(UartHandle.hdmatx);
-}
-
-void USART2_RX_DMA_IRQHandler(void)
-{
-	HAL_DMA_IRQHandler(UartHandle.hdmarx);
-}
-#endif
-
+/**
+ * @brief USART2 Interrupt Service Routine
+ *
+ * Resets interrupt flags and handles errors
+ */
 void USART2_IRQHandler(void)
 {
 	HAL_UART_IRQHandler(&UartHandle);
 }
 
-#if 0
-void USART3_TX_DMA_IRQHandler(void)
-{
-	HAL_DMA_IRQHandler(UartHandle.hdmatx);
-}
-
-void USART3_RX_DMA_IRQHandler(void)
-{
-	HAL_DMA_IRQHandler(UartHandle.hdmarx);
-}
-#endif
-
+/**
+ * @brief USART3 Interrupt Service Routine
+ *
+ * Resets interrupt flags and handles errors
+ */
 void USART3_IRQHandler(void)
 {
 	HAL_UART_IRQHandler(&UartHandle);
 }
 
-#if 0
-void UART4_TX_DMA_IRQHandler(void)
-{
-	HAL_DMA_IRQHandler(UartHandle.hdmatx);
-}
-
-void UART4_RX_DMA_IRQHandler(void)
-{
-	HAL_DMA_IRQHandler(UartHandle.hdmarx);
-}
-#endif
-
+/**
+ * @brief UART4 Interrupt Service Routine
+ *
+ * Resets interrupt flags and handles errors
+ */
 void UART4_IRQHandler(void)
 {
 	HAL_UART_IRQHandler(&UartHandle);
 }
 
-#if 0
-void UART5_TX_DMA_IRQHandler(void)
-{
-	HAL_DMA_IRQHandler(UartHandle.hdmatx);
-}
-
-void UART5_RX_DMA_IRQHandler(void)
-{
-	HAL_DMA_IRQHandler(UartHandle.hdmarx);
-}
-#endif
-
+/**
+ * @brief UART5 Interrupt Service Routine
+ *
+ * Resets interrupt flags and handles errors
+ */
 void UART5_IRQHandler(void)
 {
 	HAL_UART_IRQHandler(&UartHandle);
 }
 
-#if 0
-void USART6_TX_DMA_IRQHandler(void)
-{
-	HAL_DMA_IRQHandler(UartHandle.hdmatx);
-}
-
-void USART6_RX_DMA_IRQHandler(void)
-{
-	HAL_DMA_IRQHandler(UartHandle.hdmarx);
-}
-#endif
-
+/**
+ * @brief USART6 Interrupt Service Routine
+ *
+ * Resets interrupt flags and handles errors
+ */
 void USART6_IRQHandler(void)
 {
 	HAL_UART_IRQHandler(&UartHandle);
 }
 
-///////////////////////////////////////////////////////////////////////
-//                         Transmit function                         //
-///////////////////////////////////////////////////////////////////////
-void usart_transmit(uint8_t *s)
-{
-	uint16_t len;
+/** @} Close UART_ISRs group */
 
-	while (UartReady != SET);
-	UartReady = RESET;
-
-	len = strlen((char *)s);
-
-	if (HAL_UART_Transmit_DMA(&UartHandle, s, len) != HAL_OK)
-	{
-		// TODO: Error Handler();
-	}
-}
-
-void usart_receive_begin() {
-	if (HAL_UART_Receive_DMA(&UartHandle, (uint8_t *)DmaBuff, 2*TRANSFER_SIZE)) {
-		// TODO: Error_Handler();
-	}
-}
-
-uint8_t* usart_read(void) {
-	if (dataRead == true || validRx < 0) {
-		return NULL;
-	} else {
-		dataRead = true;
-		return pingPongBar == true ? (uint8_t *)readBuffPing : (uint8_t *)readBuffPong;
-	}
-}
-
-
+/** @} Close UART group */
+/** @} Close Peripherals Group */

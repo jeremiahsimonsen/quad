@@ -1,5 +1,5 @@
 /**
- * @file L3GD20H.h
+ * @file
  *
  * @brief Class for interfacing with the ST L3GD20H 3-axis gyroscope
  *
@@ -10,6 +10,18 @@
  *
  * Based in part on the l3g-arduino library from Pololu Corp. See license.txt for details
  *
+ */
+
+/** @addtogroup Sensors
+ *  @{
+ */
+
+/** @addtogroup IMU
+ *  @{
+ */
+
+/** @addtogroup L3GD20H L3GD20H gyroscope chip-specific class
+ *  @{
  */
 
 #ifndef L3GD20H_H_
@@ -25,7 +37,7 @@
 #include "preFilterGyro.h"
 
 /**
- * Register enumerations for the ST L3GD20H gyro
+ * @brief Register enumerations for the ST L3GD20H gyro
  */
 enum class L3GD20H_Reg {
 	WHO_AM_I	=	0x0F,   //!< WHO_AM_I
@@ -67,8 +79,12 @@ enum class L3GD20H_Reg {
 	LOW_ODR		=	0x39    //!< LOW_ODR
 };
 
+/** @addtogroup L3GD20H_Macros Register Access Macros
+ *  @{
+ */
+
 /**
- * BitField macros for writable registers
+ * @brief BitField macros for CTRL1
  */
 #if 1 // L3GD20H CTRL1 BitFields
 #define L3GD_CTRL1_YEN_MASK		0x01u
@@ -97,6 +113,9 @@ enum class L3GD20H_Reg {
 #define L3GD_CTRL1_DR(x)		(((uint8_t)(((uint8_t)(x))<<L3GD_CTRL1_DR_SHIFT))&L3GD_CTRL1_DR_MASK)
 #endif
 
+/**
+ * @brief BitField macros for CTRL2
+ */
 #if 1 // L3GD20H CTRL2 BitFields
 #define L3GD_CTRL2_HPCF_MASK			0x0Fu
 #define L3GD_CTRL2_HPCF_SHIFT			0
@@ -116,6 +135,9 @@ enum class L3GD20H_Reg {
 #define L3GD_CTRL2_EXTRen(x)			(((uint8_t)(((uint8_t)(x))<<L3GD_CTRL2_EXTRen_SHIFT))&L3GD_CTRL2_EXTRen_MASK)
 #endif
 
+/**
+ * @brief BitField macros for CTRL3
+ */
 #if 1 // L3GD20H CTRL3 BitFields
 #define L3GD_CTRL3_INT2_Empty_MASK		0x01u
 #define L3GD_CTRL3_INT2_Empty_SHIFT		0
@@ -151,6 +173,9 @@ enum class L3GD20H_Reg {
 #define L3GD_CTRL3_INT1_IG(x)			(((uint8_t)(((uint8_t)(x))<<L3GD_CTRL3_INT1_IG_SHIFT))&L3GD_CTRL3_INT1_IG_MASK)
 #endif
 
+/**
+ * @brief BitField macros for CTRL4
+ */
 #if 1 // L3GD20H CTRL4 BitFields
 #define L3GD_CTRL4_SIM_MASK				0x01u
 #define L3GD_CTRL4_SIM_SHIFT			0
@@ -178,6 +203,9 @@ enum class L3GD20H_Reg {
 #define L3GD_CTRL4_BDU(x)				(((uint8_t)(((uint8_t)(x))<<L3GD_CTRL4_BDU_SHIFT))&L3GD_CTRL4_BDU_MASK)
 #endif
 
+/**
+ * @brief BitField macros for CTRL5
+ */
 #if 1 // L3GD20H CTRL5 BitFields
 #define L3GD_CTRL5_Out_Sel_MASK			0x03u
 #define L3GD_CTRL5_Out_Sel_SHIFT		0
@@ -205,6 +233,9 @@ enum class L3GD20H_Reg {
 #define L3GD_CTRL5_BOOT(x)				(((uint8_t)(((uint8_t)(x))<<L3GD_CTRL5_BOOT_SHIFT))&L3GD_CTRL5_BOOT_MASK)
 #endif
 
+/**
+ * @brief BitField macros for STATUS
+ */
 #if 1 // L3GD20H STATUS BitFields
 #define L3GD_STATUS_XDA_MASK			0x01u
 #define L3GD_STATUS_XDA_SHIFT			0
@@ -240,6 +271,9 @@ enum class L3GD20H_Reg {
 #define L3GD_STATUS_ZYXOR(x)			(((uint8_t)(((uint8_t)(x))<<L3GD_STATUS_ZYXOR_SHIFT))&L3GD_STATUS_ZYXOR_MASK)
 #endif
 
+/**
+ * @brief BitField macros for FIFO_CTRL
+ */
 #if 1 // L3GD20H FIFO_CTRL BitFields
 #define L3GD_FIFO_CTRL_FTH_MASK			0x1Fu
 #define L3GD_FIFO_CTRL_FTH_SHIFT		0
@@ -251,6 +285,9 @@ enum class L3GD20H_Reg {
 #define L3GD_FIFO_CTRL_FM(x)			(((uint8_t)(((uint8_t)(x))<<L3GD_FIFO_CTRL_FM_SHIFT))&L3GD_FIFO_CTRL_FM_MASK)
 #endif
 
+/**
+ * @brief BitField macros for FIFO_SRC
+ */
 #if 1 // L3GD20H FIFO_SRC BitFields
 #define L3GD_FIFO_SRC_FSS_MASK			0x1Fu
 #define L3GD_FIFO_SRC_FSS_SHIFT			0
@@ -270,6 +307,9 @@ enum class L3GD20H_Reg {
 #define L3GD_FIFO_SRC_FTH(x)			(((uint8_t)(((uint8_t)(x))<<L3GD_FIFO_SRC_FTH_SHIFT))&L3GD_FIFO_SRC_FTH_MASK)
 #endif
 
+/**
+ * @brief BitField macros for IG_CFG
+ */
 #if 1 // L3GD20H IG_CFG BitFields
 #define L3GD_IG_CFG_XLIE_MASK			0x01u
 #define L3GD_IG_CFG_XLIE_SHIFT			0
@@ -305,6 +345,9 @@ enum class L3GD20H_Reg {
 #define L3GD_IG_CFG_ANDOR(x)			(((uint8_t)(((uint8_t)(x))<<L3GD_IG_CFG_ANDOR_SHIFT))&L3GD_IG_CFG_ANDOR_MASK)
 #endif
 
+/**
+ * @brief BitField macros for IG_SRC
+ */
 #if 1 // L3GD20H IG_SRC BitFields
 #define L3GD_IG_SRC_XL_MASK				0x01u
 #define L3GD_IG_SRC_XL_SHIFT			0
@@ -336,6 +379,9 @@ enum class L3GD20H_Reg {
 #define L3GD_IG_SRC_IA(x)				(((uint8_t)(((uint8_t)(x))<<L3GD_IG_SRC_IA_SHIFT))&L3GD_IG_SRC_IA_MASK)
 #endif
 
+/**
+ * @brief BitField macros for LOW_ODR
+ */
 #if 1 // L3GD20H LOW_ODR BitFields
 #define L3GD_LOW_ODR_Low_ODR_MASK		0x01u
 #define L3GD_LOW_ODR_Low_ODR_SHIFT		0
@@ -355,7 +401,14 @@ enum class L3GD20H_Reg {
 #define L3GD_LOW_ODR_DRDY_HL(x)			(((uint8_t)(((uint8_t)(x))<<L3GD_LOW_ODR_DRDY_HL_SHIFT))&L3GD_LOW_ODR_DRDY_HL_MASK)
 #endif
 
+/** @} Close L3GD20H_Macros group */
+
+/** @addtogroup L3GD20H_Config Configuration Options
+ *  @{
+ */
+
 /** DataRate and BandWidth configurations
+ *  @verbatim
  *	L3GD_ODR_BW_Config | Low_ODR(1) | DR <1:0> | BW <1:0> | ODR [Hz] | Cut-Off [Hz](2)
  *			1				 1 			 00 		00 		  12.5	 	  n.a.
  *							 1 			 00 		01 		  12.5	 	  n.a.
@@ -387,6 +440,7 @@ enum class L3GD20H_Reg {
  *			19				 0 			 11 		11 		  800		  100
  *	1. this bit is described in register LOW_ODR (39h register).
  *	2. values in the table are indicative and they can vary proportionally with the specific ODR value.
+ *	@endverbatim
  */
 enum class L3GD_ODR_BW_Config {
 	ONE			=	0b10000,	// ODR = 12.5 Hz	Cut-off = n.a.
@@ -411,12 +465,15 @@ enum class L3GD_ODR_BW_Config {
 };
 
 /**
- * Macros to access the bits corresponding to BitFields in the above configurations
+ * @brief Macros to access the bits corresponding to BitFields in the ODR_BW configurations
  */
 #define L3GD_ODR_BW_Config_LOW_ODR(x)	(((uint8_t)(((uint8_t)(x))>>4))&0b1)
 #define L3GD_ODR_BW_Config_DR(x)		(((uint8_t)(((uint8_t)(x))>>2))&0b11)
 #define L3GD_ODR_BW_Config_BW(x)		(((uint8_t)(((uint8_t)(x))))&0b11)
 
+/**
+ * @brief High-pass filter mode configurations
+ */
 enum class L3GD_HPM_Config {
 	ONE			=	0b00,		// Normal mode (reset reading REFERENCE register)
 	TWO			=	0b01,		// Reference signal for filtering
@@ -424,6 +481,9 @@ enum class L3GD_HPM_Config {
 	FOUR		=	0b11		// Autoreset on interrupt event
 };
 
+/**
+ * @brief High-pass filter cut-off frequency configurations
+ */
 enum class L3GD_HPCF_Config {
 	// Cut-off frequency vs ODR	//	12.5	25		50		100		200		400		800
 	ONE 		=	0b0000,		//	 1		 2		 4		  8		 15		 30		 56
@@ -439,7 +499,7 @@ enum class L3GD_HPCF_Config {
 };
 
 /**
- * Full-scale configurations
+ * @brief Full-scale configurations
  */
 enum class L3GD_FS_Config {
 	LOW			=	0b00,		// FS = 245 dps -> resolution = 8.75 mdps/digit
@@ -448,40 +508,47 @@ enum class L3GD_FS_Config {
 };
 
 /**
- * Structure for initializing the L3GD20H
+ * @brief Structure for initializing the L3GD20H
  */
 typedef struct {
-	L3GD_ODR_BW_Config	odr_bw_config;
-	L3GD_HPM_Config		hpm_config;
-	L3GD_HPCF_Config	hpcf_config;
-	L3GD_FS_Config		fs_config;
+	L3GD_ODR_BW_Config	odr_bw_config;		///< Output data rate and Bandwidth setting
+	L3GD_HPM_Config		hpm_config;			///< High-pass filter mode setting
+	L3GD_HPCF_Config	hpcf_config;		///< High-pass filter cut-off frequency setting
+	L3GD_FS_Config		fs_config;			///< Full-scale setting
 } L3GD20H_InitStruct;
 
+/** @} Close L3GD20H_Config group */
+
+/**
+ * @brief Class for interfacing with the ST L3GD20H 3-axis gyroscope
+ *
+ * This class is responsible for handling the i2c register reads/writes
+ * necessary to communicate with the L3GD20H gyroscope. All I/O is via
+ * i2c.
+ *
+ * The rate of angular rotation about the X, Y, or Z axes can be returned
+ */
 class L3GD20H {
 private:
-	I2C *i2c;
-	preFilter2 gx, gy, gz;
+	I2C *i2c;								///< I2C global instance
+	preFilter2 gx;							///< Filter to pre-filter raw gyro X-axis data
+	preFilter2 gy;							///< Filter to pre-filter raw gyro Y-axis data
+	preFilter2 gz;							///< Filter to pre-filter raw gyro Z-axis data
 
-	logger *log;
+	logger *log;							///< Logger instance for gathering data
 
-	float resolution;
+	float resolution;						///< Resolution setting
 
-#if USE_DOUBLE_BUFFERING
-	uint8_t buffIndicator;	// Indicates which buffer is readable
-	uint8_t gyroBuff1[6];	// Gyro angular velocity buffer 1
-	uint8_t gyroBuff2[6];	// Gyro angular velocity buffer 2
-#else
-	uint8_t gyroBuff[6];	// Gyro angular velocity buffer
-#endif
+	uint8_t gyroBuff[6];					///< Gyro angular velocity buffer
 
-	TIM_HandleTypeDef TimHandle;
-	uint32_t prevTick;
-	uint32_t dt;
+	TIM_HandleTypeDef TimHandle;			///< TIM for measuring sample rate
+	uint32_t prevTick;						///< Previous TIM count value
+	uint32_t dt;							///< Sample time
 
-	float xOffset;
-	float yOffset;
-	float zOffset;
-	uint8_t address;
+	float xOffset;							///< Average X offset from zero
+	float yOffset;							///< Average Y offset from zero
+	float zOffset;							///< Average Z offset from zero
+	uint8_t address;						///< Slave address of the chip
 
 	void enable(L3GD20H_InitStruct init);
 	void calibrate(void);
@@ -508,7 +575,9 @@ public:
 
 #endif
 
-
+/** @} Close L3GD20H group */
+/** @} Close IMU group */
+/** @} Close Sensors Group */
 
 
 

@@ -1,5 +1,5 @@
 /**
- * @file L3GD20H.cpp
+ * @file
  *
  * @brief Class for interfacing with the ST L3GD20H 3-axis gyroscope
  *
@@ -12,6 +12,18 @@
  *
  */
 
+/** @addtogroup Sensors
+ *  @{
+ */
+
+/** @addtogroup IMU
+ *  @{
+ */
+
+/** @addtogroup L3GD20H
+ *  @{
+ */
+
 #include "L3GD20H.h"
 
 /**
@@ -21,20 +33,26 @@ L3GD20H::L3GD20H(void)
 	: gx(PREFILTER_TAU), gy(PREFILTER_TAU), gz(PREFILTER_TAU)		// complementary
 //	: gx(), gy(), gz()												// IIR or FIR
 {
+	// Get a pointer to the logger
 	log = logger::instance();
 
+	// Initialize members
 	address = 0b11010110;
 	dt = prevTick = 0;
 	xOffset = yOffset = zOffset = 0.0f;
 
+	// Get a pointer to the I2C instance
 	i2c = I2C::Instance(I2C_SCL_PIN, I2C_SDA_PIN);
 
+	// Default gyro configuration
 	L3GD20H_InitStruct init;
 	init.odr_bw_config 	= 	L3GD_ODR_BW_Config::EIGHT;	// 200 Hz ODR, 12.5 Hz BW
 	init.hpm_config 	= 	L3GD_HPM_Config::THREE;		// Normal mode
 	init.hpcf_config 	= 	L3GD_HPCF_Config::FIVE;		// 1 Hz cut-off frequency for 200 Hz ODR
 	init.fs_config 		= 	L3GD_FS_Config::MEDIUM;		// 500 dps full-scale
 	resolution = 17.50e-3f;
+
+	// Enable and configure the gyro
 	enable(init);
 }
 
@@ -46,12 +64,15 @@ L3GD20H::L3GD20H(L3GD20H_InitStruct init)
 	: gx(PREFILTER_TAU), gy(PREFILTER_TAU), gz(PREFILTER_TAU)		// complementary
 //	: gx(), gy(), gz()												// IIR or FIR
 {
+	// Get a pointer to the logger
 	log = logger::instance();
 
+	// Initialize members
 	address = 0b11010110;
 	dt = prevTick = 0;
 	xOffset = yOffset = zOffset = 0.0f;
 
+	// Gyro configuration
 	switch(init.fs_config) {
 	case L3GD_FS_Config::LOW	: resolution = 8.75e-3f;  break;
 	case L3GD_FS_Config::MEDIUM	: resolution = 17.50e-3f; break;
@@ -59,7 +80,10 @@ L3GD20H::L3GD20H(L3GD20H_InitStruct init)
 	default: break;
 	}
 
+	// Get a pointer to the I2C instance
 	i2c = I2C::Instance(I2C_SCL_PIN, I2C_SDA_PIN);
+
+	// Enable and configure the gyroscope
 	enable(init);
 }
 
@@ -113,19 +137,28 @@ void L3GD20H::enable(L3GD20H_InitStruct init) {
 	TimHandle.Init.RepetitionCounter = 0;
 	TimHandle.State = HAL_TIM_STATE_RESET;
 
+	// Initialize the timer
 	if (HAL_TIM_Base_Init(&TimHandle) != HAL_OK) {
-		// Error
+		// TODO: Error
 		while(1);
 	}
 
+	// Start the timer
 	if (HAL_TIM_Base_Start(&TimHandle) != HAL_OK) {
-		// Error
+		// TODO: Error
 		while(1);
 	}
 
+	// Calibrate the sensor to eliminate offset error
 	calibrate();
 }
 
+/**
+ * @brief Basic calibration to eliminate offset errors
+ *
+ * Initializes the offset members so offset error can be reduced/eliminated.
+ * The sensor must remain stationary during calibration.
+ */
 void L3GD20H::calibrate() {
 	uint8_t samples = 128;
 	float gx_offset = 0.0f, gy_offset = 0.0f, gz_offset = 0.0f;
@@ -152,13 +185,17 @@ void L3GD20H::calibrate() {
 }
 
 /**
- * Called by HAL_TIM_Base_Init. Enable TIM clock
- * @param htim
+ * @brief Called by HAL_TIM_Base_Init. Enable TIM clock
+ * @param htim Pointer to TimHandle
  */
 void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim) {
 	__HAL_RCC_TIM6_CLK_ENABLE();
 }
 
+/**
+ * @brief Measure the sample time/rate
+ * @return The time between samples in s
+ */
 float L3GD20H::getDT() {
 	return (float)dt / 16e6f;
 }
@@ -166,52 +203,43 @@ float L3GD20H::getDT() {
 /**
  * @brief Initiates a read of all 3 axes
  * @return The return value of I2C::memRead()
- * 			DOUBLE BUFFERING: 1 or 2 means which buffer is readable, -1 means HAL_ERROR
- * 			ELSE: 0 on success, -1 on HAL_ERROR
+ * 			0 on success, -1 on HAL_ERROR
  * 			Updates data in gyroBuff
  */
 int8_t L3GD20H::read(void) {
-#if USE_DOUBLE_BUFFERING
-	buffIndicator = i2c->memRead(address, ( (uint8_t)L3GD20H_Reg::OUT_X_L | (1<<7) ), gyroBuff1, gyroBuff2, 6);
-	return buffIndicator;
-#else
 //	HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_4);
 
+	// Grab the counter value
 	uint32_t tmp = __HAL_TIM_GetCounter(&TimHandle);
 
+	// Calculate the sample time
 	if (tmp >= prevTick) {
 		dt = tmp - prevTick;
 	} else {
 		dt = 65536 - prevTick + tmp;
 	}
+	// Store counter value
 	prevTick = tmp;
 
+	// Read from the gyro registers
 	return i2c->memRead(address, ( (uint8_t)L3GD20H_Reg::OUT_X_L | (1<<7) ), gyroBuff, 6);
-#endif
 }
 
 /**
- * @brief  Function to get the rate of angular rotation about the x axis (roll)
- * @return Raw rate of angular rotation about the x axis (roll) (register values)
+ * @brief  Function to get the rate of angular rotation about the x axis (pitch)
+ * @return Raw rate of angular rotation about the x axis (pitch) (register values)
  */
 int16_t L3GD20H::getXRaw(void) {
-#if USE_DOUBLE_BUFFERING
-	if (buffIndicator == 1)
-		return (gyroBuff1[1]<<8 | gyroBuff1[0]);
-	else if (buffIndicator == 2) {
-		return (gyroBuff2[1]<<8 | gyroBuff2[0]);
-	} else {
-		return 0;
-	}
-#else
+	// Wait for the measurement to be ready
 	i2c->readyWait();
+
+	// Return the raw rate of angular rotation about the x axis (pitch)
 	return -(int16_t)(gyroBuff[1]<<8 | gyroBuff[0]);
-#endif
 }
 
 /**
- * @brief  Function to get the rate of angular rotation about the x axis (roll)
- * @return Rate of angular rotation about the x axis (roll) in degrees per second (dps)
+ * @brief  Function to get the rate of angular rotation about the x axis (pitch)
+ * @return Rate of angular rotation about the x axis (pitch) in degrees per second (dps)
  */
 float L3GD20H::getX() {
 	float x = (float)getXRaw() * resolution - xOffset;
@@ -223,6 +251,10 @@ float L3GD20H::getX() {
 	return x;
 }
 
+/**
+ * @brief  Function to get the filtered rate of angular rotation about the x axis (pitch)
+ * @return Filtered angular velocity about the x axis (pitch) [dps]
+ */
 float L3GD20H::getXFiltered() {
 	float32_t x = getX();
 	float xf = gx.filterSample(&x);
@@ -235,27 +267,20 @@ float L3GD20H::getXFiltered() {
 }
 
 /**
- * @brief  Function to get the rate of angular rotation about the y axis (pitch)
- * @return Raw rate of angular rotation about the y axis (pitch) (register values)
+ * @brief  Function to get the rate of angular rotation about the y axis (roll)
+ * @return Raw rate of angular rotation about the y axis (roll) (register values)
  */
 int16_t L3GD20H::getYRaw(void) {
-#if USE_DOUBLE_BUFFERING
-	if (buffIndicator == 1)
-		return (gyroBuff1[3]<<8 | gyroBuff1[2]);
-	else if (buffIndicator == 2) {
-		return (gyroBuff2[3]<<8 | gyroBuff2[2]);
-	} else {
-		return 0;
-	}
-#else
+	// Wait for the measurement to be ready
 	i2c->readyWait();
+
+	// Return the raw rate of angular rotation about the y axis (roll)
 	return -(int16_t)(gyroBuff[3]<<8 | gyroBuff[2]);
-#endif
 }
 
 /**
- * @brief  Function to get the rate of angular rotation about the y axis (pitch)
- * @return Rate of angular rotation about the y axis (pitch) in degrees per second (dps)
+ * @brief  Function to get the rate of angular rotation about the y axis (roll)
+ * @return Rate of angular rotation about the y axis (roll) in degrees per second (dps)
  */
 float L3GD20H::getY() {
 	float y = (float)getYRaw() * resolution - yOffset;
@@ -267,6 +292,10 @@ float L3GD20H::getY() {
 	return y;
 }
 
+/**
+ * @brief  Function to get the filtered rate of angular rotation about the y axis (roll)
+ * @return Filtered angular velocity about the y axis (roll) [dps]
+ */
 float L3GD20H::getYFiltered() {
 	float32_t y = getY();
 	float yf = gy.filterSample(&y);
@@ -283,18 +312,11 @@ float L3GD20H::getYFiltered() {
  * @return Raw rate of angular rotation about the z axis (yaw) (register values)
  */
 int16_t L3GD20H::getZRaw(void) {
-#if USE_DOUBLE_BUFFERING
-	if (buffIndicator == 1)
-		return (gyroBuff1[5]<<8 | gyroBuff1[4]);
-	else if (buffIndicator == 2) {
-		return (gyroBuff2[5]<<8 | gyroBuff2[4]);
-	} else {
-		return 0;
-	}
-#else
+	// Wait for the measurement to be ready
 	i2c->readyWait();
+
+	// Return the raw rate of angular rotation about the z axis (yaw)
 	return (int16_t)(gyroBuff[5]<<8 | gyroBuff[4]);
-#endif
 }
 
 /**
@@ -311,6 +333,10 @@ float L3GD20H::getZ() {
 	return z;
 }
 
+/**
+ * @brief  Function to get the filtered rate of angular rotation about the z axis (yaw)
+ * @return Filtered angular velocity about the z axis (yaw) [dps]
+ */
 float L3GD20H::getZFiltered() {
 	float32_t z = getZ();
 	float zf = gz.filterSample(&z);
@@ -322,4 +348,6 @@ float L3GD20H::getZFiltered() {
 	return zf;
 }
 
-
+/** @} Close L3GD20H group */
+/** @} Close IMU group */
+/** @} Close Sensors Group */

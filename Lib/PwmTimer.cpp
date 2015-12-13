@@ -21,6 +21,14 @@
  *
  */
 
+/** @addtogroup Peripherals
+ *  @{
+ */
+
+/** @addtogroup TIM
+ *  @{
+ */
+
 #include <PwmTimer.h>
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_hal_tim.h"
@@ -29,14 +37,33 @@
 #include "stm32f4_discovery.h"
 #include "stm32f407xx.h"
 
+/** @defgroup TIM_Class PwmTimer class
+ *  @brief TIM abstraction for generating PWM
+ *  @{
+ */
+
+/** @defgroup TIM_Class_Constructors Constructors
+ *  @brief Functions to obtain a PwmTimer
+ *  @{
+ */
+
+/**
+ * @brief Default constructor initialize pin PA0 for PWM with 50 Hz and 1 ms
+ */
 PwmTimer::PwmTimer() {
 	pin = TimerPin::PA0;
 	frequency = 50.0;
 	pulseWidth = 1.0;
 
+	// Initialize the TIM to generate the desired PWM waveform
 	initTimer(frequency, pulseWidth, pin);
 }
 
+/**
+ * @brief Initializes the specified GPIO pin, p, for PWM at the frequency, f
+ * @param f PWM frequency in Hz
+ * @param p PWM positive pulse width in ms
+ */
 PwmTimer::PwmTimer(float f, TimerPin p) {
 	pin = p;
 
@@ -46,15 +73,27 @@ PwmTimer::PwmTimer(float f, TimerPin p) {
 	else frequency = f;
 	pulseWidth = 1.0;
 
+	// Initialize the TIM to generate the desired PWM waveform
 	initTimer(frequency, pulseWidth, pin);
 }
 
-// TODO: Implement this function
+/** @} Close TIM_Class_Constructors group */
+
+/** @addtogroup TIM_Class_Control Control Methods
+ *  @{
+ */
+
+/**
+ * @brief Sets the PWM frequency
+ * @param f PWM frequency in Hz
+ */
 void PwmTimer::setFreq(float f) {
 	frequency = f;
 
+	// Desired counting frequency
 	float fTick = 3360000.0f;
 
+	// Calculate the necessary Prescaler and Auto-Reload Register values
 	uint32_t PSC = (uint32_t) ( fTimer / fTick - 1 );
 	uint32_t ARR = (uint32_t) ( fTick / f - 1 );
 
@@ -75,58 +114,42 @@ void PwmTimer::setFreq(float f) {
 		while(1);
 	}
 
+	// Set the positive pulse width
 	setWidth(pulseWidth);
 }
 
+/**
+ * @brief Sets the PWM positive pulse width
+ * @param w PWM positive pulse width in ms
+ */
 void PwmTimer::setWidth(float w) {
-	// TODO: Add error checking/clipping for w
 	pulseWidth = w;
 	uint32_t channel;
 
-	// TODO: Refactor this crappy array mapping shit
+	// Convert to an HAL TIM_CHANNEL_x
 	uint32_t TimerChannelToCH[32] = {TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_1, TIM_CHANNEL_1, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_1, TIM_CHANNEL_1};
 
 	channel = TimerChannelToCH[(int)ch];
 
+	// Calculate the required Capture/Compare Register value
 	uint32_t ccr = (uint32_t) ( (float)(TimHandle.Init.Period + 1) * pulseWidth * .001 * frequency - 1);
 
+	// Set the CCR value
 	__HAL_TIM_SET_COMPARE(&this->TimHandle, channel, ccr);
 }
 
-//void PwmTimer::setWidth(float w) {
-//	// TODO: Add error checking/clipping for w
-//	pulseWidth = w;
-//	uint32_t channel;
-//
-//	// TODO: Refactor this crappy array mapping shit
-//	uint32_t TimerChannelToCH[32] = {TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3, TIM_CHANNEL_4, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_1, TIM_CHANNEL_1, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_1, TIM_CHANNEL_1};
-//
-//	channel = TimerChannelToCH[(int)ch];
-//
-//	// Setup channel-specific settings
-//	TIM_OC_InitTypeDef sConfig;
-//	sConfig.OCMode = TIM_OCMODE_PWM1;
-//	sConfig.Pulse = (uint32_t) ( (float)(TimHandle.Init.Period + 1) * pulseWidth * .001 * frequency - 1 );
-//	sConfig.OCPolarity = TIM_OCPOLARITY_HIGH;
-//	sConfig.OCNPolarity = TIM_OCPOLARITY_HIGH;
-//	sConfig.OCFastMode = TIM_OCFAST_DISABLE;
-//	sConfig.OCIdleState = TIM_OCIDLESTATE_RESET;
-//	sConfig.OCNIdleState = TIM_OCIDLESTATE_RESET;
-//
-//	// Store configuration settings in peripheral registers
-//	// NOTE: Disables PWM output
-//	if (HAL_TIM_PWM_ConfigChannel(&TimHandle, &sConfig, channel) != HAL_OK) {
-//		// TODO: Error_Handler();
-//		while(1);
-//	}
-//
-//	// Start/re-enable the PWM output
-//	if (HAL_TIM_PWM_Start(&TimHandle, channel) != HAL_OK) {
-//		// TODO: Error_Handler();
-//		while(1);
-//	}
-//}
+/** @} Close TIM_Class_Control group */
 
+/** @addtogroup TIM_Class_Helper Initialization Functions
+ *  @{
+ */
+
+/**
+ * @brief Helper function for configuring the TIM for the given parameters
+ * @param f PWM frequency in Hz
+ * @param w PWM positive pulse width in ms
+ * @param p GPIO pin to initialize
+ */
 void PwmTimer::initTimer(float f, float w, TimerPin p) {
 	// Arrays for mapping TimerPin p to STM HAL variables
 	TimerChannel TimerPinToChannel[50] = {TimerChannel::TIM5_CH1, TimerChannel::TIM2_CH2, TimerChannel::TIM2_CH3, TimerChannel::TIM2_CH4, TimerChannel::TIM3_CH1, TimerChannel::TIM3_CH2, TimerChannel::TIM1_CH1, TimerChannel::TIM1_CH2, TimerChannel::TIM1_CH3, TimerChannel::TIM1_CH4, TimerChannel::TIM2_CH1, TimerChannel::TIM3_CH3, TimerChannel::TIM3_CH4, TimerChannel::TIM2_CH2, TimerChannel::TIM3_CH1, TimerChannel::TIM3_CH2, TimerChannel::TIM4_CH1, TimerChannel::TIM4_CH2, TimerChannel::TIM4_CH3, TimerChannel::TIM4_CH4, TimerChannel::TIM2_CH3, TimerChannel::TIM2_CH4, TimerChannel::TIM12_CH1, TimerChannel::TIM12_CH2, TimerChannel::TIM3_CH1, TimerChannel::TIM3_CH2, TimerChannel::TIM3_CH3, TimerChannel::TIM3_CH4, TimerChannel::TIM4_CH1, TimerChannel::TIM4_CH2, TimerChannel::TIM4_CH3, TimerChannel::TIM4_CH4, TimerChannel::TIM9_CH1, TimerChannel::TIM9_CH2, TimerChannel::TIM1_CH1, TimerChannel::TIM1_CH2, TimerChannel::TIM1_CH3, TimerChannel::TIM1_CH4, TimerChannel::TIM10_CH1, TimerChannel::TIM11_CH1, TimerChannel::TIM13_CH1, TimerChannel::TIM14_CH1, TimerChannel::TIM5_CH1, TimerChannel::TIM5_CH2, TimerChannel::TIM5_CH3, TimerChannel::TIM5_CH4, TimerChannel::TIM8_CH4, TimerChannel::TIM8_CH1, TimerChannel::TIM8_CH2, TimerChannel::TIM8_CH3};
@@ -244,8 +267,15 @@ void PwmTimer::initTimer(float f, float w, TimerPin p) {
 		while(1);
 	}
 
-	setWidth(1.0f);
+	setWidth(w);
 }
+
+/** @} Close TIM_Class_Helper group */
+/** @} Close TIM_Class group */
+
+/** @addtogroup TIM_Functions HAL Required Functions
+ *  @{
+ */
 
 /**
  * MCU specific initialization. Called by HAL_TIM_PWM_Init()
@@ -274,7 +304,11 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim) {
 	// GPIO clock is enabled in PwmTimer::initTimer()
 }
 
+/** @} Close TIM_Functions group */
 
+
+/** @} Close TIM group */
+/** @} Close Peripherals Group */
 
 
 

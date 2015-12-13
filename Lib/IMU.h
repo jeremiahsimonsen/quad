@@ -1,5 +1,5 @@
 /**
- * @file IMU.cpp
+ * @file
  *
  * @brief Class for interacting with the inertial measurement unit
  *
@@ -8,6 +8,14 @@
  *
  * @date Oct 17, 2015
  *
+ */
+
+/** @addtogroup Sensors
+ *  @{
+ */
+
+/** @addtogroup IMU Inertial Measurement Unit (IMU)
+ *  @{
  */
 
 #ifndef IMU_H_
@@ -23,20 +31,33 @@
 #include "accelCompFilter2.h"
 #include "gyroCompFilter2.h"
 
+// Complementary filter time constant
 #define COMPLEMENTARY_TAU (0.8f)
 
+/**
+ * @brief Class for calculating orientation
+ *
+ * This class is composed of the three (3) chip classes that the Pololu
+ * AltIMU-10 v4 carries. Each chip class handles the register reads/writes
+ * via i2c. This class is responsible for calculating orientation.
+ */
 class IMU {
 private:
-	LPS25H  barometer;
-	L3GD20H gyro;
-	LSM303D accel;
+	LPS25H  barometer;				///< Altimeter object
+	L3GD20H gyro;					///< Gyroscope object
+	LSM303D accel;					///< Accelerometer/Magnetometer object
 
-	logger *log;
+	logger *log;					///< Logger for gathering data
 
-	accelCompFilter aFilter_x, aFilter_y;
-	gyroCompFilter gFilter_x, gFilter_y;
+	accelCompFilter aFilter_x;		///< Complementary filter for x-angle measured by accelerometer
+	accelCompFilter aFilter_y;		///< Complementary filter for y-angle measured by accelerometer
+	gyroCompFilter gFilter_x;		///< Complementary filter for x-rate measured by gyroscope
+	gyroCompFilter gFilter_y;		///< Complementary filter for y-rate measured by gyroscope
 
-	float rate_roll, rate_pitch, angle_roll, angle_pitch;
+	float rate_roll;				///< The angular roll rate [deg/s]
+	float rate_pitch;				///< The angular pitch rate [deg/s]
+	float angle_roll;				///< The roll angle
+	float angle_pitch;				///< The pitch angle
 
 public:
 	IMU();
@@ -51,3 +72,6 @@ public:
 };
 
 #endif
+
+/** @} Close IMU group */
+/** @} Close Sensors Group */

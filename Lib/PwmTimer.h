@@ -1,5 +1,5 @@
 /**
- * @file PwmTimer.h
+ * @file
  *
  * @brief Class for generating PWM waveforms on the STM32F407
  *
@@ -21,6 +21,14 @@
  *
  */
 
+/** @addtogroup Peripherals
+ *  @{
+ */
+
+/** @addtogroup TIM PWM using General Purpose TIM
+ *  @{
+ */
+
 #ifndef PWMTIMER_H_
 #define PWMTIMER_H_
 
@@ -32,7 +40,7 @@
 #include "stm32f407xx.h"
 
 /**
- * GPIO pins that are PWM compatible
+ * @brief GPIO pins that are PWM compatible
  */
 enum class TimerPin {
 	PA0 = 0,// TIM5_CH1
@@ -95,7 +103,7 @@ enum class TimerPin {
 };
 
 /**
- * TIM channels for the STM32F407
+ * @brief TIM channels for the STM32F407
  */
 enum class TimerChannel {
 	TIM1_CH1 = 0,//!< TIM1_CH1
@@ -133,13 +141,28 @@ enum class TimerChannel {
 };
 
 /**
- * APBx options - determines f_timer
+ * @brief APBx options - determines f_timer
  */
 enum class ApbNum {
 	APB1,//!< APB1
 	APB2 //!< APB2
 };
 
+/**
+ * @brief Class for producing PWM using a general purpose TIM
+ *
+ * This class takes care of the low-level configuration required for PWM signal
+ * generation. It allows for simple initialization by specifying a compatible
+ * GPIO pin to the constructor.
+ *
+ * The default constructor PwmTimer::PwmTimer() starts PWM on PA0 with a
+ * frequency of 50 Hz and pulse width of 1 ms, consistent with the default for
+ * many hobby ESCs. The frequency and pin can be specified using the alternate
+ * constructor.
+ *
+ * The PwmTimer::setFreq() and PwmTimer::setWidth() functions adjust the PWM
+ * frequency and positive pulse width, respectively.
+ */
 class PwmTimer {
 private:
 	TIM_HandleTypeDef TimHandle;	///< STM HAL variable containing TIM config
@@ -150,36 +173,17 @@ private:
 	float frequency;				///< PWM frequency in Hz
 	float pulseWidth;				///< PWM positive pulse width in ms
 
-	/**
-	 * Helper function for configuring the TIM for the given parameters
-	 * @param f PWM frequency in Hz
-	 * @param w PWM positive pulse width in ms
-	 * @param p GPIO pin to initialize
-	 */
 	void initTimer(float f, float w, TimerPin p);
 
 public:
-	/**
-	 * Default constructor initialize pin PA0 for PWM with 50 Hz and 1 ms
-	 */
 	PwmTimer();
-	/**
-	 * Initializes the specified GPIO pin, p, for PWM at the frequency, f
-	 * @param f PWM frequency in Hz
-	 * @param p PWM positive pulse width in ms
-	 */
 	PwmTimer(float f, TimerPin p);
 
-	/**
-	 * Sets the PWM frequency
-	 * @param f PWM frequency in Hz
-	 */
 	void setFreq(float f);
-	/**
-	 * Sets the PWM positive pulse width
-	 * @param w PWM positive pulse width in ms
-	 */
 	void setWidth(float w);
 };
 
 #endif /* PWMTIMER_H_ */
+
+/** @} Close TIM group */
+/** @} Close Peripherals Group */

@@ -1,5 +1,5 @@
 /**
- * @file Adc.h
+ * @file
  *
  * @brief Class for using the ADC
  *
@@ -9,22 +9,34 @@
  *
  */
 
+/** @addtogroup Peripherals
+ *  @{
+ */
+
+/** @addtogroup Adc
+ *  @{
+ */
+
 #ifndef ADC_H_
 #define ADC_H_
 
 #include "stm32f4xx_hal.h"
 #include "stm32f4_discovery.h"
 
+/**
+ * @brief ADC GPIO Pins to be used
+ */
 enum class AdcPin {
 	PA2,	// ADC1_IN2
 	PA3		// ADC1_IN3
 };
 
+/**
+ * @brief Class for reading from the ADC
+ */
 class Adc {
 private:
-//	ADC_HandleTypeDef AdcHandle;
-
-	AdcPin pin;
+	AdcPin pin;					///< GPIO pin to read
 
 	void initAdc(AdcPin p);
 
@@ -36,3 +48,6 @@ public:
 };
 
 #endif
+
+/** @} Close Adc group */
+/** @} Close Peripherals Group */

@@ -26,9 +26,24 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>include/Adc.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/Adc.h</locationURI>
+		</link>
+		<link>
 			<name>include/DMA_IT.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/lib/DMA_IT.h</locationURI>
+		</link>
+		<link>
+			<name>include/DeathChopper9000.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/DeathChopper9000.h</locationURI>
+		</link>
+		<link>
+			<name>include/HCSR04.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/HCSR04.h</locationURI>
 		</link>
 		<link>
 			<name>include/I2C.h</name>
@@ -79,11 +94,6 @@
 			<name>include/accelCompFilter2.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/lib/accelCompFilter2.h</locationURI>
-		</link>
-		<link>
-			<name>include/dac.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/lib/dac.h</locationURI>
 		</link>
 		<link>
 			<name>include/gyroCompFilter.h</name>
@@ -176,6 +186,11 @@
 			<locationURI>PARENT-1-PROJECT_LOC/lib/DMA_IT.c</locationURI>
 		</link>
 		<link>
+			<name>src/HCSR04.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/HCSR04.cpp</locationURI>
+		</link>
+		<link>
 			<name>src/I2C.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Lib/I2C.cpp</locationURI>
@@ -224,11 +239,6 @@
 			<name>src/accelCompFilter2.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/lib/accelCompFilter2.cpp</locationURI>
-		</link>
-		<link>
-			<name>src/dac.cpp</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/lib/dac.cpp</locationURI>
 		</link>
 		<link>
 			<name>src/gyroCompFilter.cpp</name>

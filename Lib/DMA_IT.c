@@ -1,5 +1,5 @@
 /**
- * @file DMA_IT.c
+ * @file
  *
  * @brief Direct Memory Access (DMA) interrupt service routines
  *
@@ -10,12 +10,24 @@
  *
  */
 
+/** @addtogroup Peripherals
+ *  @{
+ */
+
+/** @addtogroup UART
+ *  @{
+ */
+
 #include "uart.h"
 //#include "I2C.h"
 #include "DMA_IT.h"
 
 UART_HandleTypeDef UartHandle;
 I2C_HandleTypeDef i2cHandle;
+
+/** @addtogroup UART_ISRs
+ *  @{
+ */
 
 /**
  * Handles DMA interrupt requests for:
@@ -182,3 +194,7 @@ void DMA2_Stream6_IRQHandler(void) {
 void DMA2_Stream7_IRQHandler(void) {
 	HAL_DMA_IRQHandler(UartHandle.hdmatx);
 }
+
+/** @} Close UART_ISRs group */
+/** @} Close UART group */
+/** @} Close Peripherals Group */

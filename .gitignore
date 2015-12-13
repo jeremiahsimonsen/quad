@@ -12,3 +12,5 @@ RemoteSystemsTempFiles/
 Serial/.settings/
 contract/.settings/
 test2/
+Lib/Documentation/
+Lib/Doc/Doxyfile

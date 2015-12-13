@@ -1,5 +1,5 @@
 /**
- * @file LSM303D.h
+ * @file
  *
  * @brief Class for interfacing with the ST LSM303D 3-axis accelerometer and magnetometer
  *
@@ -10,6 +10,18 @@
  *
  * Based on lsm303-arduino library from Pololu Corp. See license.txt for details
  *
+ */
+
+/** @addtogroup Sensors
+ *  @{
+ */
+
+/** @addtogroup IMU
+ *  @{
+ */
+
+/** @addtogroup LSM303D LSM303D accelerometer/magnetometer chip-specific class
+ *  @{
  */
 
 #ifndef LSM303D_H_
@@ -24,79 +36,89 @@
 #include "preFilterFIR.h"
 #include "preFilterAcc.h"
 
+/**
+ * @brief Register enumerations for the ST LSM303D accelerometer/magnetometer
+ */
 enum class LSM303D_Reg {
-	TEMP_OUT_L		= 0x05,
-	TEMP_OUT_H		= 0x06,
+	TEMP_OUT_L		= 0x05,  //!< TEMP_OUT_L
+	TEMP_OUT_H		= 0x06,  //!< TEMP_OUT_H
 
-	STATUS_M		= 0x07,
+	STATUS_M		= 0x07,    //!< STATUS_M
 
-	OUT_X_L_M 		= 0x08,
-	OUT_X_H_M 		= 0x09,
-	OUT_Y_L_M 		= 0x0A,
-	OUT_Y_H_M 		= 0x0B,
-	OUT_Z_L_M 		= 0x0C,
-	OUT_Z_H_M 		= 0x0D,
+	OUT_X_L_M 		= 0x08,  //!< OUT_X_L_M
+	OUT_X_H_M 		= 0x09,  //!< OUT_X_H_M
+	OUT_Y_L_M 		= 0x0A,  //!< OUT_Y_L_M
+	OUT_Y_H_M 		= 0x0B,  //!< OUT_Y_H_M
+	OUT_Z_L_M 		= 0x0C,  //!< OUT_Z_L_M
+	OUT_Z_H_M 		= 0x0D,  //!< OUT_Z_H_M
 
-	WHO_AM_I 		= 0x0F,
+	WHO_AM_I 		= 0x0F,   //!< WHO_AM_I
 
-	INT_CTRL_M 		= 0x12,
-	INT_SRC_M 		= 0x13,
-	INT_THS_L_M 	= 0x14,
-	INT_THS_H_M 	= 0x15,
+	INT_CTRL_M 		= 0x12, //!< INT_CTRL_M
+	INT_SRC_M 		= 0x13,  //!< INT_SRC_M
+	INT_THS_L_M 	= 0x14, //!< INT_THS_L_M
+	INT_THS_H_M 	= 0x15, //!< INT_THS_H_M
 
-	OFFSET_X_L_M 	= 0x16,
-	OFFSET_X_H_M 	= 0x17,
-	OFFSET_Y_L_M 	= 0x18,
-	OFFSET_Y_H_M 	= 0x19,
-	OFFSET_Z_L_M 	= 0x1A,
-	OFFSET_Z_H_M 	= 0x1B,
+	OFFSET_X_L_M 	= 0x16,//!< OFFSET_X_L_M
+	OFFSET_X_H_M 	= 0x17,//!< OFFSET_X_H_M
+	OFFSET_Y_L_M 	= 0x18,//!< OFFSET_Y_L_M
+	OFFSET_Y_H_M 	= 0x19,//!< OFFSET_Y_H_M
+	OFFSET_Z_L_M 	= 0x1A,//!< OFFSET_Z_L_M
+	OFFSET_Z_H_M 	= 0x1B,//!< OFFSET_Z_H_M
 
-	REFERENCE_X 	= 0x1C,
-	REFERENCE_Y 	= 0x1D,
-	REFERENCE_Z 	= 0x1E,
+	REFERENCE_X 	= 0x1C, //!< REFERENCE_X
+	REFERENCE_Y 	= 0x1D, //!< REFERENCE_Y
+	REFERENCE_Z 	= 0x1E, //!< REFERENCE_Z
 
-	CTRL0 			= 0x1F,
-	CTRL1 			= 0x20,
-	CTRL2 			= 0x21,
-	CTRL3 			= 0x22,
-	CTRL4 			= 0x23,
-	CTRL5 			= 0x24,
-	CTRL6 			= 0x25,
-	CTRL7 			= 0x26,
+	CTRL0 			= 0x1F,     //!< CTRL0
+	CTRL1 			= 0x20,     //!< CTRL1
+	CTRL2 			= 0x21,     //!< CTRL2
+	CTRL3 			= 0x22,     //!< CTRL3
+	CTRL4 			= 0x23,     //!< CTRL4
+	CTRL5 			= 0x24,     //!< CTRL5
+	CTRL6 			= 0x25,     //!< CTRL6
+	CTRL7 			= 0x26,     //!< CTRL7
 
-	STATUS_A 		= 0x27,
+	STATUS_A 		= 0x27,   //!< STATUS_A
 
-	OUT_X_L_A 		= 0x28,
-	OUT_X_H_A 		= 0x29,
-	OUT_Y_L_A 		= 0x2A,
-	OUT_Y_H_A 		= 0x2B,
-	OUT_Z_L_A 		= 0x2C,
-	OUT_Z_H_A 		= 0x2D,
+	OUT_X_L_A 		= 0x28,  //!< OUT_X_L_A
+	OUT_X_H_A 		= 0x29,  //!< OUT_X_H_A
+	OUT_Y_L_A 		= 0x2A,  //!< OUT_Y_L_A
+	OUT_Y_H_A 		= 0x2B,  //!< OUT_Y_H_A
+	OUT_Z_L_A 		= 0x2C,  //!< OUT_Z_L_A
+	OUT_Z_H_A 		= 0x2D,  //!< OUT_Z_H_A
 
-	FIFO_CTRL 		= 0x2E,
-	FIFO_SRC 		= 0x2F,
+	FIFO_CTRL 		= 0x2E,  //!< FIFO_CTRL
+	FIFO_SRC 		= 0x2F,   //!< FIFO_SRC
 
-	IG_CFG1 		= 0x30,
-	IG_SRC1 		= 0x31,
-	IG_THS1 		= 0x32,
-	IG_DUR1 		= 0x33,
-	IG_CFG2 		= 0x34,
-	IG_SRC2			= 0x35,
-	IG_THS2 		= 0x36,
-	IG_DUR2 		= 0x37,
+	IG_CFG1 		= 0x30,    //!< IG_CFG1
+	IG_SRC1 		= 0x31,    //!< IG_SRC1
+	IG_THS1 		= 0x32,    //!< IG_THS1
+	IG_DUR1 		= 0x33,    //!< IG_DUR1
+	IG_CFG2 		= 0x34,    //!< IG_CFG2
+	IG_SRC2			= 0x35,    //!< IG_SRC2
+	IG_THS2 		= 0x36,    //!< IG_THS2
+	IG_DUR2 		= 0x37,    //!< IG_DUR2
 
-	CLICK_CFG 		= 0x38,
-	CLICK_SRC 		= 0x39,
-	CLICK_THS 		= 0x3A,
+	CLICK_CFG 		= 0x38,  //!< CLICK_CFG
+	CLICK_SRC 		= 0x39,  //!< CLICK_SRC
+	CLICK_THS 		= 0x3A,  //!< CLICK_THS
 
-	TIME_LIMIT 		= 0x3B,
-	TIME_LATENCY 	= 0x3C,
-	TIME_WINDOW 	= 0x3D,
+	TIME_LIMIT 		= 0x3B, //!< TIME_LIMIT
+	TIME_LATENCY 	= 0x3C,//!< TIME_LATENCY
+	TIME_WINDOW 	= 0x3D, //!< TIME_WINDOW
 
-	Act_THS 		= 0x3E,
-	Act_DUR 		= 0x3F
+	Act_THS 		= 0x3E,    //!< Act_THS
+	Act_DUR 		= 0x3F     //!< Act_DUR
 };
 
+/** @addtogroup LSM303D_Macros Register Access Macros
+ *  @{
+ */
+
+/**
+ * @brief BitField macros for CTRL0
+ */
 #if 1 // LSM303D CTRL0 BitFields
 #define LSM303D_CTRL0_HPIS2_MASK		0x01u
 #define LSM303D_CTRL0_HPIS2_SHIFT		0
@@ -124,6 +146,9 @@ enum class LSM303D_Reg {
 #define LSM303D_CTRL0_BOOT(x)			(((uint8_t)(((uint8_t)(x))<<LSM303D_CTRL0_BOOT_SHIFT))&LSM303D_CTRL0_BOOT_MASK)
 #endif
 
+/**
+ * @brief BitField macros for CTRL1
+ */
 #if 1 // LSM303D CTRL1 BitFields
 #define LSM303D_CTRL1_AXEN_MASK			0x01u
 #define LSM303D_CTRL1_AXEN_SHIFT		0
@@ -147,6 +172,9 @@ enum class LSM303D_Reg {
 #define LSM303D_CTRL1_AODR(x)			(((uint8_t)(((uint8_t)(x))<<LSM303D_CTRL1_AODR_SHIFT))&LSM303D_CTRL1_AODR_MASK)
 #endif
 
+/**
+ * @brief BitField macros for CTRL2
+ */
 #if 1 // LSM303D CTRL2 BitFields
 #define LSM303D_CTRL2_SIM_MASK			0x01u
 #define LSM303D_CTRL2_SIM_SHIFT			0
@@ -168,6 +196,9 @@ enum class LSM303D_Reg {
 
 // Don't currently care about CTRL3-4
 
+/**
+ * @brief BitField macros for CTRL5
+ */
 #if 1 // LSM303D CTRL5 BitFields
 #define LSM303D_CTRL5_LIR1_MASK			0x01u
 #define LSM303D_CTRL5_LIR1_SHIFT		0
@@ -191,13 +222,18 @@ enum class LSM303D_Reg {
 #define LSM303D_CTRL5_TEMP_EN(x)		(((uint8_t)(((uint8_t)(x))<<LSM303D_CTRL5_TEMP_EN_SHIFT))&LSM303D_CTRL5_TEMP_EN_MASK)
 #endif
 
+/**
+ * @brief BitField macros for CTRL6
+ */
 #if 1 // LSM303D CTRL6 BitFields
 #define LSM303D_CTRL6_MFS_MASK			0x60u
 #define LSM303D_CTRL6_MFS_SHIFT			5
 #define LSM303D_CTRL6_MFS_WIDTH			2
 #define LSM303D_CTRL6_MFS(x)			(((uint8_t)(((uint8_t)(x))<<LSM303D_CTRL6_MFS_SHIFT))&LSM303D_CTRL6_MFS_MASK)
 #endif
-
+/**
+ * @brief BitField macros for CTRL7
+ */
 #if 1 // LSM303D CTRL7 BitFields
 #define LSM303D_CTRL7_MD_MASK			0x03u
 #define LSM303D_CTRL7_MD_SHIFT			0
@@ -222,6 +258,12 @@ enum class LSM303D_Reg {
 #endif
 
 // Don't currently care about the other BitFields
+
+/** @} Close LSM303D_Macros group */
+
+/** @addtogroup LSM303D_Config Configuration Options
+ *  @{
+ */
 
 /** Acceleration data rate configuration
  * 	  LSM_AODR_Config AODR3 AODR2 AODR1 AODR0 Power mode selection
@@ -340,39 +382,44 @@ enum class LSM_MD_Config {
  * Structure for initializing the LSM303D
  */
 typedef struct {
-	LSM_AODR_Config aodr_config;
-	LSM_ABW_Config	abw_config;
-	LSM_AFS_Config	afs_config;
-	LSM_MODR_Config modr_config;
-	LSM_MRES_Config mres_config;
-	LSM_MFS_Config	mfs_config;
-	LSM_MD_Config	md_config;
+	LSM_AODR_Config aodr_config;	///< Accelerometer output data rate setting
+	LSM_ABW_Config	abw_config;		///< Accelerometer anti-alias bandwidth setting
+	LSM_AFS_Config	afs_config;		///< Accelerometer full-scale setting
+	LSM_MODR_Config modr_config;	///< Magnetometer output data rate setting
+	LSM_MRES_Config mres_config;	///< Magnetometer resolution setting
+	LSM_MFS_Config	mfs_config;		///< Magnetometer full-scale setting
+	LSM_MD_Config	md_config;		///< Magnetic sensor mode setting
 } LSM303D_InitStruct;
 
+/** @} Close LSM303D_Config group */
+
+/**
+ * @brief Class for interfacing with the ST LSM303D 3-axis accelerometer and magnetometer
+ *
+ * This class is responsible for handling the i2c register reads/writes
+ * necessary to communicate with the LSM303D accelerometer/magnetometer. All I/O is via
+ * i2c.
+ *
+ * The acceleration in the X, Y, or Z direction can be returned.
+ * The magnetic field strength on the X, Y, or Z axis can be returned.
+ */
 class LSM303D {
 private:
-	I2C *i2c;
-	preFilter2 ax, ay, az;
+	I2C *i2c;					///< I2C global instance
+	preFilter2 ax;				///< Filter to pre-filter raw accelerometer X-axis data
+	preFilter2 ay;				///< Filter to pre-filter raw accelerometer Y-axis data
+	preFilter2 az;				///< Filter to pre-filter raw accelerometer Z-axis data
 
-	logger *log;
+	logger *log;				///< Logger instance for gathering data
 
-	float accResolution;
-	float magResolution;
-#if USE_DOUBLE_BUFFERING
-	uint8_t accBuffIndicator;	// Indicates which buffer is readable
-	uint8_t accBuff1[6];		// Accelerometer buffer 1
-	uint8_t accBuff2[6];		// Accelerometer buffer 2
+	float accResolution;		///< Accelerometer resolution setting
+	float magResolution;		///< Magnetometer resolution setting
 
-	uint8_t magBuffIndicator;	// Indicates which buffer is readable
-	uint8_t magBuff1[6];		// Magnetometer buffer 1
-	uint8_t magBuff2[6];		// Magnetometer buffer 2
-#else
-	uint8_t accBuff[6];			// Accelerometer buffer
+	uint8_t accBuff[6];			///< Accelerometer buffer
 
-	uint8_t magBuff[6];			// Magnetometer buffer
-#endif
+	uint8_t magBuff[6];			///< Magnetometer buffer
 
-	uint8_t address;
+	uint8_t address;			///< Slave address of the chip
 
 	void enable(LSM303D_InitStruct init);
 	void accCalibrate(void);
@@ -411,3 +458,7 @@ public:
 };
 
 #endif
+
+/** @} Close LSM303D group */
+/** @} Close IMU group */
+/** @} Close Sensors Group */

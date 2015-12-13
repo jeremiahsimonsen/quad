@@ -1,5 +1,5 @@
 /**
- * @file DMA_IT.h
+ * @file
  *
  * @brief Direct Memory Access (DMA) interrupt service routines
  *
@@ -8,6 +8,17 @@
  *
  * @date Oct 24, 2015
  *
+ * The DMA_IT module is responsible for handling all DMA interrupts. This is necessary
+ * since multiple peripherals (UART, i2c) use DMA to perform transfers.
+ *
+ */
+
+/** @addtogroup Peripherals
+ *  @{
+ */
+
+/** @addtogroup UART
+ *  @{
  */
 
 #ifndef _DMA_IT_H_
@@ -34,4 +45,6 @@ void DMA2_Stream5_IRQHandler(void);
 void DMA2_Stream6_IRQHandler(void);
 void DMA2_Stream7_IRQHandler(void);
 
+/** @} Close UART group */
+/** @} Close Peripherals Group */
 #endif
