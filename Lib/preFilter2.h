@@ -1,5 +1,5 @@
 /**
- * @file preFilter2.h
+ * @file
  *
  * @brief Class for low-pass filtering raw accelerometer and gyro data
  *
@@ -18,16 +18,42 @@
  *
  */
 
+/** @addtogroup Control
+ *  @{
+ */
+
+/** @addtogroup PREFILTER
+ *  @{
+ */
+
 #ifndef PREFILTER2_H_
 #define PREFILTER2_H_
 
-//#define PREFILTER_TAU (500.0f)	// Defined in preFilter.h
-
+/**
+ * @brief 2nd order low-pass filter
+ *
+ * This class implements a low-pass filter of the transfer function:
+ * 		\f[ \frac{2\tau s + 1}{(\tau s + 1)^2} \f]
+ * corresponding z-transform:
+ * 		\f[
+ * 			H(z) = \frac{(2\tau + 1) + 2z^{-1} + (-2\tau + 1)z^{-2}}
+ * 				{(\tau^2 + 2\tau + 1) + (-2\tau^2 + 2)z^{-1} + (\tau^2 - 2\tau + 1)z^{-2}}
+ * 		\f]
+ * which has difference equation:
+ * 		\f[
+ * 			y(n) = \frac{(2\tau + 1)x(n) + 2x(n-1) + (-2\tau + 1)x(n-2) - (-2\tau^2 + 2)y(n-1) - (\tau^2-2\tau+1)y(n-2)}
+ * 				{\tau^2 + 2\tau + 1}
+ * 		\f]
+ *
+ * Each sample is processed one at a time.
+ */
 class preFilter2 {
 private:
-	float tau;
-	float x1, x2;
-	float y1, y2;
+	float tau;		///< Filter time constant
+	float x1;		///< Previous input value, \f$ x(n-1) \f$
+	float x2;		///< 2nd previous input value, \f$ x(n-2) \f$
+	float y1;		///< Previous output value, \f$ y(n-1) \f$
+	float y2;		///< 2nd previous output value, \f$ y(n-2) \f$
 
 public:
 	preFilter2(float tau);
@@ -36,3 +62,6 @@ public:
 };
 
 #endif
+
+/** @} Close PREFILTER group */
+/** @} Close Control Group */

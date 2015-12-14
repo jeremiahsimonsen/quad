@@ -33,11 +33,6 @@ static ADC_HandleTypeDef AdcHandle;
  *  @{
  */
 
-/** @defgroup Adc_Class_Constructors Constructors/Initialization
- *  @brief Functions to obtain an Adc object
- *  @{
- */
-
 /**
  * @brief Default constructor to initialize ADC for reading pin PA2
  */
@@ -111,12 +106,6 @@ void Adc::initAdc(AdcPin p) {
 	}
 }
 
-/** @} Close Adc_Class_Constructors group */
-
-/** @addtogroup Adc_Class_IO I/O
- *  @{
- */
-
 /**
  * @brief Perform a conversion and read from the ADC data register
  * @return Raw sample value
@@ -145,11 +134,10 @@ uint32_t Adc::read() {
 	return retval;
 }
 
-/** @} Close Adc_Class_IO group */
-
 /** @} Close Adc_Class group */
 
-/** @addtogroup Adc_Functions Functions
+/** @addtogroup Adc_Functions HAL-Required Functions
+ *  @brief MCU-specific ADC initialization - required by ST HAL
  *  @{
  */
 

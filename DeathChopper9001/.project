@@ -176,11 +176,6 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Lib/Adc.cpp</locationURI>
 		</link>
 		<link>
-			<name>src/Adc.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/Lib/Adc.h</locationURI>
-		</link>
-		<link>
 			<name>src/DMA_IT.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/lib/DMA_IT.c</locationURI>

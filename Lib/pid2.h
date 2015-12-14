@@ -1,5 +1,5 @@
 /**
- * @file pid2.h
+ * @file
  *
  * @brief Class for PID feedback control
  *
@@ -8,13 +8,14 @@
  *
  * @date Dec 8, 2015
  *
- * This class implements a feedback controller with transfer function:
- *		G(s) = Kp + Ki/s + Kd*s
- * Or z-transform:
- * 		G(z) = (K1 - K2*z^-1 + K3*z^-2) / (1-z^-1)
- * and difference equation:
- * 		u(n) = u(n-1) + K1*e(n) - K2*e(n-1) + K3*e(n-2)
- *
+ */
+
+/** @addtogroup Control
+ *  @{
+ */
+
+/** @addtogroup PID
+ *  @{
  */
 
 #ifndef PID2_H_
@@ -23,11 +24,20 @@
 #define INTEGRAL_SATURATION 5.0f
 #define ERROR_DEADBAND 1.0f
 
+/**
+ * @brief Alternate PID implementation
+ *
+ * This class implements PID control in a more traditional manner. The sample
+ * time is measured and the error integral & derivative are numerically
+ * calculated.
+ */
 class pid2 {
 private:
-	float kp, ki, kd;
-	float integral;
-	float e1;
+	float kp;			///< The proportional gain constant
+	float ki;			///< The integral gain constant
+	float kd;			///< The derivative gain constant
+	float integral;		///< The error integral
+	float e1;			///< The previous error for calculating the derivative
 
 public:
 	pid2(float kp, float ki, float kd);
@@ -36,3 +46,6 @@ public:
 };
 
 #endif
+
+/** @} Close PID group */
+/** @} Close Control Group */

@@ -10,12 +10,29 @@
  * 
  */
 
-/** @addtogroup Peripherals
+/** @defgroup Peripherals Low-level MCU peripherals
+ *  @brief Low-level hardware peripherals (@ref Adc "ADC", @ref I2C "I2C", @ref UART "UART", @ref TIM "TIM", etc.)
+ *
+ *  The Death Chopper 9000 uses several of the hardware peripherals on the
+ *  STM32F407, including:
+ *  	- ADC
+ *  	- I2C
+ *  	- U(S)ART
+ *  	- TIM
+ *
+ *  For more details, refer to @ref low_level_peripherals
+ *
  *  @{
  */
 
 /** @defgroup UART UART Communication
  *  @brief Module for communication via UART - required for remote control using XBees.
+ *
+ *  The Death Chopper 9000 uses UART to talk to an XBee wireless radio for
+ *  remote control.
+ *
+ *  Refer to @ref peripheral_UART for additional information.
+ *
  *  @{
  */
 
@@ -107,9 +124,48 @@ void USART6_IRQHandler(void);
 }
 #endif
 
-/*
- * U(S)ART initialization wrapper function
+/** @defgroup UART_Functions Functions
+ *  @brief Interfacing with the hardware U(S)ART peripherals
+ *
+ *  To use UART communication, the init_USART() function should be called. It
+ *  handles GPIO initialization and configures the desired U(S)ART port.
+ *
+ *  Once the UART has been initialized, it is ready to send data using the
+ *  usart_transmit() function. To receive data, the usart_receive_begin()
+ *  function must be called, then usart_read() will return a pointer to a
+ *  buffer containing received data.
+ *
+ *  @{
  */
+
+/** @defgroup UART_Functions_Init Initialization Routines
+ *  @brief Functions to handle initializing the UART hardware peripheral
+ *
+ *  To use UART communication, the init_USART() function should be called. It
+ *  handles GPIO initialization and configures the desired U(S)ART port.
+ *
+ *  @{
+ */
+
+/**
+* @brief Initializes the U(S)ART port specified by #uart_num
+*
+* Initializes the U(S)ART port specified by #uart_num to settings specified by optional arguments.
+* 	Usage is:
+* 		init_USART(uart_num, num_args[, baud_rate[, wordlength[, stop_bits[, parity[, hw_flow_ctrl[, mode[, oversampling]]]]]]])
+*
+* @note  Must be called before using any other usart function. Should only be called ONCE
+*
+* @param uart_num 		Number of the U(S)ART port to initialize
+* @param num_args 		Number of arguments to the function
+* @param baud_rate		The baudrate (bps) to initialize the U(S)ART port to
+* @param wordlength 	The total length (DATA + STOP) of a word in bits
+* @param stop_bits		The number of stop bits
+* @param parity			The desired parity - none, even, odd, mark, space
+* @param hw_flow_ctrl	Hardware flow control settings (RTS/CTS)
+* @param mode			The peripheral mode - TX, RX, TX/RX
+* @param oversampling	The oversampling ratio
+*/
 void init_USART(int uart_num, int num_args, ...)
 {
 	// Required for variadic functions
@@ -189,8 +245,19 @@ void init_USART(int uart_num, int num_args, ...)
 	UartReady = SET;
 }
 
-/*
- * Send a string over UART
+/** @} Close UART_Functions_Init group */
+
+/** @defgroup UART_Functions_IO I/O Functions
+ *  @brief Functions to send and receive data via UART
+ *  @{
+ */
+
+/**
+ * @brief Send (TX) a string via the U(S)ART
+ *
+ * @note init_USART() should be called first
+ *
+ * @param s The string to send
  */
 void usart_transmit(uint8_t *s)
 {
@@ -207,8 +274,13 @@ void usart_transmit(uint8_t *s)
 	}
 }
 
-/*
- * Start DMAs for UART RX
+/**
+ * @brief Start receiving data (RX) using DMA
+ *
+ * Data is received using DMA in circular mode. Software double buffering is used to
+ * avoid race conditions when trying to simultaneously read/write from/to the buffer.
+ *
+ * @note init_USART() should be called first. This must be called before usart_read()
  */
 void usart_receive_begin() {
 	if (HAL_UART_Receive_DMA(&UartHandle, (uint8_t *)DmaBuff, 2*TRANSFER_SIZE)) {
@@ -216,8 +288,12 @@ void usart_receive_begin() {
 	}
 }
 
-/*
- * Read the buffer of data from UART RX
+/**
+ * @brief Retrieve a string that has been read
+ *
+ * @note init_USART() and usart_receive_being() should be called first
+ *
+ * @return A pointer to a buffer containing the read string/data
  */
 uint8_t* usart_read(void) {
 	if (dataRead == true || validRx < 0) {
@@ -228,11 +304,13 @@ uint8_t* usart_read(void) {
 	}
 }
 
+/** @} Close UART_Functions_IO group */
+
 /*
  * Initialization Functions
  */
 
-/** @addtogroup UART_Initialization UART Initialization
+/** @addtogroup UART_Functions_Init
  *  @{
  */
 
@@ -767,13 +845,14 @@ void USART6MspInit()
 	HAL_NVIC_EnableIRQ(USART6_IRQn);
 }
 
-/** @} Close UART_Initialization group */
+/** @} Close UART_Functions_Init group */
 
 /*
  * De-Initialization Routines
  */
 
-/** @addtogroup UART_DeInitialization UART De-Initialization
+/** @defgroup UART_Functions_DeInit De-Initialization Routines
+ *  @brief Functions to de-initialize the U(S)ART hardware peripherals
  *  @{
  */
 
@@ -940,13 +1019,14 @@ void USART6MspDeInit()
 	HAL_NVIC_DisableIRQ(USART6_RX_DMA_IRQn);
 }
 
-/** @} Close UART_DeInitialization group */
+/** @} Close UART_Functions_DeInit group */
 
 /*
  * Callback functions
  */
 
-/** @addtogroup UART_Callbacks Interrupt Callbacks
+/** @addtogroup UART_Functions_Callbacks Interrupt Callbacks
+ *  @brief Functions called on interrupts after flags and errors have been handled
  *  @{
  */
 
@@ -1059,13 +1139,14 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 
 #pragma GCC diagnostic pop
 
-/** @} Close UART_Callbacks group */
+/** @} Close UART_Functions_Callbacks group */
 
 /*
  * ISRs
  */
 
-/** @addtogroup UART_ISRs UART Interrupt Service Routines
+/** @addtogroup UART_Functions_ISRs ISRs for U(S)ART
+ *  @brief Functions called on U(S)ART interrupts
  *  @{
  */
 
@@ -1129,7 +1210,9 @@ void USART6_IRQHandler(void)
 	HAL_UART_IRQHandler(&UartHandle);
 }
 
-/** @} Close UART_ISRs group */
+/** @} Close UART_Functions_ISRs group */
+
+/** @} Close UART_Functions group */
 
 /** @} Close UART group */
 /** @} Close Peripherals Group */

@@ -1,5 +1,5 @@
 /**
- * @file preFilterFIR.h
+ * @file
  *
  * @brief Class for low-pass filtering raw accelerometer and gyro data
  *
@@ -10,6 +10,14 @@
  *
  */
 
+/** @addtogroup Control
+ *  @{
+ */
+
+/** @addtogroup PREFILTER
+ *  @{
+ */
+
 #ifndef PREFILTERFIR_H_
 #define PREFILTERFIR_H_
 
@@ -17,12 +25,19 @@
 #include "stm32f407xx.h"
 #include "arm_math.h"
 
-//#define PREFILTER_TAU (500.0f)	// Defined in preFilter.h
-
+/**
+ * @brief Arbitrary FIR filter
+ *
+ * This class implements an arbitrary FIR filter. The filter coefficients are
+ * defined in the constructor. The ARM CMSIS DSP filtering routines are used
+ * for maximum performance.
+ *
+ * Each sample is processed one at a time.
+ */
 class preFilterFIR {
 private:
-	arm_fir_instance_f32 f;
-	float32_t *state;
+	arm_fir_instance_f32 f;		///< ARM FIR filter structure
+	float32_t *state;			///< State buffer used by ARM routine
 
 public:
 	preFilterFIR();
@@ -31,3 +46,6 @@ public:
 };
 
 #endif
+
+/** @} Close PREFILTER group */
+/** @} Close Control Group */

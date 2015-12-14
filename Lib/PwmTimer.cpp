@@ -42,11 +42,6 @@
  *  @{
  */
 
-/** @defgroup TIM_Class_Constructors Constructors
- *  @brief Functions to obtain a PwmTimer
- *  @{
- */
-
 /**
  * @brief Default constructor initialize pin PA0 for PWM with 50 Hz and 1 ms
  */
@@ -76,12 +71,6 @@ PwmTimer::PwmTimer(float f, TimerPin p) {
 	// Initialize the TIM to generate the desired PWM waveform
 	initTimer(frequency, pulseWidth, pin);
 }
-
-/** @} Close TIM_Class_Constructors group */
-
-/** @addtogroup TIM_Class_Control Control Methods
- *  @{
- */
 
 /**
  * @brief Sets the PWM frequency
@@ -137,12 +126,6 @@ void PwmTimer::setWidth(float w) {
 	// Set the CCR value
 	__HAL_TIM_SET_COMPARE(&this->TimHandle, channel, ccr);
 }
-
-/** @} Close TIM_Class_Control group */
-
-/** @addtogroup TIM_Class_Helper Initialization Functions
- *  @{
- */
 
 /**
  * @brief Helper function for configuring the TIM for the given parameters
@@ -270,10 +253,10 @@ void PwmTimer::initTimer(float f, float w, TimerPin p) {
 	setWidth(w);
 }
 
-/** @} Close TIM_Class_Helper group */
 /** @} Close TIM_Class group */
 
 /** @addtogroup TIM_Functions HAL Required Functions
+ *  @brief MCU-specific PWM initialization - required by ST HAL
  *  @{
  */
 

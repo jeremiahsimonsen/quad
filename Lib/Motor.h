@@ -1,5 +1,5 @@
 /**
- * @file Motor.h
+ * @file
  *
  * @brief Class for controlling hobby ESCs
  *
@@ -15,6 +15,14 @@
  * width and calls routines in the PwmTimer class for processor-specific
  * operations.
  *
+ */
+
+/** @addtogroup Peripherals
+ *  @{
+ */
+
+/** @addtogroup Motor
+ *  @{
  */
 
 #ifndef MOTOR_H_
@@ -33,43 +41,37 @@
 
 #define MAX_SPEED 0.7f
 
+/**
+ * @brief Electronic Speed Controller (ESC) Interface
+ *
+ * Hobby ESCs take a PWM input with a frequency of 50 Hz. 1 ms positive pulse
+ * width corresponds to zero throttle, and 2 ms positive pulse width corresponds
+ * to full throttle.
+ *
+ * This class provides a simple interface for setting the speed of a motor. It
+ * allows for simple initialization by specifying a compatible GPIO pin to the
+ * constructor. The Motor::setSpeed() function takes care of calculating the
+ * necessary pulse width and calls routines in the PwmTimer class for processor-
+ * specific operations.
+ */
 class Motor {
 private:
 	PwmTimer *pwm;	///< PwmTimer object to handle hardware-specifics
 	float speed;	///< Speed/throttle of the motor. 0.0 <= speed <= 1.0
 
-	/**
-	 * Helper function to convert a speed level (0.0 to 1.0) to the required
-	 * PWM positive pulse width.
-	 * @param s Speed/throttle level from 0.0 to 1.0
-	 * @return PWM positive pulse width corresponding to the speed in ms
-	 */
 	float mapSpeedToPulseW(float s);
 
 public:
-	/**
-	 * Default constructor. Initializes a motor on the default PwmTimer pin
-	 */
+
 	Motor();
-	/**
-	 * Initializes a motor on the specified pin, p
-	 * @param p The pin to initialize for the motor control
-	 */
 	Motor(TimerPin p);
 
-	/**
-	 * Sets the speed of the ESC/motor to the specified throttle level, s
-	 * @param s Speed/throttle level from 0.0 to 1.0
-	 */
 	void setSpeed(float s);
 
-	/**
-	 * Retrieves the speed of the motor. Only relevant for Group B's ESC
-	 *
-	 * @todo Implement this function
-	 * @return The speed of the motor in rpm
-	 */
 	float getSpeed(void);
 };
 
 #endif /* MOTOR_H_ */
+
+/** @} Close Motor group */
+/** @} Close Peripherals Group */

@@ -1,5 +1,5 @@
 /**
- * @file preFilterFIR.cpp
+ * @file
  *
  * @brief Class for low-pass filtering raw accelerometer and gyro data
  *
@@ -10,8 +10,22 @@
  *
  */
 
+/** @addtogroup Control
+ *  @{
+ */
+
+/** @addtogroup PREFILTER
+ *  @{
+ */
+
 #include "preFilterFIR.h"
 
+/**
+ * @brief Construct a preFilterFIR object
+ *
+ * Constructs an arbitary FIR filter object and initializes the ARM structs
+ * and filter coefficients.
+ */
 preFilterFIR::preFilterFIR() {
 	// FIR filter coefficients
 
@@ -106,6 +120,14 @@ preFilterFIR::preFilterFIR() {
  	arm_fir_init_f32(&f, num_taps, &coef[0], state, 1);
 }
 
+/**
+ * @brief   Calculate the filter output
+ * @param x The current sample input
+ * @return  The corresponding filter output
+ *
+ * Calculates the filtered value using the FIR filter coefficients from the
+ * constructor.
+ */
 float32_t preFilterFIR::filterSample(float32_t *x) {
 	float32_t y = 0.0f;
 
@@ -114,6 +136,7 @@ float32_t preFilterFIR::filterSample(float32_t *x) {
 	return y;
 }
 
-
+/** @} Close PREFILTER group */
+/** @} Close Control Group */
 
 

@@ -1,5 +1,5 @@
 /**
- * @file gyroCompFilter.cpp
+ * @file
  *
  * @brief Class for low-pass filtering pre-filtered gyro data
  *
@@ -8,29 +8,42 @@
  *
  * @date Nov 22, 2015
  *
- * This class implements a low-pass filter of the transfer function:
- * 		H(z) = (tau + tau*z^(-1)) / ((tau+1) + (1-tau)z^(-1))
- * which has difference equation:
- * 		y(n) = ( (x(n)tau + x(n-1)tau - y(n-1)(1-tau) ) / (tau + 1)
- *
- * One single sample is processed at a time
- *
+ */
+
+/** @addtogroup Control
+ *  @{
+ */
+
+/** @addtogroup COMPFILTER
+ *  @{
  */
 
 #include "gyroCompFilter.h"
 
+/**
+ * @brief Construct a gyroCompFilter object with the default time constant
+ */
 gyroCompFilter::gyroCompFilter() {
 	x_prev = 0.0f;
 	y_prev = 0.0f;
 	tau = 1.0f;
 }
 
+/**
+ * @brief Construct a gyroCompFilter object with the given time constant
+ * @param t Time constant
+ */
 gyroCompFilter::gyroCompFilter(float t) {
 	x_prev = 0.0f;
 	y_prev = 0.0f;
 	tau = t;
 }
 
+/**
+ * @brief  Calculate the filter output
+ * @param  x The current sample input
+ * @return The corresponding filter output
+ */
 float gyroCompFilter::filterSample(float x) {
 	float y = ( x*tau + x_prev*tau - y_prev*(1-tau) ) / (tau+1);
 	x_prev = x;
@@ -39,6 +52,7 @@ float gyroCompFilter::filterSample(float x) {
 	return y;
 }
 
-
+/** @} Close COMPFILTER group */
+/** @} Close Control Group */
 
 

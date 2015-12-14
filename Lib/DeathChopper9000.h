@@ -41,6 +41,7 @@
  * This page gives an overview of the low-level peripherals supported by the Death Chopper 9000 library.
  * It is divided into the following sections:
  * 		- @subpage peripheral_UART
+ * 		- @subpage peripheral_I2C
  *
  */
 
@@ -78,6 +79,13 @@
  * | USART6   | TX  | 2   |   6    |   5     |
  * |          | RX  | 2   |   1    |   5     |
  *
+ */
+
+/**
+ * @page peripheral_I2C I2C Configuration
+ *
+ * @todo Insert table of i2c pin mapping
+ * @todo Insert table of i2c DMA mapping
  */
 
 #ifndef __DEATHCHOPPER9000__

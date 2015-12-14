@@ -29,66 +29,21 @@
 
 #include "DMA_IT.h"
 
-/** @addtogroup UART_Functions Functions
- *  @{
- */
-
-/**
-* @brief Initializes the U(S)ART port specified by #uart_num
-*
-* Initializes the U(S)ART port specified by #uart_num to settings specified by optional arguments.
-* 	Usage is:
-* 		init_USART(uart_num, num_args[, baud_rate[, wordlength[, stop_bits[, parity[, hw_flow_ctrl[, mode[, oversampling]]]]]]])
-*
-* @note  Must be called before using any other usart function. Should only be called ONCE
-*
-* @param uart_num 		Number of the U(S)ART port to initialize
-* @param num_args 		Number of arguments to the function
-* @param baud_rate		The baudrate (bps) to initialize the U(S)ART port to
-* @param wordlength 	The total length (DATA + STOP) of a word in bits
-* @param stop_bits		The number of stop bits
-* @param parity			The desired parity - none, even, odd, mark, space
-* @param hw_flow_ctrl	Hardware flow control settings (RTS/CTS)
-* @param mode			The peripheral mode - TX, RX, TX/RX
-* @param oversampling	The oversampling ratio
-*/
 void init_USART(int uart_num, int num_args, ...);
 
-/**
- * @brief Send (TX) a string via the U(S)ART
- *
- * @note init_USART() should be called first
- *
- * @param s The string to send
- */
 void usart_transmit(uint8_t *s);
 
-/**
- * @brief Start receiving data (RX) using DMA
- *
- * Data is received using DMA in circular mode. Software double buffering is used to
- * avoid race conditions when trying to simultaneously read/write from/to the buffer.
- *
- * @note init_USART() should be called first. This must be called before usart_read()
- */
 void usart_receive_begin(void);
 
-/**
- * @brief Retrieve a string that has been read
- *
- * @note init_USART() and usart_receive_being() should be called first
- *
- * @return A pointer to a buffer containing the read string/data
- */
 uint8_t* usart_read(void);
 
-/** @} Close UART_Functions group */
-
 /** @addtogroup UART_Defines Definitions
+ *  @brief U(S)ART RX, GPIO, DMA constants
  *  @{
  */
 
 /** @addtogroup UART_Defines_RX Receive Parameters
+ *  @brief Remote control options
  *  @{
  */
 
@@ -101,6 +56,7 @@ uint8_t* usart_read(void);
 
 /* Definitions for USART1 ****************************************************/
 /** @addtogroup UART_Defines_USART1 USART1 Defines
+ *  @brief Constants for USART1
  *  @{
  */
 
@@ -144,6 +100,7 @@ uint8_t* usart_read(void);
 
 /* Definitions for USART2 ****************************************************/
 /** @addtogroup UART_Defines_USART2 USART2 Defines
+ *  @brief Constants for USART2
  *  @{
  */
 
@@ -187,6 +144,7 @@ uint8_t* usart_read(void);
 
 /* Definitions for USART3 ****************************************************/
 /** @addtogroup UART_Defines_USART3 USART3 Defines
+ *  @brief Constants for USART3
  *  @{
  */
 
@@ -230,6 +188,7 @@ uint8_t* usart_read(void);
 
 /* Definitions for UART4 ****************************************************/
 /** @addtogroup UART_Defines_UART4 UART4 Defines
+ *  @brief Constants for UART4
  *  @{
  */
 
@@ -273,6 +232,7 @@ uint8_t* usart_read(void);
 
 /* Definitions for UART5 ****************************************************/
 /** @addtogroup UART_Defines_UART5 UART5 Defines
+ *  @brief Constants for UART5
  *  @{
  */
 
@@ -316,6 +276,7 @@ uint8_t* usart_read(void);
 
 /* Definitions for USART6 ****************************************************/
 /** @addtogroup UART_Defines_USART6 USART6 Defines
+ *  @brief Constants for USART6
  *  @{
  */
 

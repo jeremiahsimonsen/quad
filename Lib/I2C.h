@@ -25,10 +25,12 @@
 #include "stm32f4_discovery.h"
 
 /** @addtogroup I2C_Defines Definitions
+ *  @brief I2C DMA attribute definitions
  *  @{
  */
 
 /** @addtogroup I2C_Defines_I2C1 I2C1 Defines
+ *  @brief DMA attributes for the i2c1 hardware peripheral
  *  @{
  */
 
@@ -48,6 +50,7 @@
 /** @} Close I2C_Defines_I2C1 group */
 
 /** @addtogroup I2C_Defines_I2C2 I2C2 Defines
+ *  @brief DMA attributes for the i2c2 hardware peripheral
  *  @{
  */
 
@@ -67,6 +70,7 @@
 /** @} Close I2C_Defines_I2C2 group */
 
 /** @addtogroup I2C_Defines_I2C3 I2C3 Defines
+ *  @brief DMA attributes for the i2c3 hardware peripheral
  *  @{
  */
 
@@ -108,9 +112,11 @@ enum class i2cPin {
 	PH8,	// I2C3_SDA
 };
 
-// TODO: Move to config
+/// @todo Move to config
 #define I2C_SCL_PIN (i2cPin::PB6)
 #define I2C_SDA_PIN (i2cPin::PB9)
+
+/** @} Close I2C_Defines group */
 
 /**
  * @brief Class for low-level i2c operations

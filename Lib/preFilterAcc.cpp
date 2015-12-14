@@ -1,5 +1,5 @@
 /**
- * @file preFilterAcc.cpp
+ * @file
  *
  * @brief Class for low-pass filtering raw accelerometer data
  *
@@ -10,9 +10,27 @@
  *
  */
 
+/** @addtogroup Control
+ *  @{
+ */
+
+/** @addtogroup PREFILTER
+ *  @{
+ */
+
 #include "preFilterAcc.h"
 
+/**
+ * @brief Construct a preFilterAcc object
+ *
+ * Constructs an arbitrary IIR filter object and initializes the ARM structs
+ * and filter coefficients.
+ */
 preFilterAcc::preFilterAcc() {
+	/* Variables for several filters are below. Uncomment the one for the
+	 * desired filter transfer function.
+	 */
+
 	// IIR filter coefficient array
  	// {b10, b11, b12, a11, a12, b20, b21, b22, a21, a22}
 
@@ -81,14 +99,25 @@ preFilterAcc::preFilterAcc() {
  	arm_biquad_cascade_df2T_init_f32(&f,num_sections,&coef[0],state);
 }
 
+/**
+ * @brief   Calculate the filter output
+ * @param x The current sample input
+ * @return  The corresponding filter output
+ *
+ * Calculates the filtered value using the IIR filter coefficients from the
+ * constructor.
+ */
 float32_t preFilterAcc::filterSample(float32_t *x) {
 	float32_t y = 0.0f;
 
+	// Calculate output using the ARM routine
 	arm_biquad_cascade_df2T_f32(&f, (float32_t *)x, &y, 1);
 
+	// Scale by the gain
 	return y*g;
 }
 
-
+/** @} Close PREFILTER group */
+/** @} Close Control Group */
 
 

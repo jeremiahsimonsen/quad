@@ -23,8 +23,8 @@
  *  @{
  */
 
-/** @defgroup I2C I2C Communication
- *  @brief Module for communication via I2C - required for interfacing with sensors.
+/** @defgroup I2C I2C
+ *  @brief Module for communication via i2c - required for interfacing with sensors.
  *  @{
  */
 
@@ -74,17 +74,177 @@ void HAL_I2C_MemTxCpltCallback(I2C_HandleTypeDef *hi2c);
 void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c);
 void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c);
 
-void I2C1_ER_IRQHandler(void);
-
 #ifdef __cplusplus
 }
 #endif
 
-/** @addtogroup I2C_Functions Functions
+/** @defgroup I2C_Class I2C class
+ *  @brief Low-level i2c abstraction
+ *
+ * This class is responsible for low-level i2c reads and writes. It uses a
+ * singleton design pattern so that it is impossible to create more than one
+ * instance. This is because i2c transfers are done via DMA. DMA completion
+ * ISRs require the i2cHandle to be global.
+ *
+ * To use the class, an I2C* must be fetched using I2C::Instance(). Reads and
+ * writes (general and memory) can then be freely performed using the member
+ * functions. If the i2c hardware peripheral is busy performing an I/O operation,
+ * it will block until it is available to perform the next operation.
+ *
+ *  @{
+ */
+
+/**
+ * @brief This function is called to create/get an instance of the class
+ * @param cl i2cPin to be used for the clock if the instance has not been created
+ * @param da i2cPin to be used for the data if the instance has not been created
+ * @return Pointer to a I2C instance
+ */
+I2C* I2C::Instance(i2cPin cl, i2cPin da) {
+	if (i2cInstance == NULL) {
+		i2cInstance = new I2C(cl,da);
+	}
+
+	return i2cInstance;
+}
+
+/**
+ * @brief Constructs an I2C object
+ */
+I2C::I2C() {
+	scl = i2cPin::PB8;
+	sda = i2cPin::PB9;
+
+	initI2C((int)scl, (int)sda);
+}
+
+/**
+ * @brief Constructs an I2C object
+ * @param cl i2cPin to use for the clock
+ * @param da i2cPin to use for the data
+ */
+I2C::I2C(i2cPin cl, i2cPin da) {
+	if (!isSclPin(cl) || !isSdaPin(da)) {
+		// TODO: Do some error handling
+	}
+
+	// Initialize member variables
+	scl = cl;
+	sda = da;
+
+	// Initialize the i2c peripheral
+	initI2C((int)scl, (int)sda);
+}
+
+/**
+ * @brief Member function to perform generic i2c writes as master
+ * @param devAddr i2c slave address of the device to write to (left-justified)
+ * @param pData   Pointer to array of bytes to write
+ * @param size    Number of bytes to write
+ * @return 0 on success, -1 on error
+ */
+int8_t I2C::write(uint16_t devAddr, uint8_t *pData, uint16_t size) {
+	// Must wait until the I2C peripheral is ready, i.e., for any previous transfers to finish
+	while (HAL_I2C_GetState(&i2cHandle) != HAL_I2C_STATE_READY);
+
+	// Initiate a write
+	if (HAL_I2C_Master_Transmit_DMA(&i2cHandle, devAddr, pData, size) != HAL_OK) {
+		return -1;
+	}
+
+	return 0;
+}
+
+
+/**
+ * @brief Member function to perform generic i2c reads as master
+ * @param devAddr i2c slave address of the device to read from (left-justified)
+ * @param pData   Pointer to array to store read bytes
+ * @param size    Number of bytes to read
+ * @return 0 on success, -1 on error
+ */
+int8_t I2C::read(uint16_t devAddr, uint8_t *pData, uint16_t size) {
+	// Must wait until the I2C peripheral is ready, i.e., for any previous transfers to finish
+	while (HAL_I2C_GetState(&i2cHandle) != HAL_I2C_STATE_READY);
+
+	// Initiate a read
+	if (HAL_I2C_Master_Receive_DMA(&i2cHandle, devAddr, pData, size) != HAL_OK) {
+		return -1;
+	}
+
+	return 0;
+}
+
+/**
+ * @brief Member function to write to a register on an i2c slave device
+ * @param devAddr i2c slave address of the device to write to (left-justified)
+ * @param memAddr Address of the device register to begin writes
+ * @param pData   Pointer to array of bytes to write to slave device memory
+ * @param size    Number of bytes to write
+ * @return 0 on success, -1 on error
+ */
+int8_t I2C::memWrite(uint16_t devAddr, uint16_t memAddr, uint8_t *pData, uint16_t size) {
+	// Must wait until the I2C peripheral is ready, i.e., for any previous transfers to finish
+	while (HAL_I2C_GetState(&i2cHandle) != HAL_I2C_STATE_READY);
+
+	// Initiate a memory write
+	if (HAL_I2C_Mem_Write_DMA(&i2cHandle, devAddr, memAddr, I2C_MEMADD_SIZE_8BIT, pData, size) != HAL_OK) {
+		return -1;
+	}
+
+	return 0;
+}
+
+/**
+ * @brief Member function to read a register from an i2c slave device
+ * @param devAddr i2c slave address of the device to read from (left-justified)
+ * @param memAddr Address of the device register to read
+ * @param pData1  Pointer to data buffer
+ * @param size    Number of bytes to be read
+ * @return		  0 on success
+ * 				  -1 if HAL_Error returned
+ */
+int8_t I2C::memRead(uint16_t devAddr, uint16_t memAddr, uint8_t *pData1, uint16_t size) {
+	// Must wait until the I2C peripheral is ready, i.e., for any previous transfers to finish
+	while(HAL_I2C_GetState(&i2cHandle) != HAL_I2C_STATE_READY);
+
+	// Initiate a memory read
+	if (HAL_I2C_Mem_Read_DMA(&i2cHandle, devAddr, memAddr, I2C_MEMADD_SIZE_8BIT, pData1, size) != HAL_OK) {
+		return -1;
+	}
+
+	return 0;
+}
+
+/**
+ * @brief Function to block until the peripheral is ready
+ */
+void I2C::readyWait(void) {
+	// Must wait until the I2C peripheral is ready, i.e., for any previous transfers to finish
+	while(HAL_I2C_GetState(&i2cHandle) != HAL_I2C_STATE_READY);
+}
+
+/** @} Close I2C_Class group */
+
+/** @defgroup I2C_Functions Functions
+ *  @brief ST HAL required functions, interrupts, helpers
+ *
+ *  To use i2c, a pointer to the I2C singleton is fetched using I2C::Instance().
+ *  This calls the I2C constructor if the singleton has not already been
+ *  initialized. The constructors call the initI2C() helper function, which
+ *  handles setting up GPIO and the correct i2c hardware peripheral.
+ *
+ *  I/O is then performed using the I2C::write(), I2C::read(), I2C::memWrite(),
+ *  and I2C::memRead() functions.
+ *
+ *  I2C::readyWait() is exposed to allow code that depends on i2c transfers to
+ *  complete to wait for the peripheral to be idle, meaning that data is ready.
+ *
  *  @{
  */
 
 /** @addtogroup I2C_Functions_Init Initialization Routines
+ *  @brief Functions to initialize the i2c hardware peripherals
  *  @{
  */
 
@@ -371,6 +531,7 @@ void I2C3_MspInit(I2C_HandleTypeDef *hi2c) {
 /** @} Close I2C_Functions_Init group */
 
 /** @addtogroup I2C_Functions_DeInit De-Initialization Routines
+ *  @brief Functions to de-initialize the i2c hardware peripherals
  *  @{
  */
 
@@ -482,6 +643,7 @@ void I2C3_MspDeInit() {
 /** @} Close I2C_Functions_DeInit group */
 
 /** @addtogroup I2C_Functions_Callbacks Interrupt Callbacks
+ *  @brief Functions called on interrupts after flags and errors have been handled
  *  @{
  */
 
@@ -491,74 +653,102 @@ void I2C3_MspDeInit() {
 
 /**
  * @brief Function called when master transmit is complete
+ *
+ * Currently does nothing. Can be used to signal that a Master write has
+ * completed successfully.
+ *
  * @param hi2c i2c configuration
+ *
+ * @todo Implement to add functionality
  */
 void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c) {
-	// TODO: Implement
+
 }
 
 /**
  * @brief Function called when master receive is complete
+ *
+ * Currently does nothing. Can be used to signal that a Master read has
+ * completed successfully.
+ *
  * @param hi2c i2c configuration
+ *
+ * @todo Implement to add functionality
  */
 void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c) {
-	// TODO: Implement
+
 }
 
 /**
  * @brief Function called when slave transmit is complete
+ *
+ * Currently does nothing. Can be used to signal that a Slave write has
+ * completed successfully. Only useful if processor acts as slave.
+ *
  * @param hi2c i2c configuration
  */
 void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c) {
-	// TODO: Implement
+
 }
 
 /**
  * @brief Function called when slave receive is complete
+ *
+ * Currently does nothing. Can be used to signal that a Slave read has
+ * completed successfully. Only useful if processor acts as slave.
+ *
  * @param hi2c i2c configuration
  */
 void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c) {
-	// TODO: Implement
+
 }
 
 /**
  * @brief Function called when master memory transmit is complete
+ *
+ * Currently does nothing. Can be used to signal that a Master write to
+ * slave memory has completed successfully.
+ *
  * @param hi2c i2c configuration
+ *
+ * @todo Implement to add functionality
  */
 void HAL_I2C_MemTxCpltCallback(I2C_HandleTypeDef *hi2c) {
-	// TODO: Implement
+
 }
 
 /**
  * @brief Function called when master memory receive is complete
+ *
+ * Currently does nothing. Can be used to signal that a Master read from
+ * slave memory has completed successfully.
+ *
  * @param hi2c i2c configuration
+ *
+ * @todo Implement to add functionality
  */
 void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c) {
-	// TODO: Implement
+
 }
 
 /**
  * @brief Function called when transmission error occurs
+ *
+ * Currently does nothing. Can be used to signal when an i2c error occurs
+ *
  * @param hi2c i2c configuration
+ *
+ * @todo Implement to add functionality
  */
 void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c) {
-	// TODO: Implement
+
 }
 #pragma GCC diagnostic pop
 
 /** @} Close I2C_Functions_Callbacks group */
 
-/** @addtogroup I2C_Functions_ISRs Interrupt Service Routines
- *  @{
- */
-
-void I2C1_ER_IRQHandler() {
-	HAL_I2C_ER_IRQHandler(&i2cHandle);
-}
-
-/** @} Close I2C_Functions_ISRs group */
-
 /** @addtogroup I2C_Functions_Helpers Helper functions
+ *  @brief Convenience functions for utilizing the i2cPin abstraction
  *  @{
  */
 
@@ -588,156 +778,7 @@ bool isSdaPin(i2cPin p) {
 
 /** @} Close I2C_Functions_Helpers group */
 
-/** @defgroup I2C_Class I2C class
- *  @brief Low-level i2c abstraction
- *  @{
- */
-
-/** @defgroup I2C_Class_Constructors Constructors
- *  @brief Functions to obtain an I2C instance
- *  @{
- */
-
-/**
- * @brief This function is called to create/get an instance of the class
- * @param cl i2cPin to be used for the clock if the instance has not been created
- * @param da i2cPin to be used for the data if the instance has not been created
- * @return Pointer to a I2C instance
- */
-I2C* I2C::Instance(i2cPin cl, i2cPin da) {
-	if (i2cInstance == NULL) {
-		i2cInstance = new I2C(cl,da);
-	}
-
-	return i2cInstance;
-}
-
-/**
- * @brief Constructs an I2C object
- */
-I2C::I2C() {
-	scl = i2cPin::PB8;
-	sda = i2cPin::PB9;
-
-	initI2C((int)scl, (int)sda);
-}
-
-/**
- * @brief Constructs an I2C object
- * @param cl i2cPin to use for the clock
- * @param da i2cPin to use for the data
- */
-I2C::I2C(i2cPin cl, i2cPin da) {
-	if (!isSclPin(cl) || !isSdaPin(da)) {
-		// TODO: Do some error handling
-	}
-
-	// Initialize member variables
-	scl = cl;
-	sda = da;
-
-	// Initialize the i2c peripheral
-	initI2C((int)scl, (int)sda);
-}
-
-/** @} Close I2C_Class_Constructors group */
-
-/** @defgroup I2C_Class_IO I/O Methods
- *  @brief Methods to perform reads & writes
- *  @{
- */
-
-/**
- * @brief Member function to perform generic i2c writes as master
- * @param devAddr i2c slave address of the device to write to (left-justified)
- * @param pData   Pointer to array of bytes to write
- * @param size    Number of bytes to write
- * @return 0 on success, -1 on error
- */
-int8_t I2C::write(uint16_t devAddr, uint8_t *pData, uint16_t size) {
-	// Must wait until the I2C peripheral is ready, i.e., for any previous transfers to finish
-	while (HAL_I2C_GetState(&i2cHandle) != HAL_I2C_STATE_READY);
-
-	// Initiate a write
-	if (HAL_I2C_Master_Transmit_DMA(&i2cHandle, devAddr, pData, size) != HAL_OK) {
-		return -1;
-	}
-
-	return 0;
-}
-
-
-/**
- * @brief Member function to perform generic i2c reads as master
- * @param devAddr i2c slave address of the device to read from (left-justified)
- * @param pData   Pointer to array to store read bytes
- * @param size    Number of bytes to read
- * @return 0 on success, -1 on error
- */
-int8_t I2C::read(uint16_t devAddr, uint8_t *pData, uint16_t size) {
-	// Must wait until the I2C peripheral is ready, i.e., for any previous transfers to finish
-	while (HAL_I2C_GetState(&i2cHandle) != HAL_I2C_STATE_READY);
-
-	// Initiate a read
-	if (HAL_I2C_Master_Receive_DMA(&i2cHandle, devAddr, pData, size) != HAL_OK) {
-		return -1;
-	}
-
-	return 0;
-}
-
-/**
- * @brief Member function to write to a register on an i2c slave device
- * @param devAddr i2c slave address of the device to write to (left-justified)
- * @param memAddr Address of the device register to begin writes
- * @param pData   Pointer to array of bytes to write to slave device memory
- * @param size    Number of bytes to write
- * @return 0 on success, -1 on error
- */
-int8_t I2C::memWrite(uint16_t devAddr, uint16_t memAddr, uint8_t *pData, uint16_t size) {
-	// Must wait until the I2C peripheral is ready, i.e., for any previous transfers to finish
-	while (HAL_I2C_GetState(&i2cHandle) != HAL_I2C_STATE_READY);
-
-	// Initiate a memory write
-	if (HAL_I2C_Mem_Write_DMA(&i2cHandle, devAddr, memAddr, I2C_MEMADD_SIZE_8BIT, pData, size) != HAL_OK) {
-		return -1;
-	}
-
-	return 0;
-}
-
-/**
- * @brief Member function to read a register from an i2c slave device
- * @param devAddr i2c slave address of the device to read from (left-justified)
- * @param memAddr Address of the device register to read
- * @param pData1  Pointer to data buffer
- * @param size    Number of bytes to be read
- * @return		  0 on success
- * 				  -1 if HAL_Error returned
- */
-int8_t I2C::memRead(uint16_t devAddr, uint16_t memAddr, uint8_t *pData1, uint16_t size) {
-	// Must wait until the I2C peripheral is ready, i.e., for any previous transfers to finish
-	while(HAL_I2C_GetState(&i2cHandle) != HAL_I2C_STATE_READY);
-
-	// Initiate a memory read
-	if (HAL_I2C_Mem_Read_DMA(&i2cHandle, devAddr, memAddr, I2C_MEMADD_SIZE_8BIT, pData1, size) != HAL_OK) {
-		return -1;
-	}
-
-	return 0;
-}
-
-/** @} Close I2C_Class_IO group */
-
-/**
- * @brief Function to block until the peripheral is ready
- */
-void I2C::readyWait(void) {
-	// Must wait until the I2C peripheral is ready, i.e., for any previous transfers to finish
-	while(HAL_I2C_GetState(&i2cHandle) != HAL_I2C_STATE_READY);
-}
-
-/** @} Close I2C_Class group */
+/** @} Close I2C_Functions group */
 
 /** @} Close I2C group */
 /** @} Close Peripherals Group */

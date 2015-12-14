@@ -25,7 +25,8 @@
  *  @{
  */
 
-/** @addtogroup TIM PWM using General Purpose TIM
+/** @addtogroup TIM PWM
+ *  @brief Module for abstracting the general purpose timer interface
  *  @{
  */
 
@@ -149,7 +150,7 @@ enum class ApbNum {
 };
 
 /**
- * @brief Class for producing PWM using a general purpose TIM
+ * @brief PWM using a general purpose TIM
  *
  * This class takes care of the low-level configuration required for PWM signal
  * generation. It allows for simple initialization by specifying a compatible

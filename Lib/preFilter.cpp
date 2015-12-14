@@ -1,5 +1,5 @@
 /**
- * @file preFilter.cpp
+ * @file
  *
  * @brief Class for low-pass filtering raw accelerometer and gyro data
  *
@@ -8,29 +8,52 @@
  *
  * @date Nov 22, 2015
  *
- * This class implements a low-pass filter of the transfer function:
- * 		H(z) = (1+z^(-1)) / ((tau+1)+(1-tau)z^(-1))
- * which has difference equation:
- * 		y(n) = (x(n) + x(n-1) - y(n-1)(1-tau)) / (tau+1)
+ */
+
+/** @addtogroup Control
+ *  @{
+ */
+
+/** @defgroup PREFILTER Filters for raw sensor data
+ *  @brief Low-pass filtering of sensor data
  *
- * One single sample is processed at a time
+ *  The motors and propellers of a quadcopter spin at tremendous speeds.
+ *  This introduces a significant amount of mechanical vibration, causing the
+ *  accelerometer and gyroscope sensor output to be noisy. To calculate the
+ *  pitch and roll angles reliably, the sensor outputs must be low-pass
+ *  filtered prior to being used in the orientation calculation.
  *
+ *  @{
  */
 
 #include "preFilter.h"
 
+/**
+ * @brief Construct a preFilter object with default time constant
+ */
 preFilter::preFilter() {
 	x_prev = 0.0f;
 	y_prev = 0.0f;
 	tau = 1.0f;
 }
 
+/**
+ * @brief Construct a preFilter object with the given time constant
+ * @param t Time constant
+ */
 preFilter::preFilter(float t) {
 	x_prev = 0.0f;
 	y_prev = 0.0f;
 	tau = t;
 }
 
+/**
+ * @brief  Calculate the filter output
+ * @param  x The current sample input
+ * @return The corresponding filter output
+ *
+ * Calculates the filtered value, according to the transfer function.
+ */
 float preFilter::filterSample(float *x) {
 	float xn = *x;
 	float y = ( xn + x_prev - y_prev*(1-tau) ) / (tau + 1);
@@ -40,6 +63,7 @@ float preFilter::filterSample(float *x) {
 	return y;
 }
 
-
+/** @} Close PREFILTER group */
+/** @} Close Control Group */
 
 

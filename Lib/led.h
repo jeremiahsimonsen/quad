@@ -1,5 +1,5 @@
 /**
- * @file led.h
+ * @file
  *
  * @brief Class for controlling board status LEDs
  *
@@ -8,6 +8,14 @@
  *
  * @date Dec 3, 2015
  *
+ */
+
+/** @addtogroup Debugging
+ *  @{
+ */
+
+/** @addtogroup LED LED control
+ *  @{
  */
 
 #ifndef LED_H_
@@ -20,6 +28,12 @@
 #include "stm32f4_discovery.h"
 #include "stm32f407xx.h"
 
+/**
+ * @brief GPIO pins connected to LEDs
+ *
+ * GPIO pins with LEDs on the STM32F4-Discovery or the Death Chopper 9000
+ * development boards
+ */
 enum class LED_Pin {
 	// PCB
 	PE2 = 0,// Red
@@ -33,18 +47,33 @@ enum class LED_Pin {
 	PD15	// Blue
 };
 
+/**
+ * @brief LED colors
+ */
 enum class LED {
-	RED = 0,
-	GREEN,
-	BLUE,
-	ORANGE
+	RED = 0,//!< RED
+	GREEN,  //!< GREEN
+	BLUE,   //!< BLUE
+	ORANGE  //!< ORANGE
 };
 
+/**
+ * @brief Development boards
+ */
 enum class Board {
-	STM32F4_DISCOVERY,
-	DEATH_CHOPPER_9000
+	STM32F4_DISCOVERY,//!< STM32F4_DISCOVERY
+	DEATH_CHOPPER_9000//!< DEATH_CHOPPER_9000
 };
 
+/**
+ * @brief LED control
+ *
+ * This class abstracts the control of the status LEDs so that other code
+ * that toggles LEDs is independent of which development board is being
+ * used.
+ *
+ * The LED setup is determined by the Board argument to the constructor.
+ */
 class led {
 private:
 	Board board;
@@ -62,3 +91,6 @@ public:
 };
 
 #endif
+
+/** @} Close LED group */
+/** @} Close Debugging group */

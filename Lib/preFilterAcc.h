@@ -1,5 +1,5 @@
 /**
- * @file preFilterAcc.h
+ * @file
  *
  * @brief Class for low-pass filtering raw accelerometer data
  *
@@ -10,6 +10,14 @@
  *
  */
 
+/** @addtogroup Control
+ *  @{
+ */
+
+/** @addtogroup PREFILTER
+ *  @{
+ */
+
 #ifndef PREFILTERACC_H_
 #define PREFILTERACC_H_
 
@@ -17,13 +25,20 @@
 #include "stm32f407xx.h"
 #include "arm_math.h"
 
-//#define PREFILTER_TAU (500.0f)	// Defined in preFilter.h
-
+/**
+ * @brief Arbitrary IIR filter
+ *
+ * This class implements an arbitrary IIR filter. The filter coefficients are
+ * defined in the constructor. The ARM CMSIS DSP filtering routines are used
+ * for maximum performance.
+ *
+ * Each sample is processed one at a time.
+ */
 class preFilterAcc {
 private:
-	arm_biquad_cascade_df2T_instance_f32 f;
-	float32_t *state;
-	float32_t g;
+	arm_biquad_cascade_df2T_instance_f32 f;		///< ARM IIR Direct-Form II Transpose filter structure
+	float32_t *state;							///< State buffer used by ARM routine
+	float32_t g;								///< Filter gain factor
 
 public:
 	preFilterAcc();
@@ -32,3 +47,6 @@ public:
 };
 
 #endif
+
+/** @} Close PREFILTER group */
+/** @} Close Control Group */
