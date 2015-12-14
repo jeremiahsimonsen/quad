@@ -17,7 +17,7 @@
  * created.
  */
 
-/** @addtogroup Debugging
+/** @addtogroup System
  *  @{
  */
 

@@ -10,11 +10,11 @@
  *
  */
 
-/** @addtogroup Debugging
+/** @addtogroup System
  *  @{
  */
 
-/** @addtogroup LED LED control
+/** @addtogroup LED
  *  @{
  */
 

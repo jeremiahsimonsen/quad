@@ -96,6 +96,11 @@
 			<locationURI>PARENT-1-PROJECT_LOC/lib/accelCompFilter2.h</locationURI>
 		</link>
 		<link>
+			<name>include/err.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/err.h</locationURI>
+		</link>
+		<link>
 			<name>include/gyroCompFilter.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/lib/gyroCompFilter.h</locationURI>
@@ -234,6 +239,11 @@
 			<name>src/accelCompFilter2.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/lib/accelCompFilter2.cpp</locationURI>
+		</link>
+		<link>
+			<name>src/err.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/err.cpp</locationURI>
 		</link>
 		<link>
 			<name>src/gyroCompFilter.cpp</name>

@@ -10,11 +10,13 @@
  *
  */
 
-/** @addtogroup Debugging
+/** @defgroup System System/Debug
+ *  @brief System level and debugging interfaces
  *  @{
  */
 
-/** @addtogroup LOGGER Data logger
+/** @defgroup LOGGER Data logger
+ *  @brief Log data via UART for testing purposes
  *  @{
  */
 

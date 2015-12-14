@@ -10,11 +10,12 @@
  *
  */
 
-/** @addtogroup Debugging
+/** @addtogroup System
  *  @{
  */
 
-/** @addtogroup LED
+/** @defgroup LED LED control
+ *  @brief Control LEDs for status/error indication
  *  @{
  */
 
