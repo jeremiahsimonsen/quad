@@ -19,7 +19,7 @@
  */
 
 #include "HCSR04.h"
-#include "DeathChopper9000.h"
+#include "errDC9000.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -89,7 +89,7 @@ HCSR04::HCSR04() {
 
 	// Initialize the TIM
 	if (HAL_TIM_IC_Init(&Tim2Handle) != HAL_OK) {
-		// TODO: Error
+		Error_Handler(errDC9000::ULTRASONIC_INIT_ERROR);
 	}
 
 	// Channel specific configuration
@@ -99,21 +99,21 @@ HCSR04::HCSR04() {
 	sConfig.ICPolarity = TIM_ICPOLARITY_RISING;
 	sConfig.ICSelection = TIM_ICSELECTION_INDIRECTTI;
 	if (HAL_TIM_IC_ConfigChannel(&Tim2Handle, &sConfig, TIM_CHANNEL_1) != HAL_OK) {
-		// TODO: Error
+		Error_Handler(errDC9000::ULTRASONIC_INIT_ERROR);
 	}
 
 	sConfig.ICPolarity = TIM_ICPOLARITY_FALLING;
 	sConfig.ICSelection = TIM_ICSELECTION_DIRECTTI;
 	if (HAL_TIM_IC_ConfigChannel(&Tim2Handle, &sConfig, TIM_CHANNEL_2) != HAL_OK) {
-		// TODO: Error
+		Error_Handler(errDC9000::ULTRASONIC_INIT_ERROR);
 	}
 
 	// Start input capture with interrupts
 	if (HAL_TIM_IC_Start_IT(&Tim2Handle, TIM_CHANNEL_1) != HAL_OK) {
-		// Error
+		Error_Handler(errDC9000::ULTRASONIC_INIT_ERROR);
 	}
 	if (HAL_TIM_IC_Start_IT(&Tim2Handle, TIM_CHANNEL_2) != HAL_OK) {
-		// Error
+		Error_Handler(errDC9000::ULTRASONIC_INIT_ERROR);
 	}
 
 	// Start the TRIG pulse generation to take measurements

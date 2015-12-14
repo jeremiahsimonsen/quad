@@ -563,7 +563,7 @@ public:
 
 	float getDT(void);
 
-	int8_t read(void);
+	void read(void);
 
 	float getX(void);		// Roll
 	float getY(void);		// Pitch

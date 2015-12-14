@@ -30,10 +30,9 @@
 
 #include "I2C.h"
 #include "DMA_IT.h"
+#include "errDC9000.h"
+
 #include "stm32f4xx_hal.h"
-#include "stm32f4xx_hal_i2c.h"
-#include "stm32f4xx_hal_rcc.h"
-#include "stm32f4xx_hal_gpio.h"
 #include "stm32f4_discovery.h"
 #include "stm32f407xx.h"
 
@@ -125,7 +124,7 @@ I2C::I2C() {
  */
 I2C::I2C(i2cPin cl, i2cPin da) {
 	if (!isSclPin(cl) || !isSdaPin(da)) {
-		// TODO: Do some error handling
+		Error_Handler(errDC9000::I2C_INIT_ERROR);
 	}
 
 	// Initialize member variables
@@ -320,8 +319,7 @@ void initI2C(int scl, int sda) {
 
 	// Initialize the I2C
 	if (HAL_I2C_Init(&i2cHandle) != HAL_OK) {
-		// TODO: ErrorHandler();
-		while(1);
+		Error_Handler(errDC9000::I2C_INIT_ERROR);
 	}
 
 	i2cHandle.Instance->CR2 |= 1<<8;	// Interrupt error enable
@@ -374,7 +372,9 @@ void I2C1_MspInit(I2C_HandleTypeDef *hi2c) {
 	hdma_tx.Init.PeriphBurst         = DMA_PBURST_INC4;
 
 	// Initialize DMA
-	HAL_DMA_Init(&hdma_tx);
+	if ( HAL_DMA_Init(&hdma_tx) != HAL_OK ) {
+		Error_Handler(errDC9000::I2C_INIT_ERROR);
+	}
 
 	// Associate the initialized DMA handle to the I2C handle
 	__HAL_LINKDMA(hi2c, hdmatx, hdma_tx);
@@ -395,7 +395,9 @@ void I2C1_MspInit(I2C_HandleTypeDef *hi2c) {
 	hdma_rx.Init.PeriphBurst         = DMA_PBURST_INC4;
 
 	// Initialize DMA
-	HAL_DMA_Init(&hdma_rx);
+	if ( HAL_DMA_Init(&hdma_rx) != HAL_OK ) {
+		Error_Handler(errDC9000::I2C_INIT_ERROR);
+	}
 
 	// Associate the initialized DMA handle to the I2C handle
 	__HAL_LINKDMA(hi2c, hdmarx, hdma_rx);
@@ -434,7 +436,9 @@ void I2C2_MspInit(I2C_HandleTypeDef *hi2c) {
 	hdma_tx.Init.PeriphBurst         = DMA_PBURST_INC4;
 
 	// Initialize DMA
-	HAL_DMA_Init(&hdma_tx);
+	if ( HAL_DMA_Init(&hdma_tx) != HAL_OK ) {
+		Error_Handler(errDC9000::I2C_INIT_ERROR);
+	}
 
 	// Associate the initialized DMA handle to the I2C handle
 	__HAL_LINKDMA(hi2c, hdmatx, hdma_tx);
@@ -455,7 +459,9 @@ void I2C2_MspInit(I2C_HandleTypeDef *hi2c) {
 	hdma_rx.Init.PeriphBurst         = DMA_PBURST_INC4;
 
 	// Initialize DMA
-	HAL_DMA_Init(&hdma_rx);
+	if ( HAL_DMA_Init(&hdma_rx) != HAL_OK ) {
+		Error_Handler(errDC9000::I2C_INIT_ERROR);
+	}
 
 	// Associate the initialized DMA handle to the I2C handle
 	__HAL_LINKDMA(hi2c, hdmarx, hdma_rx);
@@ -494,7 +500,9 @@ void I2C3_MspInit(I2C_HandleTypeDef *hi2c) {
 	hdma_tx.Init.PeriphBurst         = DMA_PBURST_INC4;
 
 	// Initialize DMA
-	HAL_DMA_Init(&hdma_tx);
+	if ( HAL_DMA_Init(&hdma_tx) != HAL_OK ) {
+		Error_Handler(errDC9000::I2C_INIT_ERROR);
+	}
 
 	// Associate the initialized DMA handle to the I2C handle
 	__HAL_LINKDMA(hi2c, hdmatx, hdma_tx);
@@ -515,7 +523,9 @@ void I2C3_MspInit(I2C_HandleTypeDef *hi2c) {
 	hdma_rx.Init.PeriphBurst         = DMA_PBURST_INC4;
 
 	// Initialize DMA
-	HAL_DMA_Init(&hdma_rx);
+	if ( HAL_DMA_Init(&hdma_rx) != HAL_OK ) {
+		Error_Handler(errDC9000::I2C_INIT_ERROR);
+	}
 
 	// Associate the initialized DMA handle to the I2C handle
 	__HAL_LINKDMA(hi2c, hdmarx, hdma_rx);
@@ -555,7 +565,7 @@ void deInitI2C(int scl, int sda) {
 
 	// De-initialize I2C peripheral
 	if (HAL_I2C_DeInit(&i2cHandle) != HAL_OK) {
-		// Error Handling
+		Error_Handler(errDC9000::I2C_DEINIT_ERROR);
 	}
 
 	// Disable peripherals and GPIO clocks
@@ -592,8 +602,12 @@ void I2C1_MspDeInit() {
 	// GPIO DeInit by I2C::deInitI2C()
 
 	// De-Initialize the DMA streams
-	HAL_DMA_DeInit(&hdma_tx);
-	HAL_DMA_DeInit(&hdma_rx);
+	if ( HAL_DMA_DeInit(&hdma_tx) != HAL_OK ) {
+		Error_Handler(errDC9000::I2C_DEINIT_ERROR);
+	}
+	if ( HAL_DMA_DeInit(&hdma_rx) != HAL_OK ) {
+		Error_Handler(errDC9000::I2C_DEINIT_ERROR);
+	}
 
 	// Disable the DMA TX/RX Interrupts
 	HAL_NVIC_DisableIRQ(I2C1_DMA_TX_IRQn);
@@ -612,8 +626,12 @@ void I2C2_MspDeInit() {
 	// GPIO DeInit by I2C::deInitI2C()
 
 	// De-Initialize the DMA streams
-	HAL_DMA_DeInit(&hdma_tx);
-	HAL_DMA_DeInit(&hdma_rx);
+	if ( HAL_DMA_DeInit(&hdma_tx) != HAL_OK ) {
+		Error_Handler(errDC9000::I2C_DEINIT_ERROR);
+	}
+	if ( HAL_DMA_DeInit(&hdma_rx) != HAL_OK ) {
+		Error_Handler(errDC9000::I2C_DEINIT_ERROR);
+	}
 
 	// Disable the DMA TX/RX Interrupts
 	HAL_NVIC_DisableIRQ(I2C2_DMA_TX_IRQn);
@@ -632,8 +650,12 @@ void I2C3_MspDeInit() {
 	// GPIO DeInit by I2C::deInitI2C()
 
 	// De-Initialize the DMA streams
-	HAL_DMA_DeInit(&hdma_tx);
-	HAL_DMA_DeInit(&hdma_rx);
+	if ( HAL_DMA_DeInit(&hdma_tx) != HAL_OK ) {
+		Error_Handler(errDC9000::I2C_DEINIT_ERROR);
+	}
+	if ( HAL_DMA_DeInit(&hdma_rx) != HAL_OK ) {
+		Error_Handler(errDC9000::I2C_DEINIT_ERROR);
+	}
 
 	// Disable the DMA TX/RX Interrupts
 	HAL_NVIC_DisableIRQ(I2C3_DMA_TX_IRQn);
@@ -741,7 +763,7 @@ void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c) {
  * @todo Implement to add functionality
  */
 void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c) {
-
+	Error_Handler(errDC9000::I2C_IO_ERROR);
 }
 #pragma GCC diagnostic pop
 

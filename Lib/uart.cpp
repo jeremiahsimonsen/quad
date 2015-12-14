@@ -36,10 +36,12 @@
  *  @{
  */
 
-#include "uart.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "uart.h"
+#include "errDC9000.h"
 
 static __IO ITStatus UartReady = RESET;
 static DMA_HandleTypeDef hdma_tx;
@@ -237,8 +239,7 @@ void init_USART(int uart_num, int num_args, ...)
 	// Note that HAL_UART_Init() calls HAL_UART_MspInit() (MPU-specific initialization)
 	if(HAL_UART_Init(&UartHandle) != HAL_OK)
 	{
-		//TODO: Change to global error handler
-		while(1);
+		Error_Handler(errDC9000::UART_INIT_ERROR);
 	}
 
 	// The UART peripheral is now ready to transmit
@@ -256,6 +257,7 @@ void init_USART(int uart_num, int num_args, ...)
  * @brief Send (TX) a string via the U(S)ART
  *
  * @note init_USART() should be called first
+ * @note Calls Error_Handler() on error
  *
  * @param s The string to send
  */
@@ -270,7 +272,7 @@ void usart_transmit(uint8_t *s)
 
 	if (HAL_UART_Transmit_DMA(&UartHandle, s, len) != HAL_OK)
 	{
-		// TODO: Error Handler();
+		Error_Handler(errDC9000::UART_IO_ERROR);
 	}
 }
 
@@ -281,10 +283,11 @@ void usart_transmit(uint8_t *s)
  * avoid race conditions when trying to simultaneously read/write from/to the buffer.
  *
  * @note init_USART() should be called first. This must be called before usart_read()
+ * @note Calls Error_Handler() on error
  */
 void usart_receive_begin() {
 	if (HAL_UART_Receive_DMA(&UartHandle, (uint8_t *)DmaBuff, 2*TRANSFER_SIZE)) {
-		// TODO: Error_Handler();
+		Error_Handler(errDC9000::UART_INIT_ERROR);
 	}
 }
 
@@ -349,6 +352,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 //                       Initialization Helpers                      //
 /**
  * @brief Helper function. MspInit routine for USART1
+ * @note Calls Error_Handler() on error
  */
 void USART1MspInit()
 {
@@ -390,7 +394,9 @@ void USART1MspInit()
 	hdma_tx.Init.MemBurst            = DMA_MBURST_INC4;
 	hdma_tx.Init.PeriphBurst         = DMA_PBURST_INC4;
 
-	HAL_DMA_Init(&hdma_tx);   
+	if ( HAL_DMA_Init(&hdma_tx) != HAL_OK ) {
+		Error_Handler(errDC9000::UART_INIT_ERROR);
+	}
 
 	// Associate the initialized DMA handle to the the UART handle
 	__HAL_LINKDMA(&UartHandle, hdmatx, hdma_tx);
@@ -411,7 +417,9 @@ void USART1MspInit()
 	hdma_rx.Init.MemBurst            = DMA_MBURST_INC4;
 	hdma_rx.Init.PeriphBurst         = DMA_PBURST_INC4;
 
-	HAL_DMA_Init(&hdma_rx);
+	if ( HAL_DMA_Init(&hdma_rx) != HAL_OK ) {
+		Error_Handler(errDC9000::UART_INIT_ERROR);
+	}
 
 	// Associate the initialized DMA handle to the the UART handle
 	__HAL_LINKDMA(&UartHandle, hdmarx, hdma_rx);
@@ -432,6 +440,7 @@ void USART1MspInit()
 
 /**
  * @brief Helper function. MspInit routine for USART2
+ * @note Calls Error_Handler() on error
  */
 void USART2MspInit()
 {
@@ -473,7 +482,9 @@ void USART2MspInit()
 	hdma_tx.Init.MemBurst            = DMA_MBURST_INC4;
 	hdma_tx.Init.PeriphBurst         = DMA_PBURST_INC4;
 
-	HAL_DMA_Init(&hdma_tx);   
+	if ( HAL_DMA_Init(&hdma_tx) != HAL_OK ) {
+		Error_Handler(errDC9000::UART_INIT_ERROR);
+	}
 
 	// Associate the initialized DMA handle to the the UART handle
 	__HAL_LINKDMA(&UartHandle, hdmatx, hdma_tx);
@@ -494,7 +505,9 @@ void USART2MspInit()
 	hdma_rx.Init.MemBurst            = DMA_MBURST_INC4;
 	hdma_rx.Init.PeriphBurst         = DMA_PBURST_INC4;
 
-	HAL_DMA_Init(&hdma_rx);
+	if ( HAL_DMA_Init(&hdma_rx) != HAL_OK ) {
+		Error_Handler(errDC9000::UART_INIT_ERROR);
+	}
 
 	// Associate the initialized DMA handle to the the UART handle
 	__HAL_LINKDMA(&UartHandle, hdmarx, hdma_rx);
@@ -515,6 +528,7 @@ void USART2MspInit()
 
 /**
  * @brief Helper function. MspInit routine for USART3
+ * @note Calls Error_Handler() on error
  */
 void USART3MspInit()
 {
@@ -556,7 +570,9 @@ void USART3MspInit()
 	hdma_tx.Init.MemBurst            = DMA_MBURST_INC4;
 	hdma_tx.Init.PeriphBurst         = DMA_PBURST_INC4;
 
-	HAL_DMA_Init(&hdma_tx);   
+	if ( HAL_DMA_Init(&hdma_tx) != HAL_OK ) {
+		Error_Handler(errDC9000::UART_INIT_ERROR);
+	}
 
 	// Associate the initialized DMA handle to the the UART handle
 	__HAL_LINKDMA(&UartHandle, hdmatx, hdma_tx);
@@ -577,7 +593,9 @@ void USART3MspInit()
 	hdma_rx.Init.MemBurst            = DMA_MBURST_INC4;
 	hdma_rx.Init.PeriphBurst         = DMA_PBURST_INC4;
 
-	HAL_DMA_Init(&hdma_rx);
+	if ( HAL_DMA_Init(&hdma_rx) != HAL_OK ) {
+		Error_Handler(errDC9000::UART_INIT_ERROR);
+	}
 
 	// Associate the initialized DMA handle to the the UART handle
 	__HAL_LINKDMA(&UartHandle, hdmarx, hdma_rx);
@@ -598,6 +616,7 @@ void USART3MspInit()
 
 /**
  * @brief Helper function. MspInit routine for UART4
+ * @note Calls Error_Handler() on error
  */
 void UART4MspInit()
 {
@@ -639,7 +658,9 @@ void UART4MspInit()
 	hdma_tx.Init.MemBurst            = DMA_MBURST_INC4;
 	hdma_tx.Init.PeriphBurst         = DMA_PBURST_INC4;
 
-	HAL_DMA_Init(&hdma_tx);   
+	if ( HAL_DMA_Init(&hdma_tx) != HAL_OK ) {
+		Error_Handler(errDC9000::UART_INIT_ERROR);
+	}
 
 	// Associate the initialized DMA handle to the the UART handle
 	__HAL_LINKDMA(&UartHandle, hdmatx, hdma_tx);
@@ -660,7 +681,9 @@ void UART4MspInit()
 	hdma_rx.Init.MemBurst            = DMA_MBURST_INC4;
 	hdma_rx.Init.PeriphBurst         = DMA_PBURST_INC4;
 
-	HAL_DMA_Init(&hdma_rx);
+	if ( HAL_DMA_Init(&hdma_rx) != HAL_OK ) {
+		Error_Handler(errDC9000::UART_INIT_ERROR);
+	}
 
 	// Associate the initialized DMA handle to the the UART handle
 	__HAL_LINKDMA(&UartHandle, hdmarx, hdma_rx);
@@ -681,6 +704,7 @@ void UART4MspInit()
 
 /**
  * @brief Helper function. MspInit routine for UART5
+ * @note Calls Error_Handler() on error
  */
 void UART5MspInit()
 {
@@ -722,7 +746,9 @@ void UART5MspInit()
 	hdma_tx.Init.MemBurst            = DMA_MBURST_INC4;
 	hdma_tx.Init.PeriphBurst         = DMA_PBURST_INC4;
 
-	HAL_DMA_Init(&hdma_tx);   
+	if ( HAL_DMA_Init(&hdma_tx) != HAL_OK ) {
+		Error_Handler(errDC9000::UART_INIT_ERROR);
+	}
 
 	// Associate the initialized DMA handle to the the UART handle
 	__HAL_LINKDMA(&UartHandle, hdmatx, hdma_tx);
@@ -743,7 +769,9 @@ void UART5MspInit()
 	hdma_rx.Init.MemBurst            = DMA_MBURST_INC4;
 	hdma_rx.Init.PeriphBurst         = DMA_PBURST_INC4;
 
-	HAL_DMA_Init(&hdma_rx);
+	if ( HAL_DMA_Init(&hdma_rx) != HAL_OK ) {
+		Error_Handler(errDC9000::UART_INIT_ERROR);
+	}
 
 	// Associate the initialized DMA handle to the the UART handle
 	__HAL_LINKDMA(&UartHandle, hdmarx, hdma_rx);
@@ -764,6 +792,7 @@ void UART5MspInit()
 
 /**
  * @brief Helper function. MspInit routine for USART6
+ * @note Calls Error_Handler() on error
  */
 void USART6MspInit()
 {
@@ -805,7 +834,9 @@ void USART6MspInit()
 	hdma_tx.Init.MemBurst            = DMA_MBURST_INC4;
 	hdma_tx.Init.PeriphBurst         = DMA_PBURST_INC4;
 
-	HAL_DMA_Init(&hdma_tx);   
+	if ( HAL_DMA_Init(&hdma_tx) != HAL_OK ) {
+		Error_Handler(errDC9000::UART_INIT_ERROR);
+	}
 
 	// Associate the initialized DMA handle to the the UART handle
 	__HAL_LINKDMA(&UartHandle, hdmatx, hdma_tx);
@@ -826,7 +857,9 @@ void USART6MspInit()
 	hdma_rx.Init.MemBurst            = DMA_MBURST_INC4;
 	hdma_rx.Init.PeriphBurst         = DMA_PBURST_INC4;
 
-	HAL_DMA_Init(&hdma_rx);
+	if ( HAL_DMA_Init(&hdma_rx) != HAL_OK ) {
+		Error_Handler(errDC9000::UART_INIT_ERROR);
+	}
 
 	// Associate the initialized DMA handle to the the UART handle
 	__HAL_LINKDMA(&UartHandle, hdmarx, hdma_rx);
@@ -889,6 +922,7 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
 
 /**
  * @brief Helper function. MspDeInit routine for USART1
+ * @note Calls Error_Handler() on error
  */
 void USART1MspDeInit()
 {
@@ -901,8 +935,12 @@ void USART1MspDeInit()
 	HAL_GPIO_DeInit(USART1_RX_GPIO_PORT, USART1_RX_PIN);
 
 	// Disable the DMA streams
-	HAL_DMA_DeInit(&hdma_tx);
-	HAL_DMA_DeInit(&hdma_rx);
+	if ( HAL_DMA_DeInit(&hdma_tx) != HAL_OK ) {
+		Error_Handler(errDC9000::UART_DEINIT_ERROR);
+	}
+	if ( HAL_DMA_DeInit(&hdma_rx) != HAL_OK ) {
+		Error_Handler(errDC9000::UART_DEINIT_ERROR);
+	}
 
 	// Disable the NVIC for DMA
 	HAL_NVIC_DisableIRQ(USART1_TX_DMA_IRQn);
@@ -911,6 +949,7 @@ void USART1MspDeInit()
 
 /**
  * @brief Helper function. MspDeInit routine for USART2
+ * @note Calls Error_Handler() on error
  */
 void USART2MspDeInit()
 {
@@ -923,8 +962,12 @@ void USART2MspDeInit()
 	HAL_GPIO_DeInit(USART2_RX_GPIO_PORT, USART2_RX_PIN);
 
 	// Disable the DMA streams
-	HAL_DMA_DeInit(&hdma_tx);
-	HAL_DMA_DeInit(&hdma_rx);
+	if ( HAL_DMA_DeInit(&hdma_tx) != HAL_OK ) {
+		Error_Handler(errDC9000::UART_DEINIT_ERROR);
+	}
+	if ( HAL_DMA_DeInit(&hdma_rx) != HAL_OK ) {
+		Error_Handler(errDC9000::UART_DEINIT_ERROR);
+	}
 
 	// Disable the NVIC for DMA
 	HAL_NVIC_DisableIRQ(USART2_TX_DMA_IRQn);
@@ -933,6 +976,7 @@ void USART2MspDeInit()
 
 /**
  * @brief Helper function. MspDeInit routine for USART3
+ * @note Calls Error_Handler() on error
  */
 void USART3MspDeInit()
 {
@@ -945,8 +989,12 @@ void USART3MspDeInit()
 	HAL_GPIO_DeInit(USART3_RX_GPIO_PORT, USART3_RX_PIN);
 
 	// Disable the DMA streams
-	HAL_DMA_DeInit(&hdma_tx);
-	HAL_DMA_DeInit(&hdma_rx);
+	if ( HAL_DMA_DeInit(&hdma_tx) != HAL_OK ) {
+		Error_Handler(errDC9000::UART_DEINIT_ERROR);
+	}
+	if ( HAL_DMA_DeInit(&hdma_rx) != HAL_OK ) {
+		Error_Handler(errDC9000::UART_DEINIT_ERROR);
+	}
 
 	// Disable the NVIC for DMA
 	HAL_NVIC_DisableIRQ(USART3_TX_DMA_IRQn);
@@ -955,6 +1003,7 @@ void USART3MspDeInit()
 
 /**
  * @brief Helper function. MspDeInit routine for UART4
+ * @note Calls Error_Handler() on error
  */
 void UART4MspDeInit()
 {
@@ -967,8 +1016,12 @@ void UART4MspDeInit()
 	HAL_GPIO_DeInit(UART4_RX_GPIO_PORT, UART4_RX_PIN);
 
 	// Disable the DMA streams
-	HAL_DMA_DeInit(&hdma_tx);
-	HAL_DMA_DeInit(&hdma_rx);
+	if ( HAL_DMA_DeInit(&hdma_tx) != HAL_OK ) {
+		Error_Handler(errDC9000::UART_DEINIT_ERROR);
+	}
+	if ( HAL_DMA_DeInit(&hdma_rx) != HAL_OK ) {
+		Error_Handler(errDC9000::UART_DEINIT_ERROR);
+	}
 
 	// Disable the NVIC for DMA
 	HAL_NVIC_DisableIRQ(UART4_TX_DMA_IRQn);
@@ -977,6 +1030,7 @@ void UART4MspDeInit()
 
 /**
  * @brief Helper function. MspDeInit routine for UART5
+ * @note Calls Error_Handler() on error
  */
 void UART5MspDeInit()
 {
@@ -989,8 +1043,12 @@ void UART5MspDeInit()
 	HAL_GPIO_DeInit(UART5_RX_GPIO_PORT, UART5_RX_PIN);
 
 	// Disable the DMA streams
-	HAL_DMA_DeInit(&hdma_tx);
-	HAL_DMA_DeInit(&hdma_rx);
+	if ( HAL_DMA_DeInit(&hdma_tx) != HAL_OK ) {
+		Error_Handler(errDC9000::UART_DEINIT_ERROR);
+	}
+	if ( HAL_DMA_DeInit(&hdma_rx) != HAL_OK ) {
+		Error_Handler(errDC9000::UART_DEINIT_ERROR);
+	}
 
 	// Disable the NVIC for DMA
 	HAL_NVIC_DisableIRQ(UART5_TX_DMA_IRQn);
@@ -999,6 +1057,7 @@ void UART5MspDeInit()
 
 /**
  * @brief Helper function. MspDeInit routine for USART6
+ * @note Calls Error_Handler() on error
  */
 void USART6MspDeInit()
 {
@@ -1011,8 +1070,12 @@ void USART6MspDeInit()
 	HAL_GPIO_DeInit(USART6_RX_GPIO_PORT, USART6_RX_PIN);
 
 	// Disable the DMA streams
-	HAL_DMA_DeInit(&hdma_tx);
-	HAL_DMA_DeInit(&hdma_rx);
+	if ( HAL_DMA_DeInit(&hdma_tx) != HAL_OK ) {
+		Error_Handler(errDC9000::UART_DEINIT_ERROR);
+	}
+	if ( HAL_DMA_DeInit(&hdma_rx) != HAL_OK ) {
+		Error_Handler(errDC9000::UART_DEINIT_ERROR);
+	}
 
 	// Disable the NVIC for DMA
 	HAL_NVIC_DisableIRQ(USART6_TX_DMA_IRQn);
@@ -1129,12 +1192,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
  */
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 {
-	// TODO: Change to Error_Handler() after refactoring to error.h
-	/* Turn LED5 on */
-//	  BSP_LED_On(LED5);
-	  while(1)
-	  {
-	  }
+	Error_Handler(errDC9000::UART_IO_ERROR);
 }
 
 #pragma GCC diagnostic pop

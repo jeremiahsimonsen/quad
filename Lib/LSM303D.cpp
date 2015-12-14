@@ -25,6 +25,7 @@
  */
 
 #include "LSM303D.h"
+#include "errDC9000.h"
 
 /**
  * @brief Instantiates sensor with default configuration
@@ -116,26 +117,36 @@ void LSM303D::enable(LSM303D_InitStruct init) {
 			| LSM303D_CTRL1_AXEN_MASK
 			| LSM303D_CTRL1_AYEN_MASK
 			| LSM303D_CTRL1_AZEN_MASK;
-	i2c->memWrite(address, (uint8_t)LSM303D_Reg::CTRL1, &buf, 1);
+	if ( i2c->memWrite(address, (uint8_t)LSM303D_Reg::CTRL1, &buf, 1) < 0) {
+		Error_Handler(errDC9000::LSM_INIT_ERROR);
+	}
 
 	// Set accelerometer anti-alias filter bandwidth and full-scale
 	buf = (uint8_t)(LSM303D_CTRL2_ABW(init.abw_config)
 			| LSM303D_CTRL2_AFS(init.afs_config));
-	i2c->memWrite(address, (uint8_t)LSM303D_Reg::CTRL2, &buf, 1);
+	if ( i2c->memWrite(address, (uint8_t)LSM303D_Reg::CTRL2, &buf, 1) < 0) {
+		Error_Handler(errDC9000::LSM_INIT_ERROR);
+	}
 
 	// Set magnetometer resolution and output data rate
 	buf = (uint8_t)(LSM303D_CTRL5_M_RES(init.mres_config)
 			| LSM303D_CTRL5_M_ODR(init.modr_config));
-	i2c->memWrite(address, (uint8_t)LSM303D_Reg::CTRL5, &buf, 1);
+	if ( i2c->memWrite(address, (uint8_t)LSM303D_Reg::CTRL5, &buf, 1) < 0) {
+		Error_Handler(errDC9000::LSM_INIT_ERROR);
+	}
 
 	// Set magnetic full-scale
 	buf = LSM303D_CTRL6_MFS(init.mfs_config);
-	i2c->memWrite(address, (uint8_t)LSM303D_Reg::CTRL6, &buf, 1);
+	if ( i2c->memWrite(address, (uint8_t)LSM303D_Reg::CTRL6, &buf, 1) < 0) {
+		Error_Handler(errDC9000::LSM_INIT_ERROR);
+	}
 
 	// Set magnetic sensor mode
 	buf = (uint8_t)(LSM303D_CTRL7_MD(init.md_config));
 //			| LSM303D_CTRL7_AFDS_MASK);
-	i2c->memWrite(address, (uint8_t)LSM303D_Reg::CTRL7, &buf, 1);
+	if ( i2c->memWrite(address, (uint8_t)LSM303D_Reg::CTRL7, &buf, 1) < 0) {
+		Error_Handler(errDC9000::LSM_INIT_ERROR);
+	}
 
 	// Initialize PA5 for externally measuring sampling frequency
 //	__HAL_RCC_GPIOA_CLK_ENABLE();
@@ -192,14 +203,14 @@ void LSM303D::read(void) {
 }
 
 /**
- * @brief  Initiates a read of the accelerometer data registers
- * @return  The return value of I2C::memRead()
- * 			0 on success, -1 on HAL_ERROR
- * 			Updates data in accBuff
+ * @brief Initiates a read of the accelerometer data registers
+ * @note  Calls Error_Handler() on error
  */
-uint8_t LSM303D::readAcc(void) {
+void LSM303D::readAcc(void) {
 	// Read from the accelerometer registers
-	return i2c->memRead(address, ( (uint8_t)LSM303D_Reg::OUT_X_L_A | (1<<7) ), accBuff, 6);
+	if ( i2c->memRead(address, ( (uint8_t)LSM303D_Reg::OUT_X_L_A | (1<<7) ), accBuff, 6) < 0) {
+		Error_Handler(errDC9000::LSM_IO_ERROR);
+	}
 }
 
 /**
@@ -326,13 +337,13 @@ float LSM303D::getAccZFiltered() {
 }
 
 /**
- * @brief  Initiates a read of all 3 magnetometer axes
- * @return The return value of I2C::memRead()
- * 			0 on success, -1 on HAL_ERROR
- * 			Updates data in magBuff
+ * @brief Initiates a read of all 3 magnetometer axes
+ * @note  Calls Error_Handler() on error
  */
-uint8_t LSM303D::readMag(void) {
-	return i2c->memRead(address, ( (uint8_t)LSM303D_Reg::OUT_X_L_M | (1<<7) ), magBuff, 6);
+void LSM303D::readMag(void) {
+	if ( i2c->memRead(address, ( (uint8_t)LSM303D_Reg::OUT_X_L_M | (1<<7) ), magBuff, 6) < 0) {
+		Error_Handler(errDC9000::LSM_IO_ERROR);
+	}
 
 }
 

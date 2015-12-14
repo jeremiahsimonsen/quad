@@ -71,6 +71,11 @@
 			<locationURI>PARENT-1-PROJECT_LOC/Lib/LSM303D.h</locationURI>
 		</link>
 		<link>
+			<name>include/Lib.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/Lib.h</locationURI>
+		</link>
+		<link>
 			<name>include/LidarLite.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/Lib/LidarLite.h</locationURI>
@@ -96,9 +101,14 @@
 			<locationURI>PARENT-1-PROJECT_LOC/lib/accelCompFilter2.h</locationURI>
 		</link>
 		<link>
-			<name>include/err.h</name>
+			<name>include/config.h</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/lib/err.h</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/config.h</locationURI>
+		</link>
+		<link>
+			<name>include/errDC9000.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/errDC9000.h</locationURI>
 		</link>
 		<link>
 			<name>include/gyroCompFilter.h</name>
@@ -186,6 +196,11 @@
 			<locationURI>PARENT-1-PROJECT_LOC/lib/DMA_IT.c</locationURI>
 		</link>
 		<link>
+			<name>src/DeathChopper9000.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/DeathChopper9000.cpp</locationURI>
+		</link>
+		<link>
 			<name>src/HCSR04.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/lib/HCSR04.cpp</locationURI>
@@ -241,9 +256,9 @@
 			<locationURI>PARENT-1-PROJECT_LOC/lib/accelCompFilter2.cpp</locationURI>
 		</link>
 		<link>
-			<name>src/err.cpp</name>
+			<name>src/errDC9000.cpp</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/lib/err.cpp</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/lib/errDC9000.cpp</locationURI>
 		</link>
 		<link>
 			<name>src/gyroCompFilter.cpp</name>

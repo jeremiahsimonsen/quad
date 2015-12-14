@@ -26,6 +26,7 @@
 
 #include "I2C.h"
 #include "LPS25H.h"
+#include "errDC9000.h"
 
 /**
  * @brief Instantiates an object using default I2C pins
@@ -43,11 +44,14 @@ LPS25H::LPS25H(void) {
 
 /**
  * @brief Powers on the sensor and sets ODR to 12.5 Hz with BDU enabled
+ * @note  Calls Error_Handler() on error
  */
 void LPS25H::enable(void) {
 	uint8_t buff = 0xB4;
 
-	i2c->memWrite(address, (uint8_t)LPS25H_Reg::CTRL_REG1, &buff, 1);
+	if (i2c->memWrite(address, (uint8_t)LPS25H_Reg::CTRL_REG1, &buff, 1) < 0 ) {
+		Error_Handler(errDC9000::LPS_INIT_ERROR);
+	}
 }
 
 /**
@@ -60,15 +64,13 @@ float LPS25H::readPressureMillibars(void) {
 
 /**
  * @brief  Initiates a new pressure read
- * @return The latest complete raw pressure reading or -1 on error
+ * @return The latest complete raw pressure reading
+ * @note   Calls Error_Handler() on error
  */
 int32_t LPS25H::readPressureRaw(void) {
 	// Initiate the i2c read
-	int8_t retVal = i2c->memRead(address, ( (uint8_t)LPS25H_Reg::PRESS_OUT_XL | (1<<7) ), pressureBuff, 3);
-
-	// Check for errors
-	if (retVal < 0) {
-		return retVal;
+	if ( i2c->memRead(address, ( (uint8_t)LPS25H_Reg::PRESS_OUT_XL | (1<<7) ), pressureBuff, 3) < 0 ) {
+		Error_Handler(errDC9000::LPS_IO_ERROR);
 	}
 
 	// Wait for the read to complete
@@ -89,15 +91,13 @@ float LPS25H::readTemperatureF(void) {
 
 /**
  * @brief  Initiates a new temperature read
- * @return The latest complete raw temperature reading or -1 on error
+ * @return The latest complete raw temperature reading
+ * @note   Calls Error_Handler() on error
  */
 int16_t LPS25H::readTemperatureRaw(void) {
 	// Initiate the i2c read
-	int8_t retVal = i2c->memRead(address, ( (uint8_t)LPS25H_Reg::TEMP_OUT_L | (1<<7) ), temperatureBuff, 2);
-
-	// Check for errors
-	if (retVal < 0) {
-		return retVal;
+	if ( i2c->memRead(address, ( (uint8_t)LPS25H_Reg::TEMP_OUT_L | (1<<7) ), temperatureBuff, 2) < 0 ) {
+		Error_Handler(errDC9000::LPS_IO_ERROR);
 	}
 
 	// Wait for the read to complete

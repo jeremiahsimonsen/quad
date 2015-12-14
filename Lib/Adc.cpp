@@ -19,10 +19,8 @@
  */
 
 #include "Adc.h"
+#include "errDC9000.h"
 #include "stm32f4xx_hal.h"
-#include "stm32f4xx_hal_adc.h"
-#include "stm32f4xx_hal_rcc.h"
-#include "stm32f4xx_hal_gpio.h"
 #include "stm32f4_discovery.h"
 #include "stm32f407xx.h"
 
@@ -88,8 +86,7 @@ void Adc::initAdc(AdcPin p) {
 	AdcHandle.State = HAL_ADC_STATE_RESET;
 
 	if (HAL_ADC_Init(&AdcHandle) != HAL_OK) {
-		// TODO: Error_Handler();
-		while(1);
+		Error_Handler(errDC9000::ADC_INIT_ERROR);
 	}
 
 	// Configure the ADC channel
@@ -101,8 +98,7 @@ void Adc::initAdc(AdcPin p) {
 	sConfig.Offset = 0;
 
 	if (HAL_ADC_ConfigChannel(&AdcHandle, &sConfig) != HAL_OK) {
-		// TODO: Error_Handler();
-		while(1);
+		Error_Handler(errDC9000::ADC_INIT_ERROR);
 	}
 }
 
@@ -115,21 +111,21 @@ uint32_t Adc::read() {
 
 	// Start the conversion
 	if (HAL_ADC_Start(&AdcHandle) != HAL_OK) {
-		// TODO: Error_Handler();
-		while(1);
+		Error_Handler(errDC9000::ADC_IO_ERROR);
 	}
 
 	// Wait for end of conversion
 	if (HAL_ADC_PollForConversion(&AdcHandle, 1000) != HAL_OK) {
-		// TODO: Error_Handler();
-		while(1);
+		Error_Handler(errDC9000::ADC_IO_ERROR);
 	}
 
 	// Get the conversion value
 	retval = HAL_ADC_GetValue(&AdcHandle);
 
 	// Stop the ADC
-	HAL_ADC_Stop(&AdcHandle);
+	if (HAL_ADC_Stop(&AdcHandle) != HAL_OK) {
+		Error_Handler(errDC9000::ADC_IO_ERROR);
+	}
 
 	return retval;
 }

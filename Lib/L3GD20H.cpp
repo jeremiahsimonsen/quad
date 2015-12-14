@@ -25,6 +25,7 @@
  */
 
 #include "L3GD20H.h"
+#include "errDC9000.h"
 
 /**
  * @brief Instantiates an object using default I2C pins and configures the sensor to default
@@ -89,6 +90,7 @@ L3GD20H::L3GD20H(L3GD20H_InitStruct init)
 
 /**
  * @brief Configures the sensor operation
+ * @note  Calls Error_Handler() on error
  */
 void L3GD20H::enable(L3GD20H_InitStruct init) {
 	// Set data rate and bandwidth; Enable sensor for 3-axis operation
@@ -98,25 +100,35 @@ void L3GD20H::enable(L3GD20H_InitStruct init) {
 					| L3GD_CTRL1_ZEN_MASK
 					| L3GD_CTRL1_YEN_MASK
 					| L3GD_CTRL1_XEN_MASK);
-	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::CTRL1, &buf, 1);
+	if ( i2c->memWrite(address, (uint8_t)L3GD20H_Reg::CTRL1, &buf, 1) < 0 ) {
+		Error_Handler(errDC9000::L3G_INIT_ERROR);
+	}
 
 	// Set low output data rate configuration
 	buf = L3GD_LOW_ODR_Low_ODR(L3GD_ODR_BW_Config_LOW_ODR(init.odr_bw_config));
-	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::LOW_ODR, &buf, 1);
+	if ( i2c->memWrite(address, (uint8_t)L3GD20H_Reg::LOW_ODR, &buf, 1) < 0) {
+		Error_Handler(errDC9000::L3G_INIT_ERROR);
+	}
 
 	// Set high-pass filter mode and high-pass filter cutoff frequency
 	buf = (uint8_t)(L3GD_CTRL2_HPM(init.hpm_config)
 					| L3GD_CTRL2_HPCF(init.hpcf_config));
-	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::CTRL2, &buf, 1);
+	if ( i2c->memWrite(address, (uint8_t)L3GD20H_Reg::CTRL2, &buf, 1) < 0) {
+		Error_Handler(errDC9000::L3G_INIT_ERROR);
+	}
 
 	// Set full scale
 	buf = (uint8_t)(L3GD_CTRL4_FS(init.fs_config)//);
 			| L3GD_CTRL4_BDU_MASK);
-	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::CTRL4, &buf, 1);
+	if ( i2c->memWrite(address, (uint8_t)L3GD20H_Reg::CTRL4, &buf, 1) < 0) {
+		Error_Handler(errDC9000::L3G_INIT_ERROR);
+	}
 
 	// Enable the high-pass filter
 	buf = (uint8_t)(L3GD_CTRL5_HPen_MASK);
-	i2c->memWrite(address, (uint8_t)L3GD20H_Reg::CTRL5, &buf, 1);
+	if ( i2c->memWrite(address, (uint8_t)L3GD20H_Reg::CTRL5, &buf, 1) < 0) {
+		Error_Handler(errDC9000::L3G_INIT_ERROR);
+	}
 
 	// Initialize PA4 for externally measuring sampling frequency
 //	__HAL_RCC_GPIOA_CLK_ENABLE();
@@ -139,14 +151,12 @@ void L3GD20H::enable(L3GD20H_InitStruct init) {
 
 	// Initialize the timer
 	if (HAL_TIM_Base_Init(&TimHandle) != HAL_OK) {
-		// TODO: Error
-		while(1);
+		Error_Handler(errDC9000::L3G_INIT_ERROR);
 	}
 
 	// Start the timer
 	if (HAL_TIM_Base_Start(&TimHandle) != HAL_OK) {
-		// TODO: Error
-		while(1);
+		Error_Handler(errDC9000::L3G_INIT_ERROR);
 	}
 
 	// Calibrate the sensor to eliminate offset error
@@ -202,11 +212,9 @@ float L3GD20H::getDT() {
 
 /**
  * @brief Initiates a read of all 3 axes
- * @return The return value of I2C::memRead()
- * 			0 on success, -1 on HAL_ERROR
- * 			Updates data in gyroBuff
+ * @note  Calls Error_Handler() on error
  */
-int8_t L3GD20H::read(void) {
+void L3GD20H::read(void) {
 //	HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_4);
 
 	// Grab the counter value
@@ -222,7 +230,10 @@ int8_t L3GD20H::read(void) {
 	prevTick = tmp;
 
 	// Read from the gyro registers
-	return i2c->memRead(address, ( (uint8_t)L3GD20H_Reg::OUT_X_L | (1<<7) ), gyroBuff, 6);
+
+	if (i2c->memRead(address, ( (uint8_t)L3GD20H_Reg::OUT_X_L | (1<<7) ), gyroBuff, 6) < 0) {
+		Error_Handler(errDC9000::L3G_IO_ERROR);
+	}
 }
 
 /**

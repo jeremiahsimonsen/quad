@@ -44,63 +44,63 @@
  * @brief GPIO pins that are PWM compatible
  */
 enum class TimerPin {
-	PA0 = 0,// TIM5_CH1
-	PA1,	// TIM5_CH2
-	PA2,	// TIM2_CH3
-	PA3,	// TIM2_CH4
-	PA6,	// TIM3_CH1
-	PA7,	// TIM3_CH2
-	PA8,	// TIM1_CH1
-	PA9,	// TIM1_CH2
-	PA10,	// TIM1_CH3
-	PA11, 	// TIM1_CH4
-	PA15,	// TIM2_CH1
+	PA0 = 0,///< TIM5_CH1
+	PA1,	///< TIM5_CH2
+	PA2,	///< TIM2_CH3
+	PA3,	///< TIM2_CH4
+	PA6,	///< TIM3_CH1
+	PA7,	///< TIM3_CH2
+	PA8,	///< TIM1_CH1
+	PA9,	///< TIM1_CH2
+	PA10,	///< TIM1_CH3
+	PA11, 	///< TIM1_CH4
+	PA15,	///< TIM2_CH1
 
-	PB0,	// TIM3_CH3
-	PB1,	// TIM3_CH4
-	PB3,	// TIM2_CH2
-	PB4,	// TIM3_CH1
-	PB5,	// TIM3_CH2
-	PB6,	// TIM4_CH1
-	PB7,	// TIM4_CH2
-	PB8,	// TIM4_CH3
-	PB9,	// TIM4_CH4
-	PB10,	// TIM2_CH3
-	PB11, 	// TIM2_CH4
-	PB14,	// TIM12_CH1
-	PB15,	// TIM12_CH2
+	PB0,	///< TIM3_CH3
+	PB1,	///< TIM3_CH4
+	PB3,	///< TIM2_CH2
+	PB4,	///< TIM3_CH1
+	PB5,	///< TIM3_CH2
+	PB6,	///< TIM4_CH1
+	PB7,	///< TIM4_CH2
+	PB8,	///< TIM4_CH3
+	PB9,	///< TIM4_CH4
+	PB10,	///< TIM2_CH3
+	PB11, 	///< TIM2_CH4
+	PB14,	///< TIM12_CH1
+	PB15,	///< TIM12_CH2
 
-	PC6,	// TIM3_CH1
-	PC7,	// TIM3_CH2
-	PC8,	// TIM3_CH3
-	PC9,	// TIM3_CH4
+	PC6,	///< TIM3_CH1
+	PC7,	///< TIM3_CH2
+	PC8,	///< TIM3_CH3
+	PC9,	///< TIM3_CH4
 
-	PD12,	// TIM4_CH1
-	PD13,	// TIM4_CH2
-	PD14,	// TIM4_CH3
-	PD15,	// TIM4_CH4
+	PD12,	///< TIM4_CH1
+	PD13,	///< TIM4_CH2
+	PD14,	///< TIM4_CH3
+	PD15,	///< TIM4_CH4
 
-	PE5,	// TIM9_CH1
-	PE6,	// TIM9_CH2
-	PE9,	// TIM1_CH1
-	PE11,	// TIM1_CH2
-	PE13,	// TIM1_CH3
-	PE14,	// TIM1_CH4
+	PE5,	///< TIM9_CH1
+	PE6,	///< TIM9_CH2
+	PE9,	///< TIM1_CH1
+	PE11,	///< TIM1_CH2
+	PE13,	///< TIM1_CH3
+	PE14,	///< TIM1_CH4
 
-	PF6,	// TIM10_CH1
-	PF7,	// TIM11_CH1
-	PF8,	// TIM13_CH1
-	PF9,	// TIM14_CH1
+	PF6,	///< TIM10_CH1
+	PF7,	///< TIM11_CH1
+	PF8,	///< TIM13_CH1
+	PF9,	///< TIM14_CH1
 
-	PH10,	// TIM5_CH1
-	PH11,	// TIM5_CH2
-	PH12,	// TIM5_CH3
+	PH10,	///< TIM5_CH1
+	PH11,	///< TIM5_CH2
+	PH12,	///< TIM5_CH3
 
-	PI0,	// TIM5_CH4
-	PI2,	// TIM8_CH4
-	PI5,	// TIM8_CH1
-	PI6, 	// TIM8_CH2
-	PI7		// TIM8_CH3
+	PI0,	///< TIM5_CH4
+	PI2,	///< TIM8_CH4
+	PI5,	///< TIM8_CH1
+	PI6, 	///< TIM8_CH2
+	PI7		///< TIM8_CH3
 };
 
 /**
@@ -145,8 +145,8 @@ enum class TimerChannel {
  * @brief APBx options - determines f_timer
  */
 enum class ApbNum {
-	APB1,//!< APB1
-	APB2 //!< APB2
+	APB1,	//!< Max frequency: SysClk / 2 (84 MHz)
+	APB2 	//!< Max frequency: SysClk (168 MHz)
 };
 
 /**

@@ -442,7 +442,7 @@ public:
 
 	void read(void);
 
-	uint8_t readAcc(void);
+	void readAcc(void);
 	float getAccX(void);
 	float getAccY(void);
 	float getAccZ(void);
@@ -450,7 +450,7 @@ public:
 	float getAccYFiltered(void);
 	float getAccZFiltered(void);
 
-	uint8_t readMag(void);
+	void readMag(void);
 	float getMagX(void);
 	float getMagY(void);
 	float getMagZ(void);

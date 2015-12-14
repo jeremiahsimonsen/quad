@@ -29,11 +29,9 @@
  *  @{
  */
 
-#include <PwmTimer.h>
+#include "PwmTimer.h"
+#include "errDC9000.h"
 #include "stm32f4xx_hal.h"
-#include "stm32f4xx_hal_tim.h"
-#include "stm32f4xx_hal_rcc.h"
-#include "stm32f4xx_hal_gpio.h"
 #include "stm32f4_discovery.h"
 #include "stm32f407xx.h"
 
@@ -99,8 +97,7 @@ void PwmTimer::setFreq(float f) {
 	TimHandle.State = HAL_TIM_STATE_RESET;
 	// NOTE: Calls HAL_TIM_PWM_MspInit()
 	if (HAL_TIM_PWM_Init(&TimHandle) != HAL_OK) {
-		// TODO: Error_Handler();
-		while(1);
+		Error_Handler(errDC9000::PWM_INIT_ERROR);
 	}
 
 	// Set the positive pulse width
@@ -223,8 +220,7 @@ void PwmTimer::initTimer(float f, float w, TimerPin p) {
 	TimHandle.State = HAL_TIM_STATE_RESET;
 	// NOTE: Calls HAL_TIM_PWM_MspInit()
 	if (HAL_TIM_PWM_Init(&TimHandle) != HAL_OK) {
-		// TODO: Error_Handler();
-		while(1);
+		Error_Handler(errDC9000::PWM_INIT_ERROR);
 	}
 
 	// Setup channel-specific settings
@@ -240,14 +236,12 @@ void PwmTimer::initTimer(float f, float w, TimerPin p) {
 	// Store configuration settings in peripheral registers
 	// NOTE: Disables PWM output
 	if (HAL_TIM_PWM_ConfigChannel(&TimHandle, &sConfig, channel) != HAL_OK) {
-		// TODO: Error_Handler();
-		while(1);
+		Error_Handler(errDC9000::PWM_INIT_ERROR);
 	}
 
 	// Start/re-enable the PWM output
 	if (HAL_TIM_PWM_Start(&TimHandle, channel) != HAL_OK) {
-		// TODO: Error_Handler();
-		while(1);
+		Error_Handler(errDC9000::PWM_INIT_ERROR);
 	}
 
 	setWidth(w);

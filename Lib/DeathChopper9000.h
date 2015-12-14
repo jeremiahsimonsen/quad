@@ -1,99 +1,103 @@
 /**
  * @file
  *
- * @brief Death Chopper 9000 Interface
+ * @brief Death Chopper 9000
  *
- * @author Jeremiah Simonsen
  * @author Jasmine Despres
+ * @author Jeremiah Simonsen
  *
- * @date Dec, 2015
- * 
- *   @mainpage Death Chopper 9000 library for ECE 405/6/3 Senior Design Project
- *   
- *   This library defines an interface that allows a user to use the 
- *   STM32F4-Discovery or Death Chopper 9000 development boards to interface with:
- *   	- Pololu AltIMU-10 v4 Inertial Measurement Unit (IMU)
- *   		- https://www.pololu.com/product/2470
- *   		- 3-axis Gyroscope (L3GD20H) 
- *   			- https://www.pololu.com/file/0J731/L3GD20H.pdf
- *   		- 3-axis Accelerometer & 3-axis Magnetometer (LSM303D) 
- *   			- https://www.pololu.com/file/0J703/LSM303D.pdf
- *   		- Altimeter (LPS25H) 
- *   			- https://www.pololu.com/file/0J761/LPS25H.pdf
- *   	- XBee Pro Series 1 wireless radio module 
- *   		- https://www.sparkfun.com/products/8742
- *   	- LIDAR Lite v1 Laser Rangefinder 
- *   		- http://pulsedlight3d.com/
- *   	- HC-SR04 Ultrasonic Rangefinder 
- *   		- http://www.micropik.com/PDF/HCSR04.pdf
- *   	- Turnigy Plush 18A (or similar) Brushless DC (BLDC) Electronic Speed Controller (ESC)
- *   		- http://www.hobbyking.com/hobbyking/store/__68533__TURNIGY_Plush_18amp_Speed_Controller_AR_Warehouse_.html
- *   
- *   The user interface is as follows:
- *   
- *   	-# Required include: @code #include "DeathChopper9000.h" @endcode
- *   
- */
- 
-/**
- * @page low_level_peripherals Low-level Peripherals
- *
- * This page gives an overview of the low-level peripherals supported by the Death Chopper 9000 library.
- * It is divided into the following sections:
- * 		- @subpage peripheral_UART
- * 		- @subpage peripheral_I2C
+ * @date Dec 13, 2015
  *
  */
 
-/**
- * @page peripheral_UART UART Configuration
- *
- * The STM32F407 has six (6) hardware USART/UART peripherals. Each port can be connected to several pins. However,
- * The library currently only supports specific pin connections. The supported pin connections are tabulated below.
- *
- * U(S)ART Pin Mappings
- * --------------------
- * | U(S)ARTx |  TX  |  RX  |
- * | -------: | :-:  | :-:  |
- * | USART1   | PA9  | PA10 |
- * | USART2   | PA2  | PA3  |
- * | USART3   | PB10 | PB11 |
- * | UART4    | PC10 | PC11 |
- * | UART5    | PC12 | PD2  |
- * | USART6   | PC6  | PC7  |
- *
- * U(S)ART DMA Mappings
- * --------------------
- * | U(S)ARTx | Pin | DMA | Stream | Channel |
- * | -------: | :-: | :-: | :----: | :-----: |
- * | USART1   | TX  | 2   |   7    |   4     |
- * |          | RX  | 2   |   5    |   4     |
- * | USART2   | TX  | 1   |   6    |   4     |
- * |          | RX  | 1   |   5    |   4     |
- * | USART3   | TX  | 1   |   3    |   4     |
- * |          | RX  | 1   |   1    |   4     |
- * | UART4    | TX  | 1   |   4    |   4     |
- * |          | RX  | 1   |   2    |   4     |
- * | UART5    | TX  | 1   |   7    |   4     |
- * |          | RX  | 1   |   0    |   4     |
- * | USART6   | TX  | 2   |   6    |   5     |
- * |          | RX  | 2   |   1    |   5     |
- *
- */
-
-/**
- * @page peripheral_I2C I2C Configuration
- *
- * @todo Insert table of i2c pin mapping
- * @todo Insert table of i2c DMA mapping
+/** @addtogroup DC9000
+ *  @{
  */
 
 #ifndef __DEATHCHOPPER9000__
 #define __DEATHCHOPPER9000__
 
-//#define USE_LIDARLITE
-#define USE_ULTRASONIC
+#include "config.h"
+#include "Adc.h"
+#include "uart.h"
+#include "Motor.h"
+#include "IMU.h"
+#include "LidarLite.h"
+#include "HCSR04.h"
+#include "pid.h"
+#include "pid2.h"
+#include "led.h"
 
-// TODO: Add includes
+/**
+ * @brief Global variables
+ */
+extern led *leds;						///< LED controller
+
+/**
+ * @brief Quadcopter abstraction
+ *
+ * This class abstracts everything involved with flying into an extremely
+ * simple interface.
+ */
+class DeathChopper9000 {
+private:
+	Adc vSense;					///< Adc for sensing battery voltage
+
+	IMU *imu;					///< Inertial measurement unit for orientation sensing
+
+	Motor front;				///< Front motor
+	Motor rear;					///< Rear motor
+	Motor left;					///< Left motor
+	Motor right;				///< Right motor
+
+	pid2 pitch_pid;				///< PID controller for pitch angle
+	pid2 roll_pid;				///< PID controller for roll angle
+
+// Rangefinder
+#if defined USE_LIDARLITE
+	LidarLite rangefinder;		///< Rangefinder for sensing height
+#elif defined USE_ULTRASONIC
+	HCSR04 rangefinder;			///< Rangefinder for sensing height
+#endif
+
+	uint32_t rxTimeout;		///< UART RX timeout counter
+
+	float throttle_cmd;			///< Throttle command from remote control
+	float pitch_cmd;			///< Pitch angle command from remote control
+	float roll_cmd;				///< Roll angle command from remote control
+	float yaw_cmd;				///< Yaw rate command from remote control
+
+	float pitch_y;				///< Measured "output" pitch angle
+	float roll_y;				///< Measured "output" roll angle
+
+	float pitch_e;				///< Pitch angle error from command
+	float roll_e;				///< Roll angle error from command
+
+	float u_pitch;				///< Output of pitch PID controller
+	float u_roll;				///< Output of roll PID controller
+
+	float u_pitch_cmd;			///< Pitch PID controller motor command/throttle
+	float u_roll_cmd;			///< Roll PID controller motor command/throttle
+
+	float front_s;				///< Front motor speed
+	float rear_s;				///< Rear motor speed
+	float left_s;				///< Left motor speed
+	float right_s;				///< Right motor speed
+
+	// Private constructors for singleton pattern
+	DeathChopper9000();
+	DeathChopper9000(DeathChopper9000 const&);
+	DeathChopper9000& operator=(DeathChopper9000 const&);
+
+	static DeathChopper9000 *dc9000Instance;
+
+public:
+	static DeathChopper9000* instance();
+
+	void fly(void);
+	void abort(void);
+};
 
 #endif
+
+/** @} Close DC9000 group */
