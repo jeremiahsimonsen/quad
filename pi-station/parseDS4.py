@@ -92,7 +92,9 @@ def passwordProtect():
 	btn1 = False
 	btn2 = False
 	btn3 = False
+	error = False
 	while btn1 != True and btn2 != True and btn3 != True:
+		print 'Start of password'
 		while btn1 == False:
 			report = getReport()
 			for line in report:
@@ -118,12 +120,27 @@ def passwordProtect():
 			if error == True:
 				break
 		if error == True:
+			btn1 = False
 			continue
 		print 'Second button correct'
 		time.sleep(0.5)
 
-#	print lines		
-	return lines
+		while btn3 == False:
+			report = getReport()
+			for line in report:
+				if 'button' in line and not 'trackpad' in line and 'True' in line:
+					print 'Error'
+					btn3 = False
+					error = True
+					break
+				elif 'button_trackpad' in line and 'True' in line:
+					btn3 = True
+			if error == True:
+				break
+		if error == True:
+			continue
+		print 'Third button correct'
+		time.sleep(0.5)
 
 def fly():
 	print 'Entering flight mode'
