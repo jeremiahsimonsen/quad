@@ -85,6 +85,8 @@ def getReport():
 	while not 'Report dump' in l:
 		l = sys.stdin.readline()
 		lines.append(l)
+	
+	return lines
 
 def passwordProtect():
 	btn1 = False
