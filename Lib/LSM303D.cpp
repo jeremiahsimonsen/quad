@@ -50,10 +50,10 @@ LSM303D::LSM303D()
 	LSM303D_InitStruct init;
 	init.aodr_config = LSM_AODR_Config::EIGHT;		// 200 Hz Accelerometer output data rate
 	init.abw_config  = LSM_ABW_Config::ONE;			// 773 Hz Acceleration anti-alias filter bandwidth
-	init.afs_config  = LSM_AFS_Config::FOUR;		// ±4g Acceleration full-scale
+	init.afs_config  = LSM_AFS_Config::FOUR;		// +/-4g Acceleration full-scale
 	init.modr_config = LSM_MODR_Config::FIVE;		// 50 Hz Magnetometer output data rate
 	init.mres_config = LSM_MRES_Config::HIGH;		// Magnetometer high-resolution mode
-	init.mfs_config  = LSM_MFS_Config::FOUR;		// ± 4 gauss Magnetometer full-scale
+	init.mfs_config  = LSM_MFS_Config::FOUR;		// +/- 4 gauss Magnetometer full-scale
 	init.md_config   = LSM_MD_Config::CONTINUOUS;	// Magnetic sensor continuous mode
 	accResolution    = 0.122e-3f;
 	magResolution	 = 0.160e-3f;

@@ -309,18 +309,18 @@ enum class LSM_ABW_Config {
 
 /** Acceleration full-scale selection
  *	LSM_AFS_Config AFS2 AFS1 AFS0 Acceleration full-scale
- *		   TWO		  0 	0 	0 			± 2g
- *		  FOUR	  	  0 	0 	1 			± 4g
- *		   SIX		  0 	1 	0 			± 6g
- *		  EIGHT	  	  0 	1 	1 			± 8g
- *		 SIXTEEN	  1 	0 	0 			± 16g
+ *		   TWO		  0 	0 	0 			+/- 2g
+ *		  FOUR	  	  0 	0 	1 			+/- 4g
+ *		   SIX		  0 	1 	0 			+/- 6g
+ *		  EIGHT	  	  0 	1 	1 			+/- 8g
+ *		 SIXTEEN	  1 	0 	0 			+/- 16g
  */
 enum class LSM_AFS_Config {
-	TWO		=	0b000,		// ±2g
-	FOUR	=	0b001,		// ±4g
-	SIX		=	0b010,		// ±6g
-	EIGHT	=	0b011,		// ±8g
-	SIXTEEN	=	0b100,		// ±16g
+	TWO		=	0b000,		// +/-2g
+	FOUR	=	0b001,		// +/-4g
+	SIX		=	0b010,		// +/-6g
+	EIGHT	=	0b011,		// +/-8g
+	SIXTEEN	=	0b100,		// +/-16g
 };
 
 /** Magnetometer output data rate configuration
@@ -354,16 +354,16 @@ enum class LSM_MRES_Config {
 
 /** LSM303D Magnetometer full-scale configuration
  *	LSM_MFS_Config MFS1 MFS0 Magnetic full-scale
- *		  TWO		0 	  0 	  ± 2 gauss
- *		  FOUR		0 	  1 	  ± 4 gauss
- *		  EIGHT		1 	  0 	  ± 8 gauss
- *		  TWELVE	1 	  1 	  ± 12 gauss
+ *		  TWO		0 	  0 	  +/- 2 gauss
+ *		  FOUR		0 	  1 	  +/- 4 gauss
+ *		  EIGHT		1 	  0 	  +/- 8 gauss
+ *		  TWELVE	1 	  1 	  +/- 12 gauss
  */
 enum class LSM_MFS_Config {
-	TWO		=	0b00,		// ± 2 gauss
-	FOUR	=	0b01,		// ± 4 gauss
-	EIGHT	=	0b10,		// ± 8 gauss
-	TWELVE	=	0b11		// ± 12 gauss
+	TWO		=	0b00,		// +/- 2 gauss
+	FOUR	=	0b01,		// +/- 4 gauss
+	EIGHT	=	0b10,		// +/- 8 gauss
+	TWELVE	=	0b11		// +/- 12 gauss
 };
 
 /** LSM303D Magnetic sensor mode configuration

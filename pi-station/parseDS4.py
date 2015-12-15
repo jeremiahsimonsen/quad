@@ -2,6 +2,7 @@
 
 import sys
 import serial
+import time
 import StringIO
 
 report = """ Report dump
@@ -16,7 +17,7 @@ report = """ Report dump
     dpad_left: False
     dpad_right: False
     button_cross: False
-    button_circle: False
+    button_circle: True
     button_square: False
     button_triangle: False
     button_l1: False
@@ -49,6 +50,7 @@ report = """ Report dump
     plug_audio: False
     plug_mic: False
  Report dump"""
+buf = StringIO.StringIO(report)
 
 """ The analog sticks map to different control parameters based on flight Mode 1,2,3, or 4 """
 throttle_LUT = ['right_analog_y', 'left_analog_y', 'right_analog_y', 'left_analog_y']
@@ -63,14 +65,33 @@ MODE  = 3
 STICK_ZERO = 127
 DEADBAND = 10
 
-def main():
-	packet = [START, 0, STICK_ZERO, STICK_ZERO, STICK_ZERO, STOP]
-	ids = ['dummy_id', 'r2_analog', pitch_LUT[MODE-1], roll_LUT[MODE-1], yaw_LUT[MODE-1]]
-	
-	ser = serial.Serial('/dev/ttyUSB0', 57600, parity=serial.PARITY_EVEN)
+DEMO = 1
+FLY = 2
+
+packet = [START, 0, STICK_ZERO, STICK_ZERO, STICK_ZERO, STOP]
+ids = ['dummy_id', 'r2_analog', pitch_LUT[MODE-1], roll_LUT[MODE-1], yaw_LUT[MODE-1]]
+
+# ser = serial.Serial('/dev/ttyUSB0', 57600, parity=serial.PARITY_EVEN)
 # 	ser = serial.Serial('COM9', 57600, parity=serial.PARITY_EVEN)
+
+def getReport():
+	lines = []
 	
-# 	buf = StringIO.StringIO(report)
+	l = sys.stdin.readline()
+	while not 'Report dump' in l:
+		l = sys.stdin.readline()
+	
+	while not 'Report dump' in l:
+		l = sys.stdin.readline()
+		lines.append(l)
+		
+	return lines
+
+def fly():
+	print 'Entering flight mode'
+	packet = [FLY, FLY, FLY, FLY, FLY, FLY]
+# 	ser.write(bytearray(packet))
+	
 # 	for line in buf:
 	for line in sys.stdin:
 		""" New report """
@@ -81,7 +102,7 @@ def main():
 				packet[3] = STICK_ZERO
 			if abs(packet[4] - STICK_ZERO) < DEADBAND:
 				packet[4] = STICK_ZERO
-			ser.write(bytearray(packet))
+# 			ser.write(bytearray(packet))
 			print packet
 		for index, val in enumerate(ids):
 			if val in line:
@@ -90,11 +111,54 @@ def main():
 				else:
 					packet[index] = int(int(filter(str.isdigit, str.lstrip(line, ' r2'))) / 255.0 * 253.0)
 					
+		""" Send packet that causes quad to abort """
 		if 'button_cross' in line:
 			if 'True' in line:
 				packet = [0, 0, STICK_ZERO, STICK_ZERO, STICK_ZERO, 0]
-				ser.write(bytearray(packet))
+# 				ser.write(bytearray(packet))
 				exit()
+
+def demo():
+	print 'Entering demo mode'
+	packet = [DEMO, DEMO, DEMO, DEMO, DEMO, DEMO]
+# 	ser.write(bytearray(packet))
+
+def main():
+	print 'Death Chopper 9000'
+	time.sleep(1)
+	
+	print 'Please enter the password'
+	btn1 = False
+	btn2 = False
+	btn3 = False
+	while btn1 == False:
+		report = getReport()
+		for line in report:
+			if 'button' in line and not 'l1' in line and 'True' in line:
+				print 'Error'
+				btn1 = False
+				break
+			elif 'button_l1' in line and 'True' in line:
+				btn1 = True
+	print 'First button correct'
+	
+	print 'Press a button: triangle for flight, circle for contract demo'
+	
+	op_mode = -1
+	while op_mode < 0:
+# 		line = sys.stdin.readline()
+		line = buf.readline()
+		if 'button_triangle' in line and 'True' in line:
+			op_mode = FLY
+			fly()
+		elif 'button_circle' in line and 'True' in line:
+			op_mode = DEMO
+			demo()
+		else:
+# 			line = sys.stdin.readline()
+			line = buf.readline()
+	
+
 			
 if __name__ == '__main__':
 	main()
