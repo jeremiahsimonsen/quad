@@ -132,7 +132,7 @@ void DeathChopper9000::start() {
 			}
 		}
 
-		HAL_Delay(LOOP_DELAY);
+		HAL_Delay(100);
 	}
 }
 
@@ -149,6 +149,12 @@ void DeathChopper9000::start() {
 void DeathChopper9000::fly() {
 	uint8_t *readBuff = NULL;
 	uint32_t iter = 0;
+
+	// Turn all LEDs off to make sure only the running light blinks
+	leds->turnOff(LED::BLUE);
+	leds->turnOff(LED::GREEN);
+	leds->turnOff(LED::ORANGE);
+	leds->turnOff(LED::RED);
 
 	// Run forever
 	while (1) {

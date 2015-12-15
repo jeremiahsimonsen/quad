@@ -79,10 +79,16 @@ def getReport():
 	
 	l = sys.stdin.readline()
 	while not 'Report dump' in l:
+		if 'Disconnected' in l:
+			print 'Error: Controller has been disconnected'
+			exit()
 		l = sys.stdin.readline()
 
 	l = sys.stdin.readline()	
 	while not 'Report dump' in l:
+		if 'Disconnected' in l:
+			print 'Error: Controller has been disconnected'
+			exit()
 		l = sys.stdin.readline()
 		lines.append(l)
 	
@@ -149,6 +155,9 @@ def fly():
 	
 # 	for line in buf:
 	for line in sys.stdin:
+		if 'Disconnected' in l:
+			print 'Error: Controller has been disconnected'
+			exit()
 		""" New report """
 		if 'Report dump' in line:
 			if abs(packet[2] - STICK_ZERO) < DEADBAND:

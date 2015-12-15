@@ -63,6 +63,10 @@ void Error_Handler(errDC9000 e) {
 		usart_transmit((uint8_t *)errDC9000_msg[(int)e]);
 	}
 
+	// Turn on ONLY the red "Error" LED
+	leds->turnOff(LED::BLUE);
+	leds->turnOff(LED::GREEN);
+	leds->turnOff(LED::ORANGE);
 	leds->turnOn(LED::RED);
 
 	DeathChopper9000 *dc9000 = DeathChopper9000::instance();
