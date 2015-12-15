@@ -95,6 +95,7 @@ def passwordProtect():
 	error = False
 	while btn1 != True and btn2 != True and btn3 != True:
 		print 'Start of password'
+		error = False
 		while btn1 == False:
 			report = getReport()
 			for line in report:
@@ -105,7 +106,8 @@ def passwordProtect():
 				elif 'button_l1' in line and 'True' in line:
 					btn1 = True
 		print 'First button correct'
-		time.sleep(0.5)
+		time.sleep(1)
+		report = getReport()
 		
 		while btn2 == False:
 			report = getReport()
@@ -123,7 +125,8 @@ def passwordProtect():
 			btn1 = False
 			continue
 		print 'Second button correct'
-		time.sleep(0.5)
+		time.sleep(1)
+		report = getReport()
 
 		while btn3 == False:
 			report = getReport()
@@ -140,7 +143,7 @@ def passwordProtect():
 		if error == True:
 			continue
 		print 'Third button correct'
-		time.sleep(0.5)
+		time.sleep(1)
 
 def fly():
 	print 'Entering flight mode'
