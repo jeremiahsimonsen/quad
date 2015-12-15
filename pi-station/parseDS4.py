@@ -80,11 +80,14 @@ def getReport():
 	l = sys.stdin.readline()
 	while not 'Report dump' in l:
 		l = sys.stdin.readline()
-	
+
+	l = sys.stdin.readline()	
 	while not 'Report dump' in l:
 		l = sys.stdin.readline()
 		lines.append(l)
-		
+
+
+#	print lines		
 	return lines
 
 def fly():
@@ -146,8 +149,8 @@ def main():
 	
 	op_mode = -1
 	while op_mode < 0:
-# 		line = sys.stdin.readline()
-		line = buf.readline()
+ 		line = sys.stdin.readline()
+#		line = buf.readline()
 		if 'button_triangle' in line and 'True' in line:
 			op_mode = FLY
 			fly()
@@ -155,8 +158,8 @@ def main():
 			op_mode = DEMO
 			demo()
 		else:
-# 			line = sys.stdin.readline()
-			line = buf.readline()
+ 			line = sys.stdin.readline()
+#			line = buf.readline()
 	
 
 			
