@@ -58,7 +58,11 @@ const char* errDC9000_msg[] = {
  * @todo Possibly descend instead of killing the motors immediately
  */
 void Error_Handler(errDC9000 e) {
-	usart_transmit((uint8_t *)errDC9000_msg[(int)e]);
+	// If the error has to do with UART, can't send error message via UART
+	if (e != errDC9000::UART_INIT_ERROR && e != errDC9000::UART_IO_ERROR && e != errDC9000::UART_DEINIT_ERROR) {
+		usart_transmit((uint8_t *)errDC9000_msg[(int)e]);
+	}
+
 	leds->turnOn(LED::RED);
 
 	DeathChopper9000 *dc9000 = DeathChopper9000::instance();

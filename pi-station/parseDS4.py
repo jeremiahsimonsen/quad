@@ -71,7 +71,7 @@ FLY = 2
 packet = []
 ids = ['dummy_id', 'r2_analog', pitch_LUT[MODE-1], roll_LUT[MODE-1], yaw_LUT[MODE-1]]
 
-# ser = serial.Serial('/dev/ttyUSB0', 57600, parity=serial.PARITY_EVEN)
+ser = serial.Serial('/dev/ttyUSB0', 57600, parity=serial.PARITY_EVEN)
 # 	ser = serial.Serial('COM9', 57600, parity=serial.PARITY_EVEN)
 
 def getReport():
@@ -122,8 +122,6 @@ def passwordProtect():
 					btn2 = True
 			if error == True:
 				continue
-#		if error == True:
-#			continue
 		print 'Second button correct'
 		time.sleep(1)
 		report = getReport()
@@ -139,15 +137,13 @@ def passwordProtect():
 					btn3 = True
 			if error == True:
 				continue
-#		if error == True:
-#			continue
 		print 'Third button correct'
 		time.sleep(1)
 
 def fly():
 	print 'Entering flight mode'
 	packet = [FLY, FLY, FLY, FLY, FLY, FLY]
-# 	ser.write(bytearray(packet))
+	ser.write(bytearray(packet))
 	
 	packet = [START, 0, STICK_ZERO, STICK_ZERO, STICK_ZERO, STOP]
 	
@@ -161,7 +157,7 @@ def fly():
 				packet[3] = STICK_ZERO
 			if abs(packet[4] - STICK_ZERO) < DEADBAND:
 				packet[4] = STICK_ZERO
-# 			ser.write(bytearray(packet))
+			ser.write(bytearray(packet))
 			print packet
 		for index, val in enumerate(ids):
 			if val in line:
@@ -174,13 +170,13 @@ def fly():
 		if 'button_cross' in line:
 			if 'True' in line:
 				packet = [0, 0, STICK_ZERO, STICK_ZERO, STICK_ZERO, 0]
-# 				ser.write(bytearray(packet))
+				ser.write(bytearray(packet))
 				exit()
 
 def demo():
 	print 'Entering demo mode'
 	packet = [DEMO, DEMO, DEMO, DEMO, DEMO, DEMO]
-# 	ser.write(bytearray(packet))
+	ser.write(bytearray(packet))
 	for line in sys.stdin:
 		pass
 

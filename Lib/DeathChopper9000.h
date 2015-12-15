@@ -33,6 +33,9 @@
  */
 extern led *leds;						///< LED controller
 
+#define DEMO_CMD 1
+#define FLY_CMD 2
+
 /**
  * @brief Quadcopter abstraction
  *
@@ -91,10 +94,14 @@ private:
 
 	static DeathChopper9000 *dc9000Instance;
 
+	void fly(void);
+	void demo(void);
+
 public:
 	static DeathChopper9000* instance();
 
-	void fly(void);
+	void start(void);
+
 	void abort(void);
 };
 

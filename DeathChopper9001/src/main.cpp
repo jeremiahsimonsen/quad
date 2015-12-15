@@ -20,7 +20,7 @@ void main()
 	// at high speed.
 
 	DeathChopper9000 *dc9000 = DeathChopper9000::instance();
-	dc9000->fly();
+	dc9000->start();
 }
 
 

@@ -108,6 +108,34 @@ DeathChopper9000::DeathChopper9000()
 	front_s = rear_s = left_s = right_s = 0.0f;
 }
 
+void DeathChopper9000::start() {
+	uint8_t *buff = NULL;
+
+	leds->turnOn(LED::RED);
+
+	while (1) {
+		leds->toggle(LED::GREEN);
+		leds->toggle(LED::RED);
+
+		buff = usart_read();
+		if (buff != NULL) {
+			if (buff[0] == DEMO_CMD && buff[1] == DEMO_CMD && buff[2] == DEMO_CMD
+				&& buff[3] == DEMO_CMD && buff[4] == DEMO_CMD && buff[5] == DEMO_CMD)
+			{
+				demo();
+			}
+
+			else if (buff[0] == FLY_CMD && buff[1] == FLY_CMD && buff[2] == FLY_CMD
+				&& buff[3] == FLY_CMD && buff[4] == FLY_CMD && buff[5] == FLY_CMD)
+			{
+				fly();
+			}
+		}
+
+		HAL_Delay(LOOP_DELAY);
+	}
+}
+
 /**
  * @brief Fly the quadcopter using remote control
  *
@@ -125,7 +153,7 @@ void DeathChopper9000::fly() {
 	// Run forever
 	while (1) {
 		// Toggle running light
-		leds->toggle(LED::GREEN);
+		leds->toggle(LED::BLUE);
 
 		// See if a new remote control command has arrived yet
 		readBuff = usart_read();
@@ -201,6 +229,13 @@ void DeathChopper9000::fly() {
 
 		iter++;
 		HAL_Delay(LOOP_DELAY);
+	}
+}
+
+void DeathChopper9000::demo() {
+	while(1) {
+		leds->toggle(LED::ORANGE);
+		HAL_Delay(50);
 	}
 }
 
