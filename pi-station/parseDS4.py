@@ -121,9 +121,9 @@ def passwordProtect():
 				elif 'button_r1' in line and 'True' in line:
 					btn2 = True
 			if error == True:
-				break
-		if error == True:
-			continue
+				continue
+#		if error == True:
+#			continue
 		print 'Second button correct'
 		time.sleep(1)
 		report = getReport()
@@ -138,9 +138,9 @@ def passwordProtect():
 				elif 'button_trackpad' in line and 'True' in line:
 					btn3 = True
 			if error == True:
-				break
-		if error == True:
-			continue
+				continue
+#		if error == True:
+#			continue
 		print 'Third button correct'
 		time.sleep(1)
 
