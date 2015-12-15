@@ -95,13 +95,15 @@ def passwordProtect():
 	error = False
 	while btn1 != True and btn2 != True and btn3 != True:
 		print 'Start of password'
+		btn1 = False
+		btn2 = False
+		btn3 = False
 		error = False
 		while btn1 == False:
 			report = getReport()
 			for line in report:
 				if 'button' in line and not 'l1' in line and 'True' in line:
 					print 'Error'
-					btn1 = False
 					break
 				elif 'button_l1' in line and 'True' in line:
 					btn1 = True
@@ -114,7 +116,6 @@ def passwordProtect():
 			for line in report:
 				if 'button' in line and not 'r1' in line and 'True' in line:
 					print 'Error'
-					btn2 = False
 					error = True
 					break
 				elif 'button_r1' in line and 'True' in line:
@@ -122,7 +123,6 @@ def passwordProtect():
 			if error == True:
 				break
 		if error == True:
-			btn1 = False
 			continue
 		print 'Second button correct'
 		time.sleep(1)
@@ -133,7 +133,6 @@ def passwordProtect():
 			for line in report:
 				if 'button' in line and not 'trackpad' in line and 'True' in line:
 					print 'Error'
-					btn3 = False
 					error = True
 					break
 				elif 'button_trackpad' in line and 'True' in line:
@@ -182,6 +181,8 @@ def demo():
 	print 'Entering demo mode'
 	packet = [DEMO, DEMO, DEMO, DEMO, DEMO, DEMO]
 # 	ser.write(bytearray(packet))
+	for line in sys.stdin:
+		pass
 
 def main():
 	print 'Death Chopper 9000'
