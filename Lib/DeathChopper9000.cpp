@@ -270,6 +270,12 @@ void DeathChopper9000::demo() {
 	uint32_t iter = 0;
 	bool enableMotors = false;
 
+	// Turn all LEDs off to make sure only the running light blinks
+	leds->turnOff(LED::BLUE);
+	leds->turnOff(LED::GREEN);
+	leds->turnOff(LED::ORANGE);
+	leds->turnOff(LED::RED);
+
 	// Run forever
 	while(1) {
 		/*

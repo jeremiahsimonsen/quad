@@ -66,7 +66,7 @@
 #define MAX_ANGLE 20.0f					// Maximum pitch & roll angle [deg]
 #define MAX_RATE  180.0f				// Maximum yaw rate [deg/s]
 #define V_MIN 0.2f
-#define MAX_SPEED 0.7f
+#define MAX_SPEED 0.4f
 #define DEMO_MAX_SPEED 0.2f
 
 #define PITCH_KP 6.0f

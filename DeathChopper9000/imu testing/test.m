@@ -1,15 +1,12 @@
-z = tf('z',20e-3);
-
-tau = 1;
+tau = 0.8;
 s = tf('s');
-Hs = 1 / (tau*s + 1);
-
-Ts = 20e-3;
-Hz1 = tau*Ts / (1-tau*z^-1);
-Hz2 = (1-tau) / (1-tau*z^-1);
+Ha1 = 1 / (tau*s + 1);
+Hg1 = tau / (tau*s + 1);
+Ha2 = (2*tau*s+1) / (tau*s+1)^2
+Hg2 = (tau^2*s) / (tau*s+1)^2
 
 figure(1);
-bode(Hs);
+bode(Ha1,Hg1);
 
 figure(2);
-bode(Hz1,Hz2);
+bode(Ha2,Hg2);
