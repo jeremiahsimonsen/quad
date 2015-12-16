@@ -19,6 +19,8 @@ void main()
 	// At this stage the system clock should have already been configured
 	// at high speed.
 
+	HAL_Delay(500);
+
 	DeathChopper9000 *dc9000 = DeathChopper9000::instance();
 	dc9000->start();
 }

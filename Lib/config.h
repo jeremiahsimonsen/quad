@@ -22,8 +22,8 @@
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
-//#define DEATH_CHOPPER
-#define DISCOVERY_BOARD
+#define DEATH_CHOPPER
+//#define DISCOVERY_BOARD
 #define RX_TIMEOUT_ENABLE
 
 //#define USE_LIDARLITE

@@ -279,6 +279,7 @@ void DeathChopper9000::demo() {
 		if (iter % 10 == 0) {
 			char txBuff[100];
 			sprintf(txBuff, "%f %f %f %f\n\r", pitch_y, roll_y, height, v);
+			usart_transmit((uint8_t *)txBuff);
 		}
 
 		iter++;

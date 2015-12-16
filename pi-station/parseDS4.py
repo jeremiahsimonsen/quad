@@ -3,9 +3,9 @@
 import sys
 import serial
 import time
-import StringIO
 
-report = """ Report dump
+""" Report format """
+""" Report dump
     left_analog_x: 120
     left_analog_y: 124
     right_analog_x: 129
@@ -50,7 +50,6 @@ report = """ Report dump
     plug_audio: False
     plug_mic: False
  Report dump"""
-buf = StringIO.StringIO(report)
 
 """ The analog sticks map to different control parameters based on flight Mode 1,2,3, or 4 """
 throttle_LUT = ['right_analog_y', 'left_analog_y', 'right_analog_y', 'left_analog_y']
@@ -73,7 +72,6 @@ packet = []
 ids = ['dummy_id', 'r2_analog', pitch_LUT[MODE-1], roll_LUT[MODE-1], yaw_LUT[MODE-1]]
 
 ser = serial.Serial('/dev/ttyUSB0', 57600, parity=serial.PARITY_EVEN)
-# 	ser = serial.Serial('COM9', 57600, parity=serial.PARITY_EVEN)
 
 def getReport():
 	lines = []
@@ -154,10 +152,11 @@ def fly():
 	
 	packet = [START, 0, STICK_ZERO, STICK_ZERO, STICK_ZERO, STOP]
 	
-# 	for line in buf:
 	for line in sys.stdin:
-		if 'Disconnected' in l:
+		if 'Disconnected' in line:
 			print 'Error: Controller has been disconnected'
+			packet = [0, 0, STICK_ZERO, STICK_ZERO, STICK_ZERO, 0]
+			ser.write(bytearray(packet))
 			exit()
 		""" New report """
 		if 'Report dump' in line:
@@ -191,6 +190,11 @@ def demo():
 		if 'button_cross' in line and 'True' in line:
 			packet = [DEMO_MOTOR_TOGGLE, DEMO_MOTOR_TOGGLE, DEMO_MOTOR_TOGGLE, DEMO_MOTOR_TOGGLE, DEMO_MOTOR_TOGGLE, DEMO_MOTOR_TOGGLE]
 			ser.write(bytearray(packet))
+		if 'Disconnected' in line:
+			print 'Error: Controller has been disconnected'
+			packet = [0, 0, STICK_ZERO, STICK_ZERO, STICK_ZERO, 0]
+			ser.write(bytearray(packet))
+			exit()
 
 def main():
 	print 'Death Chopper 9000'
@@ -203,8 +207,12 @@ def main():
 	
 	op_mode = -1
 	while op_mode < 0:
- 		line = sys.stdin.readline()
-#		line = buf.readline()
+		line = sys.stdin.readline()
+		if 'Disconnected' in line:
+			print 'Error: Controller has been disconnected'
+			packet = [0, 0, STICK_ZERO, STICK_ZERO, STICK_ZERO, 0]
+			ser.write(bytearray(packet))
+			exit()
 		if 'button_triangle' in line and 'True' in line:
 			op_mode = FLY
 			fly()
@@ -212,8 +220,7 @@ def main():
 			op_mode = DEMO
 			demo()
 		else:
- 			line = sys.stdin.readline()
-#			line = buf.readline()
+			line = sys.stdin.readline()
 	
 
 			
