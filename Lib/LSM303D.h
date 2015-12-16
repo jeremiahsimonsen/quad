@@ -20,7 +20,8 @@
  *  @{
  */
 
-/** @addtogroup LSM303D LSM303D accelerometer/magnetometer chip-specific class
+/** @defgroup LSM303D LSM303D accelerometer/magnetometer chip-specific class
+ *  @brief Module for interfacing with the LSM303D *
  *  @{
  */
 
@@ -113,6 +114,7 @@ enum class LSM303D_Reg {
 };
 
 /** @addtogroup LSM303D_Macros Register Access Macros
+ *  @brief Macros for setting fields in registers
  *  @{
  */
 
@@ -262,6 +264,7 @@ enum class LSM303D_Reg {
 /** @} Close LSM303D_Macros group */
 
 /** @addtogroup LSM303D_Config Configuration Options
+ *  @brief Configuration structures for setting sensor configuration
  *  @{
  */
 

@@ -16,3 +16,4 @@ Lib/Documentation/
 Lib/Doc/Doxyfile
 Lib/Doc/
 codeToPDF/
+pi-station/*.txt

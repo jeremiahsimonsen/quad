@@ -21,6 +21,7 @@
  */
 
 /** @addtogroup LPS25H LPS25H altimeter chip-specific class
+ *  @brief Module for interfacing with the LPS25H
  *  @{
  */
 

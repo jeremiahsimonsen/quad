@@ -17,7 +17,7 @@
  *
  */
 
-/** @addtogroup Peripherals
+/** @addtogroup Sensors
  *  @{
  */
 

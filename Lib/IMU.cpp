@@ -10,11 +10,24 @@
  *
  */
 
-/** @addtogroup Sensors
+/** @defgroup Sensors Macro peripherals (sensors)
+ *  @brief Peripherals external to the MCU
+ *
+ *  The Death Chopper 9000 uses several sensors/devices external to the MCU,
+ *  including:
+ *  	- Pololu @ref IMU "AltIMU10-v4"
+ *  	-
+ *
  *  @{
  */
 
-/** @addtogroup IMU
+/** @defgroup IMU Inertial Measurement Unit (IMU)
+ *  @brief Module for calculating orientation using Pololu AltIMU10
+ *
+ *  Quadcopters utilize a 3-axis acclerometer and a 3-axis gyroscope for
+ *  calculating pitch and roll angles. A 3-axis magnetometer is used for
+ *  measuring the absolute yaw angle relative to magnetic north.
+ *
  *  @{
  */
 

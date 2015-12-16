@@ -14,7 +14,8 @@
  *  @{
  */
 
-/** @addtogroup LIDAR
+/** @defgroup LIDAR LIDAR Lite Laser Rangefinder
+ *  @brief Interfacing with the LIDAR Lite laser rangefinder
  *  @{
  */
 
@@ -70,7 +71,8 @@ static HAL_LockTypeDef pWidthLock = HAL_UNLOCKED;
 								(__LOCK__) = HAL_UNLOCKED;				\
 							} while (0)
 
-/** @addtogroup LIDAR_Class Class for reading from the LIDAR Lite
+/** @addtogroup LIDAR_Class LidarLite class
+ *  @brief Abstraction for measuring distance using this sensor
  *  @{
  */
 

@@ -14,7 +14,7 @@
  *  @{
  */
 
-/** @addtogroup IMU Inertial Measurement Unit (IMU)
+/** @addtogroup IMU
  *  @{
  */
 

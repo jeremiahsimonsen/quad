@@ -15,10 +15,10 @@
  *
  *  The Death Chopper 9000 uses several of the hardware peripherals on the
  *  STM32F407, including:
- *  	- ADC
- *  	- I2C
- *  	- U(S)ART
- *  	- TIM
+ *  	- @ref Adc "ADC"
+ *  	- @ref I2C
+ *  	- @ref UART "U(S)ART"
+ *  	- @ref TIM "TIM"
  *
  *  For more details, refer to @ref low_level_peripherals
  *

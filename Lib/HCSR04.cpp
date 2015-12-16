@@ -15,6 +15,7 @@
  */
 
 /** @defgroup HCSR04 HC-SR04 Ultrasonic Rangefinder
+ *  @brief Measuring distance using the HC-SR04 ultrasonic rangefinder
  *  @{
  */
 
@@ -68,7 +69,8 @@ static HAL_LockTypeDef pWidthLock = HAL_UNLOCKED;
 								(__LOCK__) = HAL_UNLOCKED;				\
 							} while (0)
 
-/** @addtogroup HCSR04_Class Class for reading from the HC-SR04
+/** @addtogroup HCSR04_Class HCSR04 class
+ *  @brief Abstraction for measuring distance using the sensor
  *  @{
  */
 
@@ -93,16 +95,21 @@ HCSR04::HCSR04() {
 		Error_Handler(errDC9000::ULTRASONIC_INIT_ERROR);
 	}
 
-	// Channel specific configuration
+	/*
+	 * Channel specific configuration
+	 */
 	// TIM2_CH1 detects rising edges, TIM2_CH2 detects falling edges so pulse width can be measured
 	sConfig.ICPrescaler = TIM_ICPSC_DIV1;
 	sConfig.ICFilter = 0;
 	sConfig.ICPolarity = TIM_ICPOLARITY_RISING;
 	sConfig.ICSelection = TIM_ICSELECTION_INDIRECTTI;
+
+	// Channel 1 config
 	if (HAL_TIM_IC_ConfigChannel(&Tim2Handle, &sConfig, TIM_CHANNEL_1) != HAL_OK) {
 		Error_Handler(errDC9000::ULTRASONIC_INIT_ERROR);
 	}
 
+	// Channel 2 config
 	sConfig.ICPolarity = TIM_ICPOLARITY_FALLING;
 	sConfig.ICSelection = TIM_ICSELECTION_DIRECTTI;
 	if (HAL_TIM_IC_ConfigChannel(&Tim2Handle, &sConfig, TIM_CHANNEL_2) != HAL_OK) {
@@ -162,7 +169,8 @@ float HCSR04::getDistIn() {
 
 #ifdef USE_ULTRASONIC
 
-/** @addtogroup HCSR04_Functions HAL and ISRs
+/** @addtogroup HCSR04_Functions Hardware-specific functions
+ *  @brief ISRs and functions required by the ST HAL
  *  @{
  */
 

@@ -57,13 +57,16 @@ pitch_LUT 	 = ['left_analog_y', 'right_analog_y', 'left_analog_y', 'right_analog
 roll_LUT 	 = ['right_analog_x', 'right_analog_x', 'left_analog_x', 'left_analog_x']
 yaw_LUT 	 = ['left_analog_x', 'left_analog_x', 'right_analog_x', 'right_analog_x']
 
+""" Comms protocol constants """
 START = 255
 STOP  = 254
-MODE  = 3
 
+""" Controller behavior constants """
+MODE  = 3
 STICK_ZERO = 127
 DEADBAND = 10
 
+""" Special command constants """
 FLY = 1
 DEMO = 2
 DEMO_MOTOR_TOGGLE = 3
@@ -73,9 +76,11 @@ ids = ['dummy_id', 'r2_analog', pitch_LUT[MODE-1], roll_LUT[MODE-1], yaw_LUT[MOD
 
 ser = serial.Serial('/dev/ttyUSB0', 57600, parity=serial.PARITY_EVEN)
 
+""" Get a complete controller status report """
 def getReport():
 	lines = []
 	
+	""" Wait for the start of a new report dump """
 	l = sys.stdin.readline()
 	while not 'Report dump' in l:
 		if 'Disconnected' in l:
@@ -83,6 +88,7 @@ def getReport():
 			exit()
 		l = sys.stdin.readline()
 
+	""" Read until start of next report dump """
 	l = sys.stdin.readline()	
 	while not 'Report dump' in l:
 		if 'Disconnected' in l:
@@ -93,17 +99,21 @@ def getReport():
 	
 	return lines
 
+""" Wireless control is locked out until the password is entered correctly.
+	The password is L1, R1, touchpad"""
 def passwordProtect():
 	btn1 = False
 	btn2 = False
 	btn3 = False
 	error = False
+	""" Buttons haven't been pressed correctly """
 	while btn1 != True and btn2 != True and btn3 != True:
 		print 'Start of password'
 		btn1 = False
 		btn2 = False
 		btn3 = False
 		error = False
+		""" Wait for the first button """
 		while btn1 == False:
 			report = getReport()
 			for line in report:
@@ -116,6 +126,7 @@ def passwordProtect():
 		time.sleep(1)
 		report = getReport()
 		
+		""" Wait for the second button """
 		while btn2 == False:
 			report = getReport()
 			for line in report:
@@ -130,7 +141,9 @@ def passwordProtect():
 		print 'Second button correct'
 		time.sleep(1)
 		report = getReport()
+		""" TODO: Start over if second button wrong """
 
+		""" Wait for the third button """
 		while btn3 == False:
 			report = getReport()
 			for line in report:
@@ -144,22 +157,28 @@ def passwordProtect():
 				continue
 		print 'Third button correct'
 		time.sleep(1)
+		""" TODO: Start over if third button wrong """
 
+""" Remote control for flight mode"""
 def fly():
+	""" Tell the DC9000 it should enter flight mode """
 	print 'Entering flight mode'
 	packet = [FLY, FLY, FLY, FLY, FLY, FLY]
 	ser.write(bytearray(packet))
 	
 	packet = [START, 0, STICK_ZERO, STICK_ZERO, STICK_ZERO, STOP]
 	
+	""" Read controller status """
 	for line in sys.stdin:
+		""" Handle controller disconnect gracefully """
 		if 'Disconnected' in line:
 			print 'Error: Controller has been disconnected'
 			packet = [0, 0, STICK_ZERO, STICK_ZERO, STICK_ZERO, 0]
 			ser.write(bytearray(packet))
 			exit()
-		""" New report """
+		""" New report so send RC packet """
 		if 'Report dump' in line:
+			""" Clip joysticks to deadband to eliminate noise """
 			if abs(packet[2] - STICK_ZERO) < DEADBAND:
 				packet[2] = STICK_ZERO
 			if abs(packet[3] - STICK_ZERO) < DEADBAND:
@@ -168,8 +187,10 @@ def fly():
 				packet[4] = STICK_ZERO
 			ser.write(bytearray(packet))
 			print packet
+		""" Search for control parameters """
 		for index, val in enumerate(ids):
 			if val in line:
+				""" Have to reverse the pitch axis. Rescale so 254,255 are reserved """
 				if index == 2:
 					packet[index] = int(int(filter(str.isdigit, str.lstrip(line, ' r2'))) / 255.0 * 253.0 * -1.0 + 253.0)
 				else:
@@ -182,6 +203,7 @@ def fly():
 				ser.write(bytearray(packet))
 				exit()
 
+""" Remote control for contract demo mode. Toggles motors enabled/disabled """
 def demo():
 	print 'Entering demo mode'
 	packet = [DEMO, DEMO, DEMO, DEMO, DEMO, DEMO]
@@ -196,15 +218,18 @@ def demo():
 			ser.write(bytearray(packet))
 			exit()
 
+""" Run everything """
 def main():
 	print 'Death Chopper 9000'
 	time.sleep(1)
 	
+	""" Password protection """
 	print 'Please enter the password'
 	passwordProtect()
 	
 	print 'Press a button: triangle for flight, circle for contract demo'
 	
+	""" Select operation mode """
 	op_mode = -1
 	while op_mode < 0:
 		line = sys.stdin.readline()

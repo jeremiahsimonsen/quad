@@ -110,30 +110,44 @@ DeathChopper9000::DeathChopper9000()
 	front_s = rear_s = left_s = right_s = 0.0f;
 }
 
+/**
+ * @brief Determine the desired mode of operation
+ *
+ * Toggle LEDs to indicate wait status. Waits until a mode command is received
+ * and calls the appropriate routine.
+ */
 void DeathChopper9000::start() {
 	uint8_t *buff = NULL;
 
+	// Turn an LED on so they are opposites
 	leds->turnOn(LED::RED);
 
 	while (1) {
+		// Toggle LEDs to indicate wait status
 		leds->toggle(LED::GREEN);
 		leds->toggle(LED::RED);
 
+		// Check if a mode command has been received
 		buff = usart_read();
 		if (buff != NULL) {
-			if (buff[0] == DEMO_CMD && buff[1] == DEMO_CMD && buff[2] == DEMO_CMD
-				&& buff[3] == DEMO_CMD && buff[4] == DEMO_CMD && buff[5] == DEMO_CMD)
+			// Check if demo command
+			if (buff[0] == DEMO_CMD && buff[1] == DEMO_CMD &&
+				buff[2] == DEMO_CMD && buff[3] == DEMO_CMD &&
+				buff[4] == DEMO_CMD && buff[5] == DEMO_CMD)
 			{
 				demo();
 			}
 
-			else if (buff[0] == FLY_CMD && buff[1] == FLY_CMD && buff[2] == FLY_CMD
-				&& buff[3] == FLY_CMD && buff[4] == FLY_CMD && buff[5] == FLY_CMD)
+			// Check if fly command
+			else if (buff[0] == FLY_CMD && buff[1] == FLY_CMD &&
+				buff[2] == FLY_CMD && buff[3] == FLY_CMD &&
+				buff[4] == FLY_CMD && buff[5] == FLY_CMD)
 			{
 				fly();
 			}
 		}
 
+		// Delay so LED blinking is visible
 		HAL_Delay(100);
 	}
 }
@@ -188,6 +202,13 @@ void DeathChopper9000::fly() {
 			}
 		}
 #endif
+		// Measure the height
+		float h = rangefinder.getDistIn();
+
+		// Measure and calculate the battery voltage
+		uint32_t vRaw = vSense.read();
+		float v = (float)vRaw * 3.0f / 4096.0f / 63.69e-3f;
+
 		// Measure the "output" angles
 		imu->getRollPitch(&roll_y, &pitch_y);
 
@@ -215,46 +236,57 @@ void DeathChopper9000::fly() {
 		right_s = throttle_cmd - u_roll_cmd;//  + yaw_cmd;
 		left_s  = throttle_cmd + u_roll_cmd;//  + yaw_cmd;
 
-//		if (enableMotors == false) {
-//			front.setSpeed(0.0f);
-//			rear.setSpeed(0.0f);
-//			left.setSpeed(0.0f);
-//			right.setSpeed(0.0f);
-//		} else {
-			front.setSpeed(front_s);
-			rear.setSpeed(rear_s);
-			left.setSpeed(left_s);
-			right.setSpeed(right_s);
-//		}
+		front.setSpeed(front_s);
+		rear.setSpeed(rear_s);
+		left.setSpeed(left_s);
+		right.setSpeed(right_s);
 
 		// Occasionally transmit information - avoids overwhelming UART port
 		if (iter % 10 == 0) {
 			char txBuff2[100];
-			sprintf(txBuff2, "%f\t%f\n\r", pitch_y, roll_y);
-//			sprintf(txBuff2, "Motors: %f %f %f %f\n\r", front_s, rear_s, right_s, left_s);
+//			sprintf(txBuff2, "%f\t%f\n\r", pitch_y, roll_y);
+			sprintf(txBuff2, "%f %f %f %f\n", pitch_y, roll_y, h, v);
 			usart_transmit((uint8_t *)txBuff2);
 		}
 
+		// Delay for fixed rate
 		iter++;
 		HAL_Delay(LOOP_DELAY);
 	}
 }
 
+/**
+ * @brief Demonstrate that the project meets contract
+ *
+ * @note Runs forever unless errors occur
+ *
+ * Measures the pitch and roll angles, height, and battery voltage.
+ * Transmits measured quantities via UART/XBee. If motors are enabled (toggle
+ * by pressing 'x' button on remote control), adjusts speed of left and right
+ * motors based on roll angle.
+ */
 void DeathChopper9000::demo() {
 	uint8_t *buff = NULL;
 	uint32_t iter = 0;
 	bool enableMotors = false;
 
+	// Run forever
 	while(1) {
+		/*
+		 * Check if data has been read from UART to see if motors should be
+		 * enabled or not
+		 */
 		buff = usart_read();
 		if (buff != NULL) {
-			if (buff[0] == DEMO_MOTOR_TOGGLE && buff[1] == DEMO_MOTOR_TOGGLE && buff[2] == DEMO_MOTOR_TOGGLE
-				&& buff[3] == DEMO_MOTOR_TOGGLE && buff[4] == DEMO_MOTOR_TOGGLE && buff[5] == DEMO_MOTOR_TOGGLE)
+			if (buff[0] == DEMO_MOTOR_TOGGLE && buff[1] == DEMO_MOTOR_TOGGLE &&
+				buff[2] == DEMO_MOTOR_TOGGLE && buff[3] == DEMO_MOTOR_TOGGLE &&
+				buff[4] == DEMO_MOTOR_TOGGLE && buff[5] == DEMO_MOTOR_TOGGLE)
 			{
 				enableMotors = !enableMotors;
 			}
 		}
 
+		// Toggle flight mode running light
 		leds->toggle(LED::ORANGE);
 
 		// Measure the "output" angles
@@ -263,11 +295,14 @@ void DeathChopper9000::demo() {
 		// Measure the height
 		float height = rangefinder.getDistIn();
 
+		// Measure and calculate the battery voltage
 		uint32_t vRaw = vSense.read();
 		float v = (float)vRaw * 3.0f / 4096.0f / 63.69e-3f;
 
+		// Calculate speed of motors based on orientation
 		float speed = (roll_y + 90.0f) / 180.0f * DEMO_MAX_SPEED;
 
+		// Set the motor speeds if motors are enabled
 		if (enableMotors == true) {
 			right.setSpeed(speed);
 			left.setSpeed(DEMO_MAX_SPEED - speed);
@@ -276,12 +311,14 @@ void DeathChopper9000::demo() {
 			left.setSpeed(0.0f);
 		}
 
+		// Occasionally transmit information to avoid overwhelming UART port
 		if (iter % 10 == 0) {
 			char txBuff[100];
-			sprintf(txBuff, "%f %f %f %f\n\r", pitch_y, roll_y, height, v);
+			sprintf(txBuff, "%f %f %f %f\n", pitch_y, roll_y, height, v);
 			usart_transmit((uint8_t *)txBuff);
 		}
 
+		// Delay for fixed rate
 		iter++;
 		HAL_Delay(LOOP_DELAY);
 	}

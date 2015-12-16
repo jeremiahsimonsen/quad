@@ -21,6 +21,7 @@
  */
 
 /** @addtogroup L3GD20H L3GD20H gyroscope chip-specific class
+ *  @brief Module for interfacing with the L3GD20H
  *  @{
  */
 
@@ -80,6 +81,7 @@ enum class L3GD20H_Reg {
 };
 
 /** @addtogroup L3GD20H_Macros Register Access Macros
+ *  @brief Macros for setting fields in registers
  *  @{
  */
 
@@ -404,6 +406,7 @@ enum class L3GD20H_Reg {
 /** @} Close L3GD20H_Macros group */
 
 /** @addtogroup L3GD20H_Config Configuration Options
+ *  @brief Configuration structures for setting sensor configuration
  *  @{
  */
 

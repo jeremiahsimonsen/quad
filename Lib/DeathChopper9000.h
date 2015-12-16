@@ -47,7 +47,7 @@ class DeathChopper9000 {
 private:
 	Adc vSense;					///< Adc for sensing battery voltage
 
-	IMU *imu;					///< Inertial measurement unit for orientation sensing
+	IMU *imu;					///< Inertial measurement unit - orientation sensing
 
 	Motor front;				///< Front motor
 	Motor rear;					///< Rear motor
@@ -93,7 +93,8 @@ private:
 	DeathChopper9000(DeathChopper9000 const&);
 	DeathChopper9000& operator=(DeathChopper9000 const&);
 
-	static DeathChopper9000 *dc9000Instance;
+	static DeathChopper9000 *dc9000Instance;	/**< Internal pointer to the
+													 global I2C singleton */
 
 	void fly(void);
 	void demo(void);

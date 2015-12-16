@@ -8,6 +8,7 @@
  *
  * @date Dec 13, 2015
  *
+ * Global quadcopter configuration options
  */
 
 /** @addtogroup DC9000
