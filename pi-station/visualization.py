@@ -2,6 +2,11 @@
 # Jeremiah Simonsen
 # Dec 16, 2015
 
+# This presents a more pleasant visual interface for displaying the measured
+# quantities for contract specifications. The Death Chopper 9000 is represented as
+# a box and reflects the angle of the quadcopter. Measured roll, pitch, height, and
+# voltage are also shown separately.
+
 # Based on:
 # Pololu MinIMU-9 + Arduino AHRS (Attitude and Heading Reference System)
 
@@ -27,8 +32,8 @@
 
 ################################################################################
 
-# This is a test/3D visualization program for the Pololu MinIMU-9 + Arduino
-# AHRS, based on "Test for Razor 9DOF IMU" by Jose Julio, copyright 2009.
+# This is a 3D visualization program based on "Test for Razor 9DOF IMU" 
+# by Jose Julio, copyright 2009.
 
 # This script needs VPython, pyserial and pywin modules
 
@@ -44,26 +49,27 @@ import math
 
 from time import time
 
+# Degrees to radians
 grad2rad = 3.141592/180.0
 
-# Check your COM port and baud rate
+# Open the XBee serial port
 ser = serial.Serial(port='COM9',baudrate=57600, parity=serial.PARITY_EVEN)
 
 # Main scene
 scene=display(title="Death Chopper 9000 Visualization")
 scene.range=(1.2,1.2,1.2)
-#scene.forward = (0,-1,-0.25)
 scene.forward = (1,0,-0.25)
 scene.up=(0,0,1)
 
-# Second scene (Roll, Pitch, Yaw)
+# Second scene (Roll, Pitch, Height, Voltage)
 scene2 = display(title='Death Chopper 9000 Visualization',x=0, y=0, width=500, height=200,center=(0,0,0), background=(0,0,0))
 scene2.range=(1,1.2,1)
 scene.width=500
 scene.y=200
 
 scene2.select()
-#Roll, Pitch, Yaw
+# Roll, Pitch, Height, Voltage
+# Make 'lines' using cylinder objects for a visual representation
 cil_roll = cylinder(pos=(-0.7,0,0),axis=(0.2,0,0),radius=0.01,color=color.red)
 cil_roll2 = cylinder(pos=(-0.7,0,0),axis=(-0.2,0,0),radius=0.01,color=color.red)
 cil_pitch = cylinder(pos=(-0.2,0,0),axis=(0.2,0,0),radius=0.01,color=color.green)
@@ -71,13 +77,13 @@ cil_pitch2 = cylinder(pos=(-0.2,0,0),axis=(-0.2,0,0),radius=0.01,color=color.gre
 cil_height = cylinder(pos=(0.1,-0.2,0),axis=(0.4,0,0),radius=0.01,color=color.yellow)
 cil_voltage = cylinder(pos=(0.6,-0.2,0),axis=(0.4,0,0),radius=0.01,color=color.cyan)
 
-#Roll,Pitch,Yaw labels
+# Roll,Pitch,Height,Voltage labels for numerical representation
 label(pos=(-0.7,0.3,0),text="Roll",box=0,opacity=0)
 label(pos=(-0.2,0.3,0),text="Pitch",box=0,opacity=0)
 label(pos=(0.3,0.3,0),text="Height",box=0,opacity=0)
 label(pos=(0.8,0.3,0),text="Voltage",box=0,opacity=0)
 
-
+# Labels to display the measured quantities
 L1 = label(pos=(-0.7,0.22,0),text="-",box=0,opacity=0)
 L2 = label(pos=(-0.2,0.22,0),text="-",box=0,opacity=0)
 L3 = label(pos=(0.3,0.22,0),text="-",box=0,opacity=0)
@@ -98,7 +104,7 @@ platform = box(length=1, height=0.05, width=1, color=color.blue)
 p_line = box(length=1,height=0.08,width=0.1,color=color.yellow)
 plat_arrow = arrow(color=color.green,axis=(1,0,0), shaftwidth=0.06, fixedwidth=1)
 
-
+# Open log file
 f = open("Serial"+str(time())+".txt", 'w')
 
 roll=0
@@ -108,6 +114,7 @@ height = 0
 voltage = 0
 nums = [0.0,0.0,0.0,0.0]
 while 1:
+    # Get a new packet
     line = ser.readline()
     print line
     f.write(line)                     # Write to the output log file
@@ -115,6 +122,8 @@ while 1:
         nums = map(float,line.split())
     except:
         print 'Invalid line'
+
+    # Parse packet
     pitch_deg = nums[0]
     pitch = -nums[0]*grad2rad
     roll_deg = nums[1]
@@ -124,6 +133,7 @@ while 1:
     voltage_raw = nums[3]
     voltage = -0.2 + (nums[3] / 12.6)*0.4
 
+    # Calculate new axis vectors and update objects
     axis=(cos(pitch)*cos(yaw),-cos(pitch)*sin(yaw),sin(pitch)) 
     up=(sin(roll)*sin(yaw)+cos(roll)*sin(pitch)*cos(yaw),sin(roll)*cos(yaw)-cos(roll)*sin(pitch)*sin(yaw),-cos(roll)*cos(pitch))
     platform.axis=axis
@@ -141,6 +151,8 @@ while 1:
     cil_pitch2.axis=(-0.2*cos(pitch),-0.2*sin(pitch),0)
     cil_height.pos=(0.1,height,0)
     cil_voltage.pos=(0.6,voltage,0)
+
+    # Display quantities
     L1.text = str(roll_deg)
     L2.text = str(pitch_deg)
     L3.text = str(height_raw)
