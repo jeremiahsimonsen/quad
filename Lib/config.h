@@ -35,10 +35,10 @@
 #if defined DEATH_CHOPPER
 
 #define BOARD Board::DEATH_CHOPPER_9000
-#define MOTOR_FRONT_PIN TimerPin::PD14	// PCB P3
-#define MOTOR_REAR_PIN  TimerPin::PD12	// PCB P5
-#define MOTOR_LEFT_PIN  TimerPin::PC8	// PCB P7
-#define MOTOR_RIGHT_PIN TimerPin::PC6	// PCB P9
+#define MOTOR_FRONT_PIN TimerPin::PD14	// PCB P7
+#define MOTOR_REAR_PIN  TimerPin::PC6	// PCB P5
+#define MOTOR_LEFT_PIN  TimerPin::PC8	// PCB P3
+#define MOTOR_RIGHT_PIN TimerPin::PD12	// PCB P9
 
 #ifndef RX_TIMEOUT_ENABLE
 #define RX_TIMEOUT_ENABLE
@@ -47,16 +47,17 @@
 #elif defined DISCOVERY_BOARD
 
 #define BOARD Board::STM32F4_DISCOVERY
-#define MOTOR_FRONT_PIN TimerPin::PD14	// PCB P3
-#define MOTOR_REAR_PIN  TimerPin::PD12	// PCB P5
-#define MOTOR_LEFT_PIN  TimerPin::PC8	// PCB P7
-#define MOTOR_RIGHT_PIN TimerPin::PC6	// PCB P9
+#define MOTOR_FRONT_PIN TimerPin::PC9
+#define MOTOR_REAR_PIN  TimerPin::PC7
+#define MOTOR_LEFT_PIN  TimerPin::PC6
+#define MOTOR_RIGHT_PIN TimerPin::PC8
 
 #else
 #error "No development board defined"
 #endif
 
 #define VSENSE_PIN AdcPin::PA2
+#define ISENSE_PIN AdcPin::PA3
 
 /*
  * Flight Parameters
@@ -64,6 +65,8 @@
 #define MAX_ANGLE 20.0f					// Maximum pitch & roll angle [deg]
 #define MAX_RATE  180.0f				// Maximum yaw rate [deg/s]
 #define V_MIN 0.2f
+#define MAX_SPEED 0.7f
+#define DEMO_MAX_SPEED 0.2f
 
 #define PITCH_KP 6.0f
 #define PITCH_KI 0.0f

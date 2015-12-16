@@ -65,8 +65,9 @@ MODE  = 3
 STICK_ZERO = 127
 DEADBAND = 10
 
-DEMO = 1
-FLY = 2
+FLY = 1
+DEMO = 2
+DEMO_MOTOR_TOGGLE = 3
 
 packet = []
 ids = ['dummy_id', 'r2_analog', pitch_LUT[MODE-1], roll_LUT[MODE-1], yaw_LUT[MODE-1]]
@@ -187,7 +188,9 @@ def demo():
 	packet = [DEMO, DEMO, DEMO, DEMO, DEMO, DEMO]
 	ser.write(bytearray(packet))
 	for line in sys.stdin:
-		pass
+		if 'button_cross' in line and 'True' in line:
+			packet = [DEMO_MOTOR_TOGGLE, DEMO_MOTOR_TOGGLE, DEMO_MOTOR_TOGGLE, DEMO_MOTOR_TOGGLE, DEMO_MOTOR_TOGGLE, DEMO_MOTOR_TOGGLE]
+			ser.write(bytearray(packet))
 
 def main():
 	print 'Death Chopper 9000'

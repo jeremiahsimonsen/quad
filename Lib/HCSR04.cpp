@@ -20,6 +20,7 @@
 
 #include "HCSR04.h"
 #include "errDC9000.h"
+#include "config.h"
 
 #ifdef __cplusplus
 extern "C" {

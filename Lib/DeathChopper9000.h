@@ -33,8 +33,9 @@
  */
 extern led *leds;						///< LED controller
 
-#define DEMO_CMD 1
-#define FLY_CMD 2
+#define FLY_CMD 1
+#define DEMO_CMD 2
+#define DEMO_MOTOR_TOGGLE 3
 
 /**
  * @brief Quadcopter abstraction

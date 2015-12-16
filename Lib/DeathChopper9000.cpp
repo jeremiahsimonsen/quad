@@ -61,7 +61,9 @@ DeathChopper9000::DeathChopper9000()
 	  front(MOTOR_FRONT_PIN), rear(MOTOR_REAR_PIN),
 	  left(MOTOR_LEFT_PIN), right(MOTOR_RIGHT_PIN),
 	  pitch_pid(PITCH_KP, PITCH_KI, PITCH_KD),
-	  roll_pid(ROLL_KP, ROLL_KI, ROLL_KD)
+	  roll_pid(ROLL_KP, ROLL_KI, ROLL_KD),
+	  rangefinder()
+
 {
 	/*
 	 * Initialize global variables
@@ -239,9 +241,48 @@ void DeathChopper9000::fly() {
 }
 
 void DeathChopper9000::demo() {
+	uint8_t *buff = NULL;
+	uint32_t iter = 0;
+	bool enableMotors = false;
+
 	while(1) {
+		buff = usart_read();
+		if (buff != NULL) {
+			if (buff[0] == DEMO_MOTOR_TOGGLE && buff[1] == DEMO_MOTOR_TOGGLE && buff[2] == DEMO_MOTOR_TOGGLE
+				&& buff[3] == DEMO_MOTOR_TOGGLE && buff[4] == DEMO_MOTOR_TOGGLE && buff[5] == DEMO_MOTOR_TOGGLE)
+			{
+				enableMotors = !enableMotors;
+			}
+		}
+
 		leds->toggle(LED::ORANGE);
-		HAL_Delay(50);
+
+		// Measure the "output" angles
+		imu->getRollPitch(&roll_y, &pitch_y);
+
+		// Measure the height
+		float height = rangefinder.getDistIn();
+
+		uint32_t vRaw = vSense.read();
+		float v = (float)vRaw * 3.0f / 4096.0f / 63.69e-3f;
+
+		float speed = (roll_y + 90.0f) / 180.0f * DEMO_MAX_SPEED;
+
+		if (enableMotors == true) {
+			right.setSpeed(speed);
+			left.setSpeed(DEMO_MAX_SPEED - speed);
+		} else {
+			right.setSpeed(0.0f);
+			left.setSpeed(0.0f);
+		}
+
+		if (iter % 10 == 0) {
+			char txBuff[100];
+			sprintf(txBuff, "%f %f %f %f\n\r", pitch_y, roll_y, height, v);
+		}
+
+		iter++;
+		HAL_Delay(LOOP_DELAY);
 	}
 }
 
