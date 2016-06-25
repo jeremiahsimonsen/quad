@@ -3,7 +3,6 @@
  *
  * @brief Death Chopper 9000
  *
- * @author Jasmine Despres
  * @author Jeremiah Simonsen
  *
  * @date Dec 13, 2015

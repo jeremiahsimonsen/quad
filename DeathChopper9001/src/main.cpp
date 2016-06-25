@@ -3,7 +3,6 @@
  *
  * @brief Main program
  *
- * @author Jasmine Despres
  * @author Jeremiah Simonsen
  *
  * @date Nov 21, 2015

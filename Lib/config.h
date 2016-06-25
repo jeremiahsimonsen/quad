@@ -3,7 +3,6 @@
  *
  * @brief Quadcopter configuration
  *
- * @author Jasmine Despres
  * @author Jeremiah Simonsen
  *
  * @date Dec 13, 2015

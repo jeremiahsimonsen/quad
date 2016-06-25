@@ -3,7 +3,6 @@
  *
  * @brief Death Chopper 9000
  *
- * @author Jasmine Despres
  * @author Jeremiah Simonsen
  *
  * @date Dec 13, 2015
@@ -64,7 +63,7 @@ private:
 	HCSR04 rangefinder;			///< Rangefinder for sensing height
 #endif
 
-	uint32_t rxTimeout;		///< UART RX timeout counter
+	uint32_t rxTimeout;			///< UART RX timeout counter
 
 	float throttle_cmd;			///< Throttle command from remote control
 	float pitch_cmd;			///< Pitch angle command from remote control
